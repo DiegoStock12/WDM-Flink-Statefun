@@ -1,0 +1,29 @@
+version: "1.0"
+module:
+  meta:
+    type: remote
+  spec:
+    functions:
+      - function:
+          meta:
+            kind: http
+            type: example/increment
+          spec:
+            endpoint: http://function-endpoint:8000/statefun
+            states:
+              - user
+            maxNumBatchRequests: 500
+            timeout: 2min
+    ingresses:
+      - ingress:
+          meta:
+            type: statefun.kafka.io/routable-protobuf-ingress
+            id: example/names
+          spec:
+            address: kafka-broker:9092
+            consumerGroupId: my-group-id
+            topics:
+              - topic: names
+                typeUrl: com.googleapis/example.IncreaseUserCount
+                targets:
+                  - example/increment

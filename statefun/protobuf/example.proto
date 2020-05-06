@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package example;
+
+
+// Message sent to increase the count of the user
+message IncreaseUserCount{
+    string name = 1;
+}
+
+// State of the user
+message User{
+    string name = 1;
+    int64 count = 2;
+}
