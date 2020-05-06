@@ -14,6 +14,26 @@ module:
               - user
             maxNumBatchRequests: 500
             timeout: 2min
+      
+      - function:
+          meta:
+            kind: http
+            type: example/request
+          spec:
+            endpoint: http://function-endpoint:8000/statefun
+            maxNumBatchRequests: 500
+            timeout: 2min
+
+      - function:
+          meta:
+            kind: http
+            type: example/reply
+          spec:
+            endpoint: http://function-endpoint:8000/statefun
+            maxNumBatchRequests: 500
+            timeout: 2min
+
+
     ingresses:
       - ingress:
           meta:
@@ -27,3 +47,9 @@ module:
                 typeUrl: com.googleapis/example.IncreaseUserCount
                 targets:
                   - example/increment
+
+              - topic: test
+                typeUrl: com.googleapis/example.ExampleRequest
+                targets:
+                  - example/request
+

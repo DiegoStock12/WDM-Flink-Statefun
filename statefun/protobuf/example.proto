@@ -13,3 +13,11 @@ message User{
     string name = 1;
     int64 count = 2;
 }
+
+message ExampleResponse{
+    string message = 1;
+}
+
+message ExampleRequest{
+    string message = 1;
+}

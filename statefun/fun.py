@@ -1,6 +1,7 @@
 """ File including the functions served by the endpoint """
+import typing
 
-from example_pb2 import IncreaseUserCount, User
+from example_pb2 import IncreaseUserCount, User, ExampleRequest, ExampleResponse
 
 from statefun import StatefulFunctions
 from statefun import RequestReplyHandler
@@ -19,6 +20,24 @@ def increment_user(context, request: IncreaseUserCount):
     context.state('user').pack(state)
 
     print(f"Current number for user {request.name} is {state.count}", flush=True)
+
+@functions.bind("example/request")
+def send_request(context, msg : typing.Union[ExampleRequest, ExampleResponse]):
+    if isinstance(msg, ExampleRequest):
+        print("Got a new request!, Sending message to other function", flush=True)
+        m = ExampleRequest()
+        m.message = msg.message
+        context.pack_and_send("example/reply", "id", m)
+    
+    elif isinstance(msg, ExampleResponse):
+        print(f"Got an example response with message {msg.message}", flush =True)
+
+@functions.bind("example/reply")
+def send_reponse(context, msg: ExampleRequest):
+    print(f"Got a message: {msg.message} replying...", flush =True)
+    m = ExampleResponse()
+    m.message = "repliying to you from example/reply"
+    context.pack_and_reply(m)
 
 
 # Use the handler and expose the endpoint
