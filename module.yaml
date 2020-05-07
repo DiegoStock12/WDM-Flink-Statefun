@@ -33,6 +33,28 @@ module:
             maxNumBatchRequests: 500
             timeout: 2min
 
+      - function:
+          meta:
+            kind: http
+            type: users/create
+          spec:
+            endpoint: http://function-endpoint:8000/statefun
+            states:
+              - count
+            maxNumBatchRequests: 500
+            timeout: 2min
+
+      - function:
+          meta:
+            kind: http
+            type: users/user
+          spec:
+            endpoint: http://function-endpoint:8000/statefun
+            states:
+              - user
+            maxNumBatchRequests: 500
+            timeout: 2min
+
 
     ingresses:
       - ingress:
@@ -52,8 +74,27 @@ module:
                 typeUrl: com.googleapis/example.ExampleRequest
                 targets:
                   - example/request
+
+              - topic: users-create
+                typeUrl: com.googleapis/users.CreateUserRequest
+                targets:
+                  - users/create
+
+              - topic: users
+                typeUrl: com.googleapis/users.UserRequest
+                targets:
+                  - users/user
     
     egresses:
+      - egress:
+          meta:
+            type: statefun.kafka.io/generic-egress
+            id: users/out
+          spec:
+            address: kafka-broker:9092
+            deliverySemantic:
+              type: exactly-once
+              transactionTimeoutMillis: 100000
       - egress:
           meta:
             type: statefun.kafka.io/generic-egress
