@@ -2,6 +2,14 @@ from flask import Flask, jsonify
 
 from example_pb2 import IncreaseUserCount, ExampleResponse
 
+# Import the messages to be sent to the statefun cluster
+from users_pb2 import CreateUserRequest, CreateUserResponse
+from users_pb2 import RemoveUserRequest, RemoveUserResponse
+from users_pb2 import FindUserRequest
+from users_pb2 import SubtractCreditRequest, SubtractCreditResponse
+from users_pb2 import AddCreditRequest, AddCreditResponse
+from users_pb2 import UserRequest
+
 from kafka import KafkaProducer, KafkaConsumer
 from kafka.errors import NoBrokersAvailable
 
@@ -11,6 +19,10 @@ import time
 app = Flask(__name__)
 
 KAFKA_BROKER = "kafka-broker:9092"
+USER_TOPIC = "users"
+USER_CREATION_TOPIC = "users-create"
+
+
 brokers_available = False
 producer = None
 
@@ -20,14 +32,85 @@ while not brokers_available:
         consumer = KafkaConsumer(
                 'greetings', 
                 bootstrap_servers = [KAFKA_BROKER], 
-                auto_offset_reset='earliest',
-                group_id = 'api-endpoint-users'
+                auto_offset_reset='earliest'
             )
         brokers_available = True
         print("Got the broker!", flush=True)
     except NoBrokersAvailable:
         time.sleep(4)
         continue
+
+
+# ENDPOINTS OF THE USER API
+
+@app.route('/users/create', methods=['POST'])
+def create_user():
+    """ Sends a create user request to the cluster"""
+    request = CreateUserRequest()
+
+    send_msg(USER_CREATION_TOPIC, key="create", value = request)
+    return "User create"
+
+
+@app.route('/users/remove/<int:user_id>', methods=['DELETE'])
+def remove_user(user_id):
+    """ Sends a remove user request to the statefun cluster"""
+    request = UserRequest()
+    request.remove_user.id = user_id
+
+    send_msg(USER_TOPIC, key=user_id, value = request)
+    return "User remove"
+
+
+@app.route('/users/find/<int:user_id>', methods=['GET'])
+def find_user(user_id):
+    """ Searches for a user in the cluster """
+    request = UserRequest()
+    request.find_user.id = user_id
+
+    send_msg(USER_TOPIC, key=user_id, value = request)
+    return "User find"
+
+@app.route('/users/credit/<int:user_id>', methods=['GET'])
+def get_credit(user_id):
+    # this can do the same as the find user as long as 
+    # we just return the number only
+    find_user(user_id)
+
+    # Here we should get the response and extract the credit 
+    # instead of the whole user
+
+@app.route('/users/credit/subtract/<int:user_id>/<int:amount>', methods=['POST'])
+def subtract_credit(user_id, amount):
+    
+    request = UserRequest()
+    request.subtract_credit.id = user_id
+    request.subtract_credit.amount = amount
+
+    send_msg(USER_TOPIC, key=user_id, value=request)
+    return "User subtract"
+
+@app.route('/users/credit/add/<int:user_id>/<int:amount>', methods=['POST'])
+def add_credit(user_id, amount):
+    
+    request = UserRequest()
+    request.add_credit.id = user_id
+    request.add_credit.amount = amount
+    
+    send_msg(USER_TOPIC, key=user_id, value=request)
+    return "User add"
+
+
+def send_msg(topic, key, value):
+    """ Sends a protobuf message to the specified topic"""
+    global producer 
+
+    k = str(key).encode('utf-8')
+    v = value.SerializeToString()
+
+    producer.send(topic=topic, key= k, value = v)
+
+
 
 @app.route('/user/<string:name>/add')
 def increment_user(name):
