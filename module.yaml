@@ -55,6 +55,16 @@ module:
             maxNumBatchRequests: 500
             timeout: 2min
 
+      - function:
+          meta:
+            kind: http
+            type: orders/create
+          spec:
+            endpoint: http://orders-endpoint:8001/statefun
+            states:
+              - order
+            maxNumBatchRequests: 500
+            timeout: 2min
 
     ingresses:
       - ingress:
@@ -84,6 +94,11 @@ module:
                 typeUrl: com.googleapis/users.UserRequest
                 targets:
                   - users/user
+
+              - topic: orders-create
+                typeUrl: com.googleapis/orders.CreateOrder
+                targets:
+                  - orders/create
     
     egresses:
       - egress:

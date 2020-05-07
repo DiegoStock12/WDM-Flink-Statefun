@@ -1,6 +1,7 @@
 from flask import Flask, jsonify
 
 from example_pb2 import IncreaseUserCount, ExampleResponse
+from orders_pb2 import CreateOrder
 
 # Import the messages to be sent to the statefun cluster
 from users_pb2 import CreateUserRequest, CreateUserResponse
@@ -140,6 +141,24 @@ def increment_user(name):
             print("Got a response for the user {} --> {}".format(name, msg.value), flush=True)
 
             return jsonify({'response': msg.value.decode('utf-8')})
+
+
+@app.route('/users/<int:userId>/order', methods=['GET'])
+def create_order(userId):
+    global producer, consumer
+
+    print("Received request to create order for user", flush=True)
+    request = CreateOrder()
+    request.userId = userId
+
+    if producer is None:
+        print("Creating the producer", flush=True)
+        producer = KafkaProducer(bootstrap_servers=[KAFKA_BROKER])
+        print("Got the broker!", flush=True)
+
+    send_msg("orders-create", "create_order", request)
+
+    return jsonify({'response': 'asdasd'})
 
 @app.route('/test/<string:name>')
 def test(name):
