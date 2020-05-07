@@ -1,4 +1,5 @@
 from kafka import KafkaProducer
+from kafka import KafkaConsumer
 
 from sys import argv
 
@@ -31,4 +32,17 @@ elif function == "test":
     val = request.SerializeToString()
     producer.send(topic="test", key=key, value=val)
     producer.flush()
+
+elif function == 'consume':
+    print("Starting consumer")
+    consumer = KafkaConsumer(
+        'greetings', 
+        bootstrap_servers = [KAFKA_BROKER], 
+        auto_offset_reset='earliest',
+        group_id = 'api-endp'
+    )
+
+    while True:
+        for msg in consumer:
+            print(msg)
 

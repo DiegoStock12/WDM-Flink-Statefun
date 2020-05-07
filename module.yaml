@@ -52,4 +52,16 @@ module:
                 typeUrl: com.googleapis/example.ExampleRequest
                 targets:
                   - example/request
+    
+    egresses:
+      - egress:
+          meta:
+            type: statefun.kafka.io/generic-egress
+            id: example/greets
+          spec:
+            address: kafka-broker:9092
+            deliverySemantic:
+              type: exactly-once
+              transactionTimeoutMillis: 100000
+              
 

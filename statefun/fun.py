@@ -5,6 +5,7 @@ from example_pb2 import IncreaseUserCount, User, ExampleRequest, ExampleResponse
 
 from statefun import StatefulFunctions
 from statefun import RequestReplyHandler
+from statefun import kafka_egress_record
 
 functions = StatefulFunctions()
 
@@ -20,6 +21,17 @@ def increment_user(context, request: IncreaseUserCount):
     context.state('user').pack(state)
 
     print(f"Current number for user {request.name} is {state.count}", flush=True)
+
+    # send it to the exit topic
+    response = compute_response(name= request.name)
+    egress_message = kafka_egress_record(topic='greetings', key=request.name, value=response)
+    context.pack_and_send_egress("example/greets", egress_message)
+    print(f"Sent message {response} to topic greetings", flush=True)
+
+def compute_response(name):
+    response = ExampleResponse()
+    response.message = "Hello! This is a response for user {}".format(name)
+    return response
 
 @functions.bind("example/request")
 def send_request(context, msg : typing.Union[ExampleRequest, ExampleResponse]):
