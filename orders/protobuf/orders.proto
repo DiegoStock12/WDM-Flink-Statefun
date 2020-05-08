@@ -20,3 +20,14 @@ message CreateOrderWithId{
 message CreateOrderResponse{
     int64 orderId = 1;
 }
+
+message OrderRequest{
+
+    oneof message {
+        RemoveOrderRequest remove_order = 1;
+    }
+}
+
+message RemoveOrderRequest{
+    int64 id = 1;
+}

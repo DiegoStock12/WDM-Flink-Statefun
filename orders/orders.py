@@ -1,7 +1,8 @@
 """ File including the functions served by the endpoint """
 import logging
+import typing
 
-from orders_pb2 import Order, CreateOrder, CreateOrderWithId, CreateOrderResponse
+from orders_pb2 import Order, CreateOrder, CreateOrderWithId, CreateOrderResponse, OrderRequest
 from users_pb2 import Count
 
 from statefun import StatefulFunctions, RequestReplyHandler, kafka_egress_record
@@ -44,19 +45,34 @@ def create_order(context, msg: CreateOrder):
 
 
 @functions.bind("orders/order")
-def operate_order(context, msg: CreateOrderWithId):
+def operate_order(context, msg: typing.Union[CreateOrderWithId, OrderRequest]):
+    """ Does all the operations with a single order """
     response = None
 
     if isinstance(msg, CreateOrderWithId):
         state = Order()
         state.id = msg.id
         state.userId = msg.userId
+        # state.items.append([1])
 
         context.state('order').pack(state)
         logger.info(f'Created new order with id {msg.id}')
         response = CreateOrderResponse()
         response.orderId = msg.id
 
+    elif isinstance(msg, OrderRequest):
+        logger.info("Received order request!")
+
+        msg_type = msg.WhichOneof('message')
+        logger.info(f'Got message of type {msg_type}')
+
+        if msg_type == 'remove_order':
+            state = context.state('order').unpack(Order)
+            if not state:
+                logger.info("Order does not exists.")
+            else:
+                logger.info(f"Deleting the order with it {msg.remove_order.id}")
+                del context['order']
     else:
         logger.error('Received unknown message type!')
 
@@ -67,6 +83,7 @@ def operate_order(context, msg: CreateOrderWithId):
             value=response
             )
         context.pack_and_send_egress("orders/out", egress_message)
+
 
 # Use the handler and expose the endpoint
 handler = RequestReplyHandler(functions)

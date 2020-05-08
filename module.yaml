@@ -111,6 +111,11 @@ module:
                 typeUrl: com.googleapis/orders.CreateOrder
                 targets:
                   - orders/create
+
+              - topic: orders
+                typeUrl: com.googleapis/orders.OrderRequest
+                targets:
+                  - orders/order
     
     egresses:
       - egress:
