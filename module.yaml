@@ -62,9 +62,21 @@ module:
           spec:
             endpoint: http://orders-endpoint:8001/statefun
             states:
+              - count
+            maxNumBatchRequests: 500
+            timeout: 2min
+
+      - function:
+          meta:
+            kind: http
+            type: orders/order
+          spec:
+            endpoint: http://orders-endpoint:8001/statefun
+            states:
               - order
             maxNumBatchRequests: 500
             timeout: 2min
+
 
     ingresses:
       - ingress:
@@ -105,6 +117,15 @@ module:
           meta:
             type: statefun.kafka.io/generic-egress
             id: users/out
+          spec:
+            address: kafka-broker:9092
+            deliverySemantic:
+              type: exactly-once
+              transactionTimeoutMillis: 100000
+      - egress:
+          meta:
+            type: statefun.kafka.io/generic-egress
+            id: orders/out
           spec:
             address: kafka-broker:9092
             deliverySemantic:

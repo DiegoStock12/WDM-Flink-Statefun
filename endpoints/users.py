@@ -143,7 +143,7 @@ def increment_user(name):
             return jsonify({'response': msg.value.decode('utf-8')})
 
 
-@app.route('/users/<int:userId>/order', methods=['GET'])
+@app.route('/orders/create/<int:userId>', methods=['POST'])
 def create_order(userId):
     global producer, consumer
 

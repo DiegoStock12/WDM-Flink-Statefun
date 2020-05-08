@@ -2,14 +2,6 @@ syntax = "proto3";
 
 package orders;
 
-// State of the user
-message UserOrder{
-    string name = 1;
-    int64 count = 2;
-    int64 id = 3;
-}
-
-// State of the order
 message Order{
     int64 id = 1;
     int64 userId = 2;
@@ -18,4 +10,13 @@ message Order{
 
 message CreateOrder{
     int64 userId = 1;
+}
+
+message CreateOrderWithId{
+    int64 id = 1;
+    int64 userId = 2;
+}
+
+message CreateOrderResponse{
+    int64 orderId = 1;
 }

@@ -18,55 +18,10 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='orders',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=b'\n\x15protobuf/orders.proto\x12\x06orders\"4\n\tUserOrder\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\r\n\x05\x63ount\x18\x02 \x01(\x03\x12\n\n\x02id\x18\x03 \x01(\x03\"2\n\x05Order\x12\n\n\x02id\x18\x01 \x01(\x03\x12\x0e\n\x06userId\x18\x02 \x01(\x03\x12\r\n\x05items\x18\x03 \x03(\x03\"\x1d\n\x0b\x43reateOrder\x12\x0e\n\x06userId\x18\x01 \x01(\x03\x62\x06proto3'
+  serialized_pb=b'\n\x15protobuf/orders.proto\x12\x06orders\"2\n\x05Order\x12\n\n\x02id\x18\x01 \x01(\x03\x12\x0e\n\x06userId\x18\x02 \x01(\x03\x12\r\n\x05items\x18\x03 \x03(\x03\"\x1d\n\x0b\x43reateOrder\x12\x0e\n\x06userId\x18\x01 \x01(\x03\"/\n\x11\x43reateOrderWithId\x12\n\n\x02id\x18\x01 \x01(\x03\x12\x0e\n\x06userId\x18\x02 \x01(\x03\"&\n\x13\x43reateOrderResponse\x12\x0f\n\x07orderId\x18\x01 \x01(\x03\x62\x06proto3'
 )
 
 
-
-
-_USERORDER = _descriptor.Descriptor(
-  name='UserOrder',
-  full_name='orders.UserOrder',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='name', full_name='orders.UserOrder.name', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='count', full_name='orders.UserOrder.count', index=1,
-      number=2, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='id', full_name='orders.UserOrder.id', index=2,
-      number=3, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=33,
-  serialized_end=85,
-)
 
 
 _ORDER = _descriptor.Descriptor(
@@ -109,8 +64,8 @@ _ORDER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=87,
-  serialized_end=137,
+  serialized_start=33,
+  serialized_end=83,
 )
 
 
@@ -140,21 +95,84 @@ _CREATEORDER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=139,
-  serialized_end=168,
+  serialized_start=85,
+  serialized_end=114,
 )
 
-DESCRIPTOR.message_types_by_name['UserOrder'] = _USERORDER
+
+_CREATEORDERWITHID = _descriptor.Descriptor(
+  name='CreateOrderWithId',
+  full_name='orders.CreateOrderWithId',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='id', full_name='orders.CreateOrderWithId.id', index=0,
+      number=1, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='userId', full_name='orders.CreateOrderWithId.userId', index=1,
+      number=2, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=116,
+  serialized_end=163,
+)
+
+
+_CREATEORDERRESPONSE = _descriptor.Descriptor(
+  name='CreateOrderResponse',
+  full_name='orders.CreateOrderResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='orderId', full_name='orders.CreateOrderResponse.orderId', index=0,
+      number=1, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=165,
+  serialized_end=203,
+)
+
 DESCRIPTOR.message_types_by_name['Order'] = _ORDER
 DESCRIPTOR.message_types_by_name['CreateOrder'] = _CREATEORDER
+DESCRIPTOR.message_types_by_name['CreateOrderWithId'] = _CREATEORDERWITHID
+DESCRIPTOR.message_types_by_name['CreateOrderResponse'] = _CREATEORDERRESPONSE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
-
-UserOrder = _reflection.GeneratedProtocolMessageType('UserOrder', (_message.Message,), {
-  'DESCRIPTOR' : _USERORDER,
-  '__module__' : 'protobuf.orders_pb2'
-  # @@protoc_insertion_point(class_scope:orders.UserOrder)
-  })
-_sym_db.RegisterMessage(UserOrder)
 
 Order = _reflection.GeneratedProtocolMessageType('Order', (_message.Message,), {
   'DESCRIPTOR' : _ORDER,
@@ -169,6 +187,20 @@ CreateOrder = _reflection.GeneratedProtocolMessageType('CreateOrder', (_message.
   # @@protoc_insertion_point(class_scope:orders.CreateOrder)
   })
 _sym_db.RegisterMessage(CreateOrder)
+
+CreateOrderWithId = _reflection.GeneratedProtocolMessageType('CreateOrderWithId', (_message.Message,), {
+  'DESCRIPTOR' : _CREATEORDERWITHID,
+  '__module__' : 'protobuf.orders_pb2'
+  # @@protoc_insertion_point(class_scope:orders.CreateOrderWithId)
+  })
+_sym_db.RegisterMessage(CreateOrderWithId)
+
+CreateOrderResponse = _reflection.GeneratedProtocolMessageType('CreateOrderResponse', (_message.Message,), {
+  'DESCRIPTOR' : _CREATEORDERRESPONSE,
+  '__module__' : 'protobuf.orders_pb2'
+  # @@protoc_insertion_point(class_scope:orders.CreateOrderResponse)
+  })
+_sym_db.RegisterMessage(CreateOrderResponse)
 
 
 # @@protoc_insertion_point(module_scope)

@@ -1,29 +1,72 @@
 """ File including the functions served by the endpoint """
+import logging
 
-from orders_pb2 import Order, CreateOrder
+from orders_pb2 import Order, CreateOrder, CreateOrderWithId, CreateOrderResponse
+from users_pb2 import Count
 
-from statefun import StatefulFunctions
-from statefun import RequestReplyHandler
+from statefun import StatefulFunctions, RequestReplyHandler, kafka_egress_record
 
 functions = StatefulFunctions()
+
+FORMAT = '[%(asctime)s] %(levelname)-8s %(message)s'
+logging.basicConfig(level=logging.DEBUG, format=FORMAT)
+
+logger = logging.getLogger()
+
+ORDER_EVENTS_TOPIC = "order-events"
 
 
 @functions.bind("orders/create")
 def create_order(context, msg: CreateOrder):
-    print(f"Got a message: replying...", flush=True)
-    # TODO Check if user exists.
-    state1 = context.state('order').unpack(Order)
-    if not state1:
-        print("State didn't existed", flush=True)
+    """ Creates an order by sending a message to the order function 
+    - Only has one state (int) that saves the current id to be 
+    assigned to the next order """
+
+    logger.info("Creating order...")
+
+    # get the current id to assign
+    state = context.state('count').unpack(Count)
+
+    if not state:
+        state = Count()
+        state.num = 0
+
+    request = CreateOrderWithId()
+    request.id = state.num
+    request.userId = msg.userId
+    print(f"Sending request to function with id {request.id}", flush=True)
+    context.pack_and_send("orders/order", str(request.id), request)
+
+    # update the next id to assign and save
+    state.num += 1
+    context.state('count').pack(state)
+    logger.info('Next state to assign is {}'.format(state.num))
+
+
+@functions.bind("orders/order")
+def operate_order(context, msg: CreateOrderWithId):
+    response = None
+
+    if isinstance(msg, CreateOrderWithId):
+        state = Order()
+        state.id = msg.id
+        state.userId = msg.userId
+
+        context.state('order').pack(state)
+        logger.info(f'Created new order with id {msg.id}')
+        response = CreateOrderResponse()
+        response.orderId = msg.id
+
     else:
-        print("State existed", flush=True)
+        logger.error('Received unknown message type!')
 
-    state = Order()
-    state.userId = msg.userId
-    state.items = [1]
-    state.id = 1
-    context.state('order').pack(state)
-
+    if response:
+        egress_message = kafka_egress_record(
+            topic=ORDER_EVENTS_TOPIC,
+            key="example".encode('utf-8'),
+            value=response
+            )
+        context.pack_and_send_egress("orders/out", egress_message)
 
 # Use the handler and expose the endpoint
 handler = RequestReplyHandler(functions)
@@ -31,7 +74,6 @@ handler = RequestReplyHandler(functions)
 from flask import Flask, request, make_response
 
 app = Flask(__name__)
-
 
 @app.route('/statefun', methods=['POST'])
 def handle():
