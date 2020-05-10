@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package stock;
+
+// Message used to store the user data
+// in the statefun and also what we give back to the
+// queries
+message ItemData {
+    uint64 id = 1;
+    int64 price = 2;
+    int64 amount = 3;
+}
+
+// Message used to keep track of the current max
+// id to be assigned
+message Count{
+    uint64 num = 1;
+}
+
+
+message CreateItemRequest{
+    int64 price = 1;
+}
+
+message CreateItemResponse{
+    string result = 1;
+}
