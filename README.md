@@ -6,3 +6,9 @@ Instructions for getting the Apache Flink Docker container:
 
 Run the whole demo:
 * `docker-compose up`
+* `docker-compose built -> Tomaz command here... for auto-detect changes and rebuilt`
+
+# Ask Asterios
+
+* How do we scale the Flink side -> not just duplicating containers, need to share state as well -> how to configure and define this in Kubernetes?
+* What about the replies -> should be non-blocking -> save ID per request and listen on an reply output topic?
