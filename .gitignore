@@ -4,3 +4,4 @@ checkpoint-dir
 .vscode
 example_pb2*
 test.py*
+.idea
