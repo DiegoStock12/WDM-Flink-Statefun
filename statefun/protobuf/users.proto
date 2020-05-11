@@ -36,32 +36,31 @@ message CreateUserWithId{
     uint64 id = 1;
 }
 
-// GET USER MESSAGE
-
-message FindUserRequest{
-    uint64 id = 1;
-}
-
-// USER DELETION MESSAGES
-message RemoveUserRequest{
-    uint64 id = 1;
-}
-
-// SUBTRACT CREDIT MESSAGES
-message SubtractCreditRequest{
-    uint64 id = 1;
-    int64 amount =2;
-}
-
-// ADD CREDIT MESSAGES
-message AddCreditRequest{
-    uint64 id = 1;
-    int64 amount = 2;
-}
 
 // Message containing the others
 message UserRequest{
 
+    // GET USER MESSAGE
+    message FindUserRequest{
+    uint64 id = 1;
+}
+
+    // USER DELETION MESSAGES
+    message RemoveUserRequest{
+        uint64 id = 1;
+    }
+
+    // SUBTRACT CREDIT MESSAGES
+    message SubtractCreditRequest{
+        uint64 id = 1;
+        int64 amount =2;
+    }
+
+    // ADD CREDIT MESSAGES
+    message AddCreditRequest{
+        uint64 id = 1;
+        int64 amount = 2;
+    }
 
     oneof message {
         FindUserRequest find_user = 1;
