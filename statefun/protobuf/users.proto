@@ -7,7 +7,7 @@ package users;
 * to the user endpoint
 */
 
-// Message used to store the user data 
+// Message used to store the user data
 // in the statefun and also what we give back to the
 // queries
 message UserData{

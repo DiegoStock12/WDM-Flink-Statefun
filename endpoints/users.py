@@ -31,8 +31,8 @@ while not brokers_available:
     try:
         producer = KafkaProducer(bootstrap_servers=[KAFKA_BROKER])
         consumer = KafkaConsumer(
-                'greetings', 
-                bootstrap_servers = [KAFKA_BROKER], 
+                'greetings',
+                bootstrap_servers = [KAFKA_BROKER],
                 auto_offset_reset='earliest'
             )
         brokers_available = True
@@ -46,6 +46,7 @@ while not brokers_available:
 
 @app.route('/users/create', methods=['POST'])
 def create_user():
+    print('create user function called', flush=True)
     """ Sends a create user request to the cluster"""
     request = CreateUserRequest()
 
@@ -74,16 +75,16 @@ def find_user(user_id):
 
 @app.route('/users/credit/<int:user_id>', methods=['GET'])
 def get_credit(user_id):
-    # this can do the same as the find user as long as 
+    # this can do the same as the find user as long as
     # we just return the number only
     find_user(user_id)
 
-    # Here we should get the response and extract the credit 
+    # Here we should get the response and extract the credit
     # instead of the whole user
 
 @app.route('/users/credit/subtract/<int:user_id>/<int:amount>', methods=['POST'])
 def subtract_credit(user_id, amount):
-    
+
     request = UserRequest()
     request.subtract_credit.id = user_id
     request.subtract_credit.amount = amount
@@ -93,18 +94,18 @@ def subtract_credit(user_id, amount):
 
 @app.route('/users/credit/add/<int:user_id>/<int:amount>', methods=['POST'])
 def add_credit(user_id, amount):
-    
+
     request = UserRequest()
     request.add_credit.id = user_id
     request.add_credit.amount = amount
-    
+
     send_msg(USER_TOPIC, key=user_id, value=request)
     return "User add"
 
 
 def send_msg(topic, key, value):
     """ Sends a protobuf message to the specified topic"""
-    global producer 
+    global producer
 
     k = str(key).encode('utf-8')
     v = value.SerializeToString()
@@ -179,12 +180,13 @@ def remove_order(orderId):
 
 @app.route('/test/<string:name>')
 def test(name):
+    print("received requist", flush=True)
     return f"It's working {name}!!"
 
 @app.route('/')
 def basic():
     return "Hello world!"
-    
+
 
 if __name__ == "__main__":
     app.run()
