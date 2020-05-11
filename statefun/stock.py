@@ -10,11 +10,16 @@ from statefun import kafka_egress_record
 
 functions = StatefulFunctions()
 
-# Functions to deal with user management
+FORMAT = '[%(asctime)s] %(levelname)-8s %(message)s'
+logging.basicConfig(level=logging.DEBUG, format=FORMAT)
 
-# Function to create users
-# extracts the next free user id from its state and
-# sends a creation request to that new user function
+logger = logging.getLogger()
+
+# Functions to deal with stock management
+
+# Function to create stock
+# Extracts the next free stock id from its state and
+# Sends a creation request to that new user function
 @functions.bind("stock/create")
 def create_item(context, request: CreateItemRequest):
     """ Creates an item by sending a message to the user function
@@ -40,8 +45,3 @@ def create_item(context, request: CreateItemRequest):
     state.num += 1
     context.state('count').pack(state)
     logger.info('Next state to assign is {}'.format(state.num))
-
-FORMAT = '[%(asctime)s] %(levelname)-8s %(message)s'
-logging.basicConfig(level=logging.DEBUG, format=FORMAT)
-
-logger = logging.getLogger()
