@@ -71,8 +71,17 @@ def operate_order(context, msg: typing.Union[CreateOrderWithId, OrderRequest]):
             if not state:
                 logger.info("Order does not exists.")
             else:
-                logger.info(f"Deleting the order with it {msg.remove_order.id}")
+                logger.info(f"Deleting the order with id: {msg.remove_order.id}")
                 del context['order']
+
+        elif msg_type == 'find_order':
+            state = context.state('order').unpack(Order)
+            if not state:
+                logger.info("Order does not exist.")
+            else:
+                logger.info(f"{state}")
+                logger.info(f"Returning order with id: {msg.find_order.id}")
+
     else:
         logger.error('Received unknown message type!')
 

@@ -160,6 +160,7 @@ def create_order(userId):
 
     return jsonify({'response': 'Created order'})
 
+
 @app.route('/orders/remove/<int:orderId>', methods=['DELETE'])
 def remove_order(orderId):
     global producer, consumer
@@ -176,6 +177,24 @@ def remove_order(orderId):
     send_msg("orders", orderId, request)
 
     return jsonify({'response': 'Removed order'})
+
+
+@app.route('/orders/find/<int:orderId>', methods=['GET'])
+def get_order(orderId):
+    global producer, consumer
+
+    print("Received request to find an order.", flush=True)
+    request = OrderRequest()
+    request.find_order.id = orderId
+
+    if producer is None:
+        print("Creating the producer", flush=True)
+        producer = KafkaProducer(bootstrap_servers=[KAFKA_BROKER])
+        print("Got the broker!", flush=True)
+
+    send_msg("orders", orderId, request)
+
+    return jsonify({'response': 'Found order'})
 
 @app.route('/test/<string:name>')
 def test(name):
