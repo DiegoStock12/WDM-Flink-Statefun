@@ -24,16 +24,15 @@ message Count{
 // USER CREATION MESSAGES
 
 message CreateUserRequest{
+    string request_id = 1;
 }
 
-message CreateUserResponse{
-    string result = 1;
-}
 
 // internal to be used by the statefun
 // between the create_user and the user function
 message CreateUserWithId{
     uint64 id = 1;
+    string request_id = 2;
 }
 
 
@@ -62,23 +61,19 @@ message UserRequest{
         int64 amount = 2;
     }
 
+    string request_id = 1;
+
     oneof message {
-        FindUserRequest find_user = 1;
-        RemoveUserRequest remove_user = 2;
-        SubtractCreditRequest subtract_credit = 3;
-        AddCreditRequest add_credit = 4;
+        FindUserRequest find_user = 2;
+        RemoveUserRequest remove_user = 3;
+        SubtractCreditRequest subtract_credit = 4;
+        AddCreditRequest add_credit = 5;
     }
 
 }
 
-message AddCreditResponse{
-    string result = 1;
-}
-
-message SubtractCreditResponse{
-    string result = 1;
-}
-
-message RemoveUserResponse{
-    string result = 1;
+// Global response given for user operationsusers_pb2.py
+message UserResponse{
+    string request_id = 1;
+    string result = 2;
 }

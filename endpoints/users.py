@@ -1,20 +1,15 @@
 from flask import Flask, jsonify
 
-from example_pb2 import IncreaseUserCount, ExampleResponse
-
 # Import the messages to be sent to the statefun cluster
-from users_pb2 import CreateUserRequest, CreateUserResponse
-from users_pb2 import RemoveUserRequest, RemoveUserResponse
-from users_pb2 import FindUserRequest
-from users_pb2 import SubtractCreditRequest, SubtractCreditResponse
-from users_pb2 import AddCreditRequest, AddCreditResponse
-from users_pb2 import UserRequest
+from users_pb2 import CreateUserRequest
+from users_pb2 import UserRequest, UserResponse
 
 from kafka import KafkaProducer, KafkaConsumer
 from kafka.errors import NoBrokersAvailable
 
 import threading
 import time
+import uuid
 
 app = Flask(__name__)
 
@@ -22,18 +17,21 @@ KAFKA_BROKER = "kafka-broker:9092"
 USER_TOPIC = "users"
 USER_CREATION_TOPIC = "users-create"
 
+USER_EVENTS_TOPIC = "user-events"
 
 brokers_available = False
 producer = None
+
+new_messages = {}
 
 while not brokers_available:
     try:
         producer = KafkaProducer(bootstrap_servers=[KAFKA_BROKER])
         consumer = KafkaConsumer(
-                'greetings', 
-                bootstrap_servers = [KAFKA_BROKER], 
-                auto_offset_reset='earliest'
-            )
+            'user-events',
+            bootstrap_servers=[KAFKA_BROKER],
+            auto_offset_reset='earliest',
+        )
         brokers_available = True
         print("Got the broker!", flush=True)
     except NoBrokersAvailable:
@@ -41,15 +39,46 @@ while not brokers_available:
         continue
 
 
+def consume_forever(cons: KafkaConsumer):
+    print('Strated consumer thread', flush=True)
+    for msg in cons:
+        print(f'Received message! {msg.value}', flush=True)
+        resp = UserResponse()
+        resp.ParseFromString(msg.value)
+        new_messages[resp.request_id] = resp.result
+
+
+con_thread = threading.Thread(target=consume_forever, args=[consumer])
+con_thread.start()
+
+
 # ENDPOINTS OF THE USER API
+
+def get_message(id: str):
+    """ Returns a given message from the dictionary"""
+
+    result = None
+    while id not in new_messages:
+        print("Not found the message", flush=True)
+        time.sleep(0.2)
+    if id in new_messages:
+        result = new_messages[id]
+        del new_messages[id]
+
+    return result
+
 
 @app.route('/users/create', methods=['POST'])
 def create_user():
     """ Sends a create user request to the cluster"""
     request = CreateUserRequest()
+    request.request_id = str(uuid.uuid4())
 
-    send_msg(USER_CREATION_TOPIC, key="create", value = request)
-    return "User create"
+    send_msg(USER_CREATION_TOPIC, key="create", request=request)
+
+    result = get_message(request.request_id)
+
+    return jsonify(result)
 
 
 @app.route('/users/remove/<int:user_id>', methods=['DELETE'])
@@ -57,9 +86,14 @@ def remove_user(user_id):
     """ Sends a remove user request to the statefun cluster"""
     request = UserRequest()
     request.remove_user.id = user_id
+    request.request_id = str(uuid.uuid4())
 
-    send_msg(USER_TOPIC, key=user_id, value = request)
-    return "User remove"
+    send_msg(USER_TOPIC, key=user_id, request=request)
+
+    result = get_message(request.request_id)
+
+    return jsonify(result)
+
 
 
 @app.route('/users/find/<int:user_id>', methods=['GET'])
@@ -67,9 +101,15 @@ def find_user(user_id):
     """ Searches for a user in the cluster """
     request = UserRequest()
     request.find_user.id = user_id
+    request.request_id = str(uuid.uuid4())
 
-    send_msg(USER_TOPIC, key=user_id, value = request)
-    return "User find"
+    send_msg(USER_TOPIC, key=user_id, request=request)
+
+    result = get_message(request.request_id)
+
+    return jsonify(result)
+
+
 
 @app.route('/users/credit/<int:user_id>', methods=['GET'])
 def get_credit(user_id):
@@ -80,75 +120,50 @@ def get_credit(user_id):
     # Here we should get the response and extract the credit 
     # instead of the whole user
 
+
+
 @app.route('/users/credit/subtract/<int:user_id>/<int:amount>', methods=['POST'])
 def subtract_credit(user_id, amount):
-    
     request = UserRequest()
     request.subtract_credit.id = user_id
     request.subtract_credit.amount = amount
+    request.request_id = str(uuid.uuid4())
 
-    send_msg(USER_TOPIC, key=user_id, value=request)
-    return "User subtract"
+    send_msg(USER_TOPIC, key=user_id, request=request)
+    result = get_message(request.request_id)
+
+    return jsonify(result)
+
+
 
 @app.route('/users/credit/add/<int:user_id>/<int:amount>', methods=['POST'])
 def add_credit(user_id, amount):
-    
     request = UserRequest()
     request.add_credit.id = user_id
     request.add_credit.amount = amount
-    
-    send_msg(USER_TOPIC, key=user_id, value=request)
-    return "User add"
+    request.request_id = str(uuid.uuid4())
+
+    send_msg(USER_TOPIC, key=user_id, request=request)
+
+    result = get_message(request.request_id)
+
+    return jsonify(result)
 
 
-def send_msg(topic, key, value):
+def send_msg(topic, key, request):
     """ Sends a protobuf message to the specified topic"""
-    global producer 
+    global producer
 
     k = str(key).encode('utf-8')
-    v = value.SerializeToString()
+    v = request.SerializeToString()
 
-    producer.send(topic=topic, key= k, value = v)
+    producer.send(topic=topic, key=k, value=v)
 
-
-
-@app.route('/user/<string:name>/add')
-def increment_user(name):
-    """ Sends an increment request to the specified name"""
-    global producer, consumer
-
-    print("Received request to increment name ",name)
-    request = IncreaseUserCount()
-    request.name = name
-
-    if producer is None:
-        print("Creating the producer", flush=True)
-        producer = KafkaProducer(bootstrap_servers=[KAFKA_BROKER])
-        print("Got the broker!", flush=True)
-
-
-    key = name.encode('utf-8')
-    val = request.SerializeToString()
-    producer.send(topic="names", key=key, value=val)
-    producer.flush()
-
-    # try to get the message from the consumer
-    for msg in consumer:
-        print(msg, flush=True)
-        print(msg.key.decode('utf-8'), flush=True)
-        if msg.key.decode('utf-8') == name:
-            print("Got a response for the user {} --> {}".format(name, msg.value), flush=True)
-
-            return jsonify({'response': msg.value.decode('utf-8')})
-
-@app.route('/test/<string:name>')
-def test(name):
-    return f"It's working {name}!!"
 
 @app.route('/')
 def basic():
     return "Hello world!"
-    
+
 
 if __name__ == "__main__":
     app.run()
