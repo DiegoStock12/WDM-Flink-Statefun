@@ -14,3 +14,6 @@ Rebuild single container:
 
 * How do we scale the Flink side -> not just duplicating containers, need to share state as well -> how to configure and define this in Kubernetes?
 * What about the replies -> should be non-blocking -> save ID per request and listen on an reply output topic?
+* Is return success/failure JSON or simply a status code?
+* Should the ID also be in a JSON field?
+* /orders/find/{order_id} -> what if an order does not exist?
