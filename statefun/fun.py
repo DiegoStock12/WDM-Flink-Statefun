@@ -35,26 +35,29 @@ def create_user(context, create_user_request : CreateUserRequest):
     - Only has one state (int) that saves the current id to be 
     asigned to the next user """
 
-    logger.info("Creating user...")
+    logger.debug("Creating user...")
 
     # get the current id to assign
     state = context.state('count').unpack(Count)
     if not state:
-        logger.info("First user ever!")
+        logger.debug("First user ever!")
         state = Count()
         state.num = 0
 
     # send a message to the user function to define the user
+    # also send the request and worker id with it
     request = CreateUserWithId()
     request.id = state.num
     request.request_id =  create_user_request.request_id
-    print(f"Sending request to function with id {request.id}", flush=True)
+    request.worker_id = create_user_request.worker_id
+
+    logger.debug(f"Sending request to function with id {request.id}")
     context.pack_and_send("users/user", str(request.id), request)
 
     # update the next id to assign and save
     state.num += 1
     context.state('count').pack(state)
-    logger.info('Next state to assign is {}'.format(state.num))
+    logger.debug('Next state to assign is {}'.format(state.num))
 
 
 # Managing the user finding and credit management operations
@@ -76,23 +79,23 @@ def operate_user(context,
 
     # depending on the message do one thing or the other
     if isinstance(request, UserRequest):
-        logger.info("Received user request!")
+        logger.debug("Received user request!")
 
         # check which field we have
         msg_type = request.WhichOneof('message')
-        logger.info(f'Got message of type {msg_type}')
+        logger.debug(f'Got message of type {msg_type}')
 
         if msg_type == 'find_user':
-            logger.info('finding user')
+            logger.debug('finding user')
 
-            logger.info(f'Found user: {state.id}:{state.credit}')
+            logger.debug(f'Found user: {state.id}:{state.credit}')
 
             response = UserResponse()
             response.result = json.dumps({'id': state.id,
                                           'credit': state.credit})
 
         elif msg_type == 'remove_user':
-            logger.info(f"Deleting user {request.remove_user.id}")
+            logger.debug(f"Deleting user {request.remove_user.id}")
             del context['user']
 
             response = UserResponse()
@@ -103,7 +106,7 @@ def operate_user(context,
             state.credit += request.add_credit.amount
             context.state('user').pack(state)
 
-            logger.info(f"New credit for user {request.add_credit.id} is {state.credit}")
+            logger.debug(f"New credit for user {request.add_credit.id} is {state.credit}")
 
             # send the reponse
             response = UserResponse()
@@ -119,13 +122,13 @@ def operate_user(context,
                 context.state('user').pack(state)
 
                 # response.result = "success"
-                logger.info(f"New credit for user {request.subtract_credit.id} is {state.credit}")
+                logger.debug(f"New credit for user {request.subtract_credit.id} is {state.credit}")
 
                 response.result = json.dumps({'result': 'success'})
 
             else:
                 response.result = json.dumps({'result': 'failure'})
-                logger.info('Failure updating credit')
+                logger.debug('Failure updating credit')
 
     elif isinstance(request, CreateUserWithId):
         # create a new user with the id given and 0 credit
@@ -133,7 +136,7 @@ def operate_user(context,
         state.id = request.id
         state.credit = 0
         context.state('user').pack(state)
-        logger.info(f'Created new user with id {request.id}')
+        logger.debug(f'Created new user with id {request.id}')
 
         response = UserResponse()
         response.result = json.dumps({'id': state.id})
@@ -143,13 +146,22 @@ def operate_user(context,
 
     # respond if needed
     if response:
+        # Use the same request id in the message body
+        # and use the request worker_id as key of the message
+
         response.request_id = request.request_id
-        logger.debug(f'Sending response {response}')
+        logger.debug(f'Sending response {response} with key {request.worker_id}')
+
+        # create the egress message and send it to the 
+        # users/out egress
         egress_message = kafka_egress_record(
             topic=USER_EVENTS_TOPIC,
-            key="example",
+            key=request.worker_id,
             value=response
         )
+
+        logger.debug(f'Created egress message: {egress_message}')
+
         context.pack_and_send_egress("users/out", egress_message)
 
 

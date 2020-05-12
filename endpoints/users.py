@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, Response
 
 # Import the messages to be sent to the statefun cluster
 from users_pb2 import CreateUserRequest
@@ -10,57 +10,83 @@ from kafka.errors import NoBrokersAvailable
 import threading
 import time
 import uuid
+import json
 
-app = Flask(__name__)
+from typing import Dict
 
+# create the logger and configure
+import logging
+
+FORMAT = '[%(asctime)s] %(levelname)-8s %(message)s'
+logging.basicConfig(level=logging.INFO, format=FORMAT)
+
+logger = logging.getLogger()
+
+
+
+
+# Some parameters to send and read from kafka
 KAFKA_BROKER = "kafka-broker:9092"
 USER_TOPIC = "users"
 USER_CREATION_TOPIC = "users-create"
-
 USER_EVENTS_TOPIC = "user-events"
 
 brokers_available = False
 producer = None
 
-new_messages = {}
+# Where yet to answer request messages 
+# are kept
+new_messages : Dict[str, str] = {}
 
+# The worker id that we'll use to identify 
+# messages adderessed to us
+WORKER_ID : str = str(uuid.uuid4())
+logger.info(f'Started worker with id {WORKER_ID}')
+
+
+# Get the global 
 while not brokers_available:
     try:
+        # Try to create the producer and consumer for 
+        # this worker
         producer = KafkaProducer(bootstrap_servers=[KAFKA_BROKER])
         consumer = KafkaConsumer(
-            'user-events',
+            USER_EVENTS_TOPIC,
             bootstrap_servers=[KAFKA_BROKER],
-            auto_offset_reset='earliest',
+            auto_offset_reset='latest',
         )
         brokers_available = True
-        print("Got the broker!", flush=True)
+        logger.info('Got the broker!')
     except NoBrokersAvailable:
-        time.sleep(4)
+        time.sleep(2)
         continue
 
 
+# Background thread receiving messages from
+# the kafka topic and putting them in the dictionary
 def consume_forever(cons: KafkaConsumer):
-    print('Strated consumer thread', flush=True)
+    logger.info('Started consumer thread')
     for msg in cons:
-        print(f'Received message! {msg.value}', flush=True)
-        resp = UserResponse()
-        resp.ParseFromString(msg.value)
-        new_messages[resp.request_id] = resp.result
+        if msg.key.decode('utf-8') == WORKER_ID:
+            logger.info(f'Received message! {msg.value}')
+            resp = UserResponse()
+            resp.ParseFromString(msg.value)
+            new_messages[resp.request_id] = resp.result
 
-
+# Create and start the background thread for the consumer
 con_thread = threading.Thread(target=consume_forever, args=[consumer])
 con_thread.start()
 
-
-# ENDPOINTS OF THE USER API
-
+# Looks for the message in the local dict
 def get_message(id: str):
     """ Returns a given message from the dictionary"""
+    logger.info(new_messages)
 
     result = None
     while id not in new_messages:
-        print("Not found the message", flush=True)
-        time.sleep(0.2)
+        logger.info("Not found the message")
+        logger.info(new_messages)
+        time.sleep(0.01)
     if id in new_messages:
         result = new_messages[id]
         del new_messages[id]
@@ -68,17 +94,24 @@ def get_message(id: str):
     return result
 
 
+# Create the flask app
+app = Flask(__name__)
+
+
+
+# ENDPOINTS OF THE USER API
 @app.route('/users/create', methods=['POST'])
 def create_user():
     """ Sends a create user request to the cluster"""
     request = CreateUserRequest()
     request.request_id = str(uuid.uuid4())
+    
 
     send_msg(USER_CREATION_TOPIC, key="create", request=request)
 
     result = get_message(request.request_id)
 
-    return jsonify(result)
+    return Response(result, mimetype='application/json')
 
 
 @app.route('/users/remove/<int:user_id>', methods=['DELETE'])
@@ -92,7 +125,7 @@ def remove_user(user_id):
 
     result = get_message(request.request_id)
 
-    return jsonify(result)
+    return Response(result, mimetype='application/json')
 
 
 
@@ -107,7 +140,7 @@ def find_user(user_id):
 
     result = get_message(request.request_id)
 
-    return jsonify(result)
+    return Response(result, mimetype='application/json')
 
 
 
@@ -115,11 +148,15 @@ def find_user(user_id):
 def get_credit(user_id):
     # this can do the same as the find user as long as 
     # we just return the number only
-    find_user(user_id)
 
-    # Here we should get the response and extract the credit 
-    # instead of the whole user
+    # we get the result that is a dict of {'id': 0, 
+    #                                       ' credit': 100}
+    # and we need to extract the credit from there and return it
+    result : Response = find_user(user_id)
 
+    r_json = json.loads(result.data)
+
+    return Response(json.dumps({'credit': r_json['credit']}), mimetype='application/json')
 
 
 @app.route('/users/credit/subtract/<int:user_id>/<int:amount>', methods=['POST'])
@@ -130,9 +167,10 @@ def subtract_credit(user_id, amount):
     request.request_id = str(uuid.uuid4())
 
     send_msg(USER_TOPIC, key=user_id, request=request)
+
     result = get_message(request.request_id)
 
-    return jsonify(result)
+    return Response(result, mimetype='application/json')
 
 
 
@@ -147,17 +185,20 @@ def add_credit(user_id, amount):
 
     result = get_message(request.request_id)
 
-    return jsonify(result)
+    return Response(result, mimetype='application/json')
 
 
 def send_msg(topic, key, request):
     """ Sends a protobuf message to the specified topic"""
-    global producer
+
+    # Add the worker id to all requests
+    request.worker_id = WORKER_ID
 
     k = str(key).encode('utf-8')
     v = request.SerializeToString()
 
     producer.send(topic=topic, key=k, value=v)
+    producer.flush()
 
 
 @app.route('/')
