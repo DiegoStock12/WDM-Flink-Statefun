@@ -1,8 +1,7 @@
 from flask import Flask, Response
 
 # Import the messages to be sent to the statefun cluster
-from users_pb2 import CreateUserRequest
-from users_pb2 import UserRequest, UserResponse
+from users_pb2 import CreateUserRequest, UserRequest, UserResponse
 
 from kafka import KafkaProducer, KafkaConsumer
 from kafka.errors import NoBrokersAvailable
@@ -22,9 +21,6 @@ logging.basicConfig(level=logging.INFO, format=FORMAT)
 
 logger = logging.getLogger()
 
-
-
-
 # Some parameters to send and read from kafka
 KAFKA_BROKER = "kafka-broker:9092"
 USER_TOPIC = "users"
@@ -34,20 +30,20 @@ USER_EVENTS_TOPIC = "user-events"
 brokers_available = False
 producer = None
 
-# Where yet to answer request messages 
+# Where yet to answer request messages
 # are kept
-new_messages : Dict[str, str] = {}
+new_messages: Dict[str, str] = {}
 
-# The worker id that we'll use to identify 
+# The worker id that we'll use to identify
 # messages adderessed to us
-WORKER_ID : str = str(uuid.uuid4())
+WORKER_ID: str = str(uuid.uuid4())
 logger.info(f'Started worker with id {WORKER_ID}')
 
 
-# Get the global 
+# Get the global
 while not brokers_available:
     try:
-        # Try to create the producer and consumer for 
+        # Try to create the producer and consumer for
         # this worker
         producer = KafkaProducer(bootstrap_servers=[KAFKA_BROKER])
         consumer = KafkaConsumer(
@@ -73,9 +69,11 @@ def consume_forever(cons: KafkaConsumer):
             resp.ParseFromString(msg.value)
             new_messages[resp.request_id] = resp.result
 
+
 # Create and start the background thread for the consumer
 con_thread = threading.Thread(target=consume_forever, args=[consumer])
 con_thread.start()
+
 
 # Looks for the message in the local dict
 def get_message(id: str):
@@ -86,10 +84,14 @@ def get_message(id: str):
     while id not in new_messages:
         logger.info("Not found the message")
         logger.info(new_messages)
-        time.sleep(0.01)
-    if id in new_messages:
-        result = new_messages[id]
-        del new_messages[id]
+
+        # TODO we have to tweak this time based 
+        # on real-world performance
+        time.sleep(0.02)
+
+    # Once the message is present return and delete it
+    result = new_messages[id]
+    del new_messages[id]
 
     return result
 
@@ -98,14 +100,12 @@ def get_message(id: str):
 app = Flask(__name__)
 
 
-
 # ENDPOINTS OF THE USER API
 @app.route('/users/create', methods=['POST'])
 def create_user():
     """ Sends a create user request to the cluster"""
     request = CreateUserRequest()
     request.request_id = str(uuid.uuid4())
-    
 
     send_msg(USER_CREATION_TOPIC, key="create", request=request)
 
@@ -128,7 +128,6 @@ def remove_user(user_id):
     return Response(result, mimetype='application/json')
 
 
-
 @app.route('/users/find/<int:user_id>', methods=['GET'])
 def find_user(user_id):
     """ Searches for a user in the cluster """
@@ -143,16 +142,15 @@ def find_user(user_id):
     return Response(result, mimetype='application/json')
 
 
-
 @app.route('/users/credit/<int:user_id>', methods=['GET'])
 def get_credit(user_id):
-    # this can do the same as the find user as long as 
+    # this can do the same as the find user as long as
     # we just return the number only
 
-    # we get the result that is a dict of {'id': 0, 
+    # we get the result that is a dict of {'id': 0,
     #                                       ' credit': 100}
     # and we need to extract the credit from there and return it
-    result : Response = find_user(user_id)
+    result: Response = find_user(user_id)
 
     r_json = json.loads(result.data)
 
@@ -171,7 +169,6 @@ def subtract_credit(user_id, amount):
     result = get_message(request.request_id)
 
     return Response(result, mimetype='application/json')
-
 
 
 @app.route('/users/credit/add/<int:user_id>/<int:amount>', methods=['POST'])
@@ -198,12 +195,10 @@ def send_msg(topic, key, request):
     v = request.SerializeToString()
 
     producer.send(topic=topic, key=k, value=v)
+
+    # If we don't have a lot of messages 
+    # this really increases performance
     producer.flush()
-
-
-@app.route('/')
-def basic():
-    return "Hello world!"
 
 
 if __name__ == "__main__":

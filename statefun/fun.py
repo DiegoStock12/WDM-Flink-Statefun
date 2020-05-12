@@ -1,36 +1,34 @@
 """ File including the functions served by the endpoint """
+from flask import Flask, request, jsonify, make_response
 import typing
 import logging
 import json
 
-from users_pb2 import CreateUserRequest
-from users_pb2 import UserRequest, UserResponse
-
-# to be used internally as state or message from 
-# one function to the other
-from users_pb2 import UserData, Count, CreateUserWithId
+# Messages and internal states of the functions
+from users_pb2 import CreateUserRequest, UserRequest, UserResponse, UserData, Count, CreateUserWithId
 
 from statefun import StatefulFunctions
 from statefun import RequestReplyHandler
 from statefun import kafka_egress_record
 
-USER_EVENTS_TOPIC = "user-events"
-
-functions = StatefulFunctions()
-
+# Logging config
 FORMAT = '[%(asctime)s] %(levelname)-8s %(message)s'
 logging.basicConfig(level=logging.DEBUG, format=FORMAT)
 
 logger = logging.getLogger()
 
 
-# Functions to deal with user management
+# Topic to output the responses to
+USER_EVENTS_TOPIC = "user-events"
+
+# Functions where to bind
+functions = StatefulFunctions()
 
 # Function to create users
-# extracts the next free user id from its state and 
+# extracts the next free user id from its state and
 # sends a creation request to that new user function
 @functions.bind("users/create")
-def create_user(context, create_user_request : CreateUserRequest):
+def create_user(context, create_user_request: CreateUserRequest):
     """ Creates a user by sending a message to the user function 
     - Only has one state (int) that saves the current id to be 
     asigned to the next user """
@@ -48,7 +46,7 @@ def create_user(context, create_user_request : CreateUserRequest):
     # also send the request and worker id with it
     request = CreateUserWithId()
     request.id = state.num
-    request.request_id =  create_user_request.request_id
+    request.request_id = create_user_request.request_id
     request.worker_id = create_user_request.worker_id
 
     logger.debug(f"Sending request to function with id {request.id}")
@@ -106,7 +104,8 @@ def operate_user(context,
             state.credit += request.add_credit.amount
             context.state('user').pack(state)
 
-            logger.debug(f"New credit for user {request.add_credit.id} is {state.credit}")
+            logger.debug(
+                f"New credit for user {request.add_credit.id} is {state.credit}")
 
             # send the reponse
             response = UserResponse()
@@ -122,7 +121,8 @@ def operate_user(context,
                 context.state('user').pack(state)
 
                 # response.result = "success"
-                logger.debug(f"New credit for user {request.subtract_credit.id} is {state.credit}")
+                logger.debug(
+                    f"New credit for user {request.subtract_credit.id} is {state.credit}")
 
                 response.result = json.dumps({'result': 'success'})
 
@@ -150,9 +150,10 @@ def operate_user(context,
         # and use the request worker_id as key of the message
 
         response.request_id = request.request_id
-        logger.debug(f'Sending response {response} with key {request.worker_id}')
+        logger.debug(
+            f'Sending response {response} with key {request.worker_id}')
 
-        # create the egress message and send it to the 
+        # create the egress message and send it to the
         # users/out egress
         egress_message = kafka_egress_record(
             topic=USER_EVENTS_TOPIC,
@@ -168,7 +169,6 @@ def operate_user(context,
 # Use the handler and expose the endpoint
 handler = RequestReplyHandler(functions)
 
-from flask import Flask, request, jsonify, make_response
 
 app = Flask(__name__)
 
@@ -179,12 +179,6 @@ def handle():
     response = make_response(response_data)
     response.headers.set('Content-Type', 'application/octet-stream')
     return response
-
-
-@app.route('/')
-def welcome():
-    return "Hello world!"
-
 
 if __name__ == "__main__":
     app.run()
