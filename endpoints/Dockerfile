@@ -8,7 +8,7 @@ COPY requirements.txt /app
 RUN pip install -r requirements.txt
 
 COPY users.py /app
-COPY example_pb2.py /app
+COPY users_pb2.py /app
 
 EXPOSE 5000
 
