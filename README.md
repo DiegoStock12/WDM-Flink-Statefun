@@ -6,7 +6,8 @@ Instructions for getting the Apache Flink Docker container:
 
 Run the whole demo:
 * `docker-compose up`
-* `docker-compose built -> Tomaz command here... for auto-detect changes and rebuilt`
+Rebuilt single container:
+* `rebuild single container: 'docker-compose up -d --no-deps --build <service-name>`
 
 # Ask Asterios
 
