@@ -38,7 +38,11 @@ The stateful functions preserve the state of each user and receive events from t
 
 After processing the requests, the result of the computation is published in the `user-events` topic within a general `UserResponse` protobuf message. The actual response that will be displayed to the caller is embedded in the `result` field of that protobuf in JSON format.
 
-
+# Resources
+- [Stateful functions - keynote](https://www.youtube.com/watch?v=NF0hXZfUyqE&feature=youtu.be)
+- [Stateful functions - demo](https://www.youtube.com/watch?v=tuSylBadNSo)
+- [Kafka client - benchmarks](https://activisiongamescience.github.io/2016/06/15/Kafka-Client-Benchmarking/)
+- [Python WSGI servers - performance analysis](https://www.appdynamics.com/blog/engineering/a-performance-analysis-of-python-wsgi-servers-part-2/)
 
 # Ask Asterios
 
