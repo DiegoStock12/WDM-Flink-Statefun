@@ -3,3 +3,4 @@ venv/
 checkpoint-dir
 .vscode
 .idea
+.DS_Store

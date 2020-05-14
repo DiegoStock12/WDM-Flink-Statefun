@@ -18,10 +18,59 @@ message Count{
 }
 
 
+// Create an item with a certain price.
 message CreateItemRequest{
     int64 price = 1;
+    string request_id = 2;
+    string worker_id = 3;
 }
 
-message CreateItemResponse{
-    string result = 1;
+// internal to be used by the statefun
+// between the create_item and the item function
+message CreateItemWithId{
+    uint64 id = 1;
+    int64 price = 2;
+    string request_id = 3;
+    string worker_id = 4;
+}
+
+message StockRequest {
+
+    // Get stock item.
+    message FindItemRequest{
+        uint64 id = 1;
+    }
+
+    // Substract stock.
+    message SubtractItemStockRequest{
+        uint64 id = 1;
+        int64 amount = 2;
+    }
+
+    // Add stock.
+    message AddItemStockRequest{
+        uint64 id = 1;
+        int64 amount = 2;
+    }
+
+    // Request id for identifying the request
+    // in the endpoint and answer
+    string request_id = 1;
+
+    // Worker id used as key of the response
+    // so a given worker just has to save its
+    // own messages
+    string worker_id = 2;
+
+    oneof message {
+        FindItemRequest find_item = 3;
+        SubtractItemStockRequest substract_stock = 4;
+        AddItemStockRequest add_stock = 5;
+
+    }
+}
+
+message StockResponse {
+    string request_id = 1;
+    string result = 2;
 }
