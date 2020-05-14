@@ -82,6 +82,16 @@ def operate_order(context, msg: typing.Union[CreateOrderWithId, OrderRequest]):
                 logger.info(f"{state}")
                 logger.info(f"Returning order with id: {msg.find_order.id}")
 
+        elif msg_type == 'add_item':
+            state = context.state('order').unpack(Order)
+            if not state:
+                logger.info("Order does not exist.")
+            else:
+                state.items.append(msg.add_item.itemId)
+                logger.info(f"{state}")
+                context.state('order').pack(state)
+                logger.info(f"Returning order with id: {msg.add_item.id}")
+
     else:
         logger.error('Received unknown message type!')
 
@@ -111,7 +121,6 @@ def handle():
 
 @app.route('/')
 def welcome():
-    print("asdasdasd", flush=True)
     return "This is Orders microservice!"
 
 

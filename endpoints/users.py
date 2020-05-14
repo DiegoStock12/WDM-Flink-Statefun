@@ -196,6 +196,24 @@ def get_order(orderId):
 
     return jsonify({'response': 'Found order'})
 
+@app.route('/orders/addItem/<int:orderId>/<int:itemId>', methods=['POST'])
+def add_item_to_order(orderId, itemId):
+    global producer, consumer
+
+    print("Received request to add item to an order.", flush=True)
+    request = OrderRequest()
+    request.add_item.id = orderId
+    request.add_item.itemId = itemId
+
+    if producer is None:
+        print("Creating the producer", flush=True)
+        producer = KafkaProducer(bootstrap_servers=[KAFKA_BROKER])
+        print("Got the broker!", flush=True)
+
+    send_msg("orders", orderId, request)
+
+    return jsonify({'response': 'Added item'})
+
 @app.route('/test/<string:name>')
 def test(name):
     return f"It's working {name}!!"
