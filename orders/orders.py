@@ -92,6 +92,29 @@ def operate_order(context, msg: typing.Union[CreateOrderWithId, OrderRequest]):
                 context.state('order').pack(state)
                 logger.info(f"Returning order with id: {msg.add_item.id}")
 
+        elif msg_type == 'remove_item':
+            orderId = msg.remove_item.id
+            state = context.state('order').unpack(Order)
+            if not state:
+                logger.info("Order does not exist.")
+            else:
+                items = state.items
+                logger.info(f"{type(items)}")
+                logger.info(f"{len(items)}")
+                item_to_delete = msg.remove_item.itemId
+                item_index = -1
+                for i in range(len(items)):
+                    logger.info(f"{items[i]}")
+                    if items[i] == item_to_delete:
+                        item_index = i
+                if item_index != -1:
+                    del state.items[item_index]
+                    logger.info(f"Removing item {item_to_delete} from order {orderId}")
+                else:
+                    logger.info(f"Order {orderId} does not contain item with id {item_to_delete}")
+
+                context.state('order').pack(state)
+
     else:
         logger.error('Received unknown message type!')
 

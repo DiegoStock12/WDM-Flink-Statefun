@@ -27,6 +27,7 @@ message OrderRequest{
         RemoveOrderRequest remove_order = 1;
         FindOrderRequest find_order = 2;
         AddItemRequest add_item = 3;
+        RemoveItemRequest remove_item = 4;
     }
 }
 
@@ -39,6 +40,11 @@ message FindOrderRequest{
 }
 
 message AddItemRequest{
+    int64 id = 1;
+    int64 itemId = 2;
+}
+
+message RemoveItemRequest{
     int64 id = 1;
     int64 itemId = 2;
 }
