@@ -96,7 +96,7 @@ async def create_kafka_consumer(app: web.Application):
             logger.info('Started consumer!')
 
         except (KafkaConnectionError, NoBrokersAvailable):
-            consumer.stop()
+            await consumer.stop()
             time.sleep(4)
             continue
 
@@ -126,8 +126,8 @@ async def create_kafka_producer(app: web.Application):
             broker_available = True
 
         except (KafkaConnectionError, NoBrokersAvailable):
+            await producer.stop()
             time.sleep(4)
-            producer.stop()
             continue
 
 
