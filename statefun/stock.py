@@ -20,6 +20,8 @@ logger = logging.getLogger()
 # Topic to output the responses to
 STOCK_EVENTS_TOPIC = "stock-events"
 
+# TODO ADD STOCK ITEM ID IMPL.
+
 # Functions to deal with stock management
 
 # Function to create stock

@@ -72,5 +72,6 @@ message StockRequest {
 
 message StockResponse {
     string request_id = 1;
-    string result = 2;
+    string item_id = 2;
+    string result = 3;
 }
