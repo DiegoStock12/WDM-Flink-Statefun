@@ -1,4 +1,5 @@
 """ File including the functions served by the endpoint """
+from flask import Flask, request, jsonify, make_response
 import typing
 import logging
 import json
@@ -68,8 +69,46 @@ def manage_stock(context, request: typing.Union[StockRequest, CreateItemWithId])
 
         response = StockResponse()
         response.result = json.dumps({'id': item_state.id})
+    elif isinstance(request, StockRequest):
+        logger.debug("Received stock request!")
 
+        # check which field we have
+        msg_type = request.WhichOneof('message')
+        logger.debug(f'Got message of type {msg_type}')
 
+        if msg_type == "find_item":
+            if item_state is None:
+                # Item does not exist yet. Return error.
+                response = StockResponse()
+                response.result = json.dump({'result:': 'not_found'})
+            else:
+                response = StockResponse()
+                response.result = json.dump({'id:': item_state.id, 'price': item_state.price, 'stock': item_state.stock})
+        elif msg_type == "substract_stock":
+            new_amount = item_state.stock - request.substract_stock.amount
+            response = StockResponse()
+
+            if new_amount >= 0:
+                item_state.credit -= request.subtract_stock.amount
+
+                context.state('item').pack(item_state)
+                logger.debug(
+                    f"New credit for user {request.subtract_credit.id} is {item_state.stock}")
+                response.result = json.dumps({'result': 'success'})
+            else:
+                response.result = json.dumps({'result': 'failure'})
+                logger.debug('Stock is too low.')
+
+        elif msg_type == "add_stock":
+            item_state.credit += request.add_stock.amount
+            context.state('item').pack(item_state)
+
+            logger.debug(
+                f"New credit for user {request.add_credit.id} is {item_state.credit}")
+
+            # send the reponse.
+            response = StockResponse()
+            response.result = json.dumps({'result': 'success'})
     if response:
         # Use the same request id in the message body
         # and use the request worker_id as key of the message
@@ -89,3 +128,17 @@ def manage_stock(context, request: typing.Union[StockRequest, CreateItemWithId])
         logger.debug(f'Created egress message: {egress_message}')
 
         context.pack_and_send_egress("stock/out", egress_message)
+
+# Use the handler and expose the endpoint
+handler = RequestReplyHandler(functions)
+app = Flask(__name__)
+
+@app.route('/statefun', methods=['POST'])
+def handle():
+    response_data = handler(request.data)
+    response = make_response(response_data)
+    response.headers.set('Content-Type', 'application/octet-stream')
+    return response
+
+if __name__ == "__main__":
+    app.run()
