@@ -15,6 +15,7 @@ app = Flask(__name__)
 
 KAFKA_BROKER = "kafka-broker:9092"
 USER_TOPIC = "users"
+PAYMENT_TOPIC = "payments"
 USER_CREATION_TOPIC = "users-create"
 
 USER_EVENTS_TOPIC = "user-events"
@@ -113,11 +114,11 @@ def find_user(user_id):
 
 @app.route('/users/credit/<int:user_id>', methods=['GET'])
 def get_credit(user_id):
-    # this can do the same as the find user as long as 
+    # this can do the same as the find user as long as
     # we just return the number only
     find_user(user_id)
 
-    # Here we should get the response and extract the credit 
+    # Here we should get the response and extract the credit
     # instead of the whole user
 
 
@@ -149,6 +150,48 @@ def add_credit(user_id, amount):
 
     return jsonify(result)
 
+
+@app.route('/payment/pay/<int:user_id>/<int:order_id>', methods=['POST'])
+def order_pay(user_id, order_id):
+    # total_cost = requests.get('http://localhost:5000/orders/totalCost/'+str(order_id))
+    request = PaymentRequest()
+    request.user_id = user_id
+    request.order_id = order_id
+    request.request_type = PaymentRequest.RequestType.PAY
+    request.request_id = str(uuid.uuid4())
+
+    send_msg(PAYMENT_TOPIC, key=user_id, request=request)
+
+    result = get_message(request.request_id)
+
+    return result
+
+@app.route('/payment/cancel/<int:user_id>/<int:order_id>', methods=['POST']):
+def order_cancel(user_id, order_id):
+    request = PaymentRequest()
+    request.user_id = user_id
+    request.order_id = order_id
+    request.request_type = PaymentRequest.RequestType.CANCEL
+    request.request_id = str(uuid.uuid4())
+
+    send_msg(PAYMENT_TOPIC, key=user_id, request=request)
+
+    result = get_message(request.request_id)
+
+    return result
+
+@app.route('/payment/status/<int:order_id>', methods=['GET'])
+def order_status(order_id):
+    request = PaymentRequest()
+    request.order_id = order_id
+    request.request_type = PaymentRequest.RequestType.STATUS
+    requests.request_id = str(uuid.uuid4())
+
+    send_msg(PAYMENT_TOPIC, key=user_id, request=request)
+
+    result = get_message(request.request_id)
+
+    return result
 
 def send_msg(topic, key, request):
     """ Sends a protobuf message to the specified topic"""

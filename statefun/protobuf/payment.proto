@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package = users;
+
+message PaymentData {
+    uint64 order_id = 1;
+
+    enum StatusType {
+      UNPAID = 0;
+      PAID = 1;
+    }
+
+    StatusType status_type = 2;
+}
+
+message PaymentRequest {
+    uint64 user_id = 1;
+    uint64 order_id = 2;
+
+    enum RequestType {
+      PAY = 0;
+      CANCEL = 1;
+      STATUS = 2;
+    }
+
+    RequestType request_type = 3;
+}

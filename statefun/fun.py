@@ -6,7 +6,7 @@ import json
 from users_pb2 import CreateUserRequest
 from users_pb2 import UserRequest, UserResponse
 
-# to be used internally as state or message from 
+# to be used internally as state or message from
 # one function to the other
 from users_pb2 import UserData, Count, CreateUserWithId
 
@@ -15,6 +15,7 @@ from statefun import RequestReplyHandler
 from statefun import kafka_egress_record
 
 USER_EVENTS_TOPIC = "user-events"
+PAYMENT_EVENTS_TOPIC = "payment-events"
 
 functions = StatefulFunctions()
 
@@ -27,12 +28,12 @@ logger = logging.getLogger()
 # Functions to deal with user management
 
 # Function to create users
-# extracts the next free user id from its state and 
+# extracts the next free user id from its state and
 # sends a creation request to that new user function
 @functions.bind("users/create")
 def create_user(context, create_user_request : CreateUserRequest):
-    """ Creates a user by sending a message to the user function 
-    - Only has one state (int) that saves the current id to be 
+    """ Creates a user by sending a message to the user function
+    - Only has one state (int) that saves the current id to be
     asigned to the next user """
 
     logger.info("Creating user...")
@@ -151,6 +152,38 @@ def operate_user(context,
             value=response
         )
         context.pack_and_send_egress("users/out", egress_message)
+
+
+@functions.bind('payments/pay')
+def payments_pay(context, request: PaymentRequest):
+    if request.request_type == PaymentRequest.RequestType.PAY:
+        # send message to orders/find -> blocking wait here? get total price back in another function?
+
+        # send message to users/find -> blocking wait here? get credit for user back
+
+        # join above two here (blocking wait)?
+        # above two can be in parallel?
+
+        # subtract amount from user -> get success/failure back
+        # return success / failure to orders function
+        pass
+    elif request.request_type == PaymentRequest.RequestType.CANCEL:
+        # send message to orders/find -> get total price back in another function?
+
+        # send message to user add to add the amount of the order -> get success/failure back
+
+        # send message to orders to mark orders as unpaid
+        pass
+    elif: request.request_type == PaymentRequest.RequestType.STATUS:
+        # call orders/find and return status from there
+
+        pass
+
+# @functions.bind('payments/cancel')
+# def payments_cancel(context, request: PaymentRequest):
+#
+# @functions.bind('payments/status')
+# def payments_status(context, request: PaymentRequest):
 
 
 # Use the handler and expose the endpoint
