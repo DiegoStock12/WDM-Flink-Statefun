@@ -24,62 +24,66 @@ message Count{
 // USER CREATION MESSAGES
 
 message CreateUserRequest{
+    string request_id = 1;
+    string worker_id = 2;
 }
 
-message CreateUserResponse{
-    string result = 1;
-}
 
 // internal to be used by the statefun
 // between the create_user and the user function
 message CreateUserWithId{
     uint64 id = 1;
+    string request_id = 2;
+    string worker_id = 3;
 }
 
-// GET USER MESSAGE
-
-message FindUserRequest{
-    uint64 id = 1;
-}
-
-// USER DELETION MESSAGES
-message RemoveUserRequest{
-    uint64 id = 1;
-}
-
-// SUBTRACT CREDIT MESSAGES
-message SubtractCreditRequest{
-    uint64 id = 1;
-    int64 amount =2;
-}
-
-// ADD CREDIT MESSAGES
-message AddCreditRequest{
-    uint64 id = 1;
-    int64 amount = 2;
-}
 
 // Message containing the others
 message UserRequest{
 
+    // GET USER MESSAGE
+    message FindUserRequest{
+    uint64 id = 1;
+}
+
+    // USER DELETION MESSAGES
+    message RemoveUserRequest{
+        uint64 id = 1;
+    }
+
+    // SUBTRACT CREDIT MESSAGES
+    message SubtractCreditRequest{
+        uint64 id = 1;
+        int64 amount =2;
+    }
+
+    // ADD CREDIT MESSAGES
+    message AddCreditRequest{
+        uint64 id = 1;
+        int64 amount = 2;
+    }
+
+    // Request id for identifying the request
+    // in the endpoint and answer
+    string request_id = 1;
+
+    // Worker id used as key of the response 
+    // so a given worker just has to save its
+    // own messages
+    string worker_id = 2;
 
     oneof message {
-        FindUserRequest find_user = 1;
-        RemoveUserRequest remove_user = 2;
-        SubtractCreditRequest subtract_credit = 3;
-        AddCreditRequest add_credit = 4;
+        FindUserRequest find_user = 3;
+        RemoveUserRequest remove_user = 4;
+        SubtractCreditRequest subtract_credit = 5;
+        AddCreditRequest add_credit = 6;
     }
 
 }
 
-message AddCreditResponse{
-    string result = 1;
+// Global response given for user operationsusers_pb2.py
+message UserResponse{
+    string request_id = 1;
+    string result = 2;
 }
 
-message SubtractCreditResponse{
-    string result = 1;
-}
-
-message RemoveUserResponse{
-    string result = 1;
-}

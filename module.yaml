@@ -7,35 +7,6 @@ module:
       - function:
           meta:
             kind: http
-            type: example/increment
-          spec:
-            endpoint: http://function-endpoint:8000/statefun
-            states:
-              - user
-            maxNumBatchRequests: 500
-            timeout: 2min
-      
-      - function:
-          meta:
-            kind: http
-            type: example/request
-          spec:
-            endpoint: http://function-endpoint:8000/statefun
-            maxNumBatchRequests: 500
-            timeout: 2min
-
-      - function:
-          meta:
-            kind: http
-            type: example/reply
-          spec:
-            endpoint: http://function-endpoint:8000/statefun
-            maxNumBatchRequests: 500
-            timeout: 2min
-
-      - function:
-          meta:
-            kind: http
             type: users/create
           spec:
             endpoint: http://function-endpoint:8000/statefun
@@ -76,7 +47,6 @@ module:
               - order
             maxNumBatchRequests: 500
             timeout: 2min
-
 
     ingresses:
       - ingress:
@@ -130,7 +100,7 @@ module:
       - egress:
           meta:
             type: statefun.kafka.io/generic-egress
-            id: orders/out
+            id: example/greets
           spec:
             address: kafka-broker:9092
             deliverySemantic:
@@ -139,11 +109,9 @@ module:
       - egress:
           meta:
             type: statefun.kafka.io/generic-egress
-            id: example/greets
+            id: orders/out
           spec:
             address: kafka-broker:9092
             deliverySemantic:
               type: exactly-once
               transactionTimeoutMillis: 100000
-              
-

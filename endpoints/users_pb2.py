@@ -18,7 +18,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='users',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=b'\n\x0busers.proto\x12\x05users\"&\n\x08UserData\x12\n\n\x02id\x18\x01 \x01(\x04\x12\x0e\n\x06\x63redit\x18\x02 \x01(\x03\"\x14\n\x05\x43ount\x12\x0b\n\x03num\x18\x01 \x01(\x04\"\x13\n\x11\x43reateUserRequest\"$\n\x12\x43reateUserResponse\x12\x0e\n\x06result\x18\x01 \x01(\t\"\x1e\n\x10\x43reateUserWithId\x12\n\n\x02id\x18\x01 \x01(\x04\"\x1d\n\x0f\x46indUserRequest\x12\n\n\x02id\x18\x01 \x01(\x04\"\x1f\n\x11RemoveUserRequest\x12\n\n\x02id\x18\x01 \x01(\x04\"3\n\x15SubtractCreditRequest\x12\n\n\x02id\x18\x01 \x01(\x04\x12\x0e\n\x06\x61mount\x18\x02 \x01(\x03\".\n\x10\x41\x64\x64\x43reditRequest\x12\n\n\x02id\x18\x01 \x01(\x04\x12\x0e\n\x06\x61mount\x18\x02 \x01(\x03\"\xde\x01\n\x0bUserRequest\x12+\n\tfind_user\x18\x01 \x01(\x0b\x32\x16.users.FindUserRequestH\x00\x12/\n\x0bremove_user\x18\x02 \x01(\x0b\x32\x18.users.RemoveUserRequestH\x00\x12\x37\n\x0fsubtract_credit\x18\x03 \x01(\x0b\x32\x1c.users.SubtractCreditRequestH\x00\x12-\n\nadd_credit\x18\x04 \x01(\x0b\x32\x17.users.AddCreditRequestH\x00\x42\t\n\x07message\"#\n\x11\x41\x64\x64\x43reditResponse\x12\x0e\n\x06result\x18\x01 \x01(\t\"(\n\x16SubtractCreditResponse\x12\x0e\n\x06result\x18\x01 \x01(\t\"$\n\x12RemoveUserResponse\x12\x0e\n\x06result\x18\x01 \x01(\tb\x06proto3'
+  serialized_pb=b'\n\x0busers.proto\x12\x05users\"&\n\x08UserData\x12\n\n\x02id\x18\x01 \x01(\x04\x12\x0e\n\x06\x63redit\x18\x02 \x01(\x03\"\x14\n\x05\x43ount\x12\x0b\n\x03num\x18\x01 \x01(\x04\":\n\x11\x43reateUserRequest\x12\x12\n\nrequest_id\x18\x01 \x01(\t\x12\x11\n\tworker_id\x18\x02 \x01(\t\"E\n\x10\x43reateUserWithId\x12\n\n\x02id\x18\x01 \x01(\x04\x12\x12\n\nrequest_id\x18\x02 \x01(\t\x12\x11\n\tworker_id\x18\x03 \x01(\t\"\xda\x03\n\x0bUserRequest\x12\x12\n\nrequest_id\x18\x01 \x01(\t\x12\x11\n\tworker_id\x18\x02 \x01(\t\x12\x37\n\tfind_user\x18\x03 \x01(\x0b\x32\".users.UserRequest.FindUserRequestH\x00\x12;\n\x0bremove_user\x18\x04 \x01(\x0b\x32$.users.UserRequest.RemoveUserRequestH\x00\x12\x43\n\x0fsubtract_credit\x18\x05 \x01(\x0b\x32(.users.UserRequest.SubtractCreditRequestH\x00\x12\x39\n\nadd_credit\x18\x06 \x01(\x0b\x32#.users.UserRequest.AddCreditRequestH\x00\x1a\x1d\n\x0f\x46indUserRequest\x12\n\n\x02id\x18\x01 \x01(\x04\x1a\x1f\n\x11RemoveUserRequest\x12\n\n\x02id\x18\x01 \x01(\x04\x1a\x33\n\x15SubtractCreditRequest\x12\n\n\x02id\x18\x01 \x01(\x04\x12\x0e\n\x06\x61mount\x18\x02 \x01(\x03\x1a.\n\x10\x41\x64\x64\x43reditRequest\x12\n\n\x02id\x18\x01 \x01(\x04\x12\x0e\n\x06\x61mount\x18\x02 \x01(\x03\x42\t\n\x07message\"2\n\x0cUserResponse\x12\x12\n\nrequest_id\x18\x01 \x01(\t\x12\x0e\n\x06result\x18\x02 \x01(\tb\x06proto3'
 )
 
 
@@ -100,33 +100,16 @@ _CREATEUSERREQUEST = _descriptor.Descriptor(
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=84,
-  serialized_end=103,
-)
-
-
-_CREATEUSERRESPONSE = _descriptor.Descriptor(
-  name='CreateUserResponse',
-  full_name='users.CreateUserResponse',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
     _descriptor.FieldDescriptor(
-      name='result', full_name='users.CreateUserResponse.result', index=0,
+      name='request_id', full_name='users.CreateUserRequest.request_id', index=0,
       number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='worker_id', full_name='users.CreateUserRequest.worker_id', index=1,
+      number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -143,8 +126,8 @@ _CREATEUSERRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=105,
-  serialized_end=141,
+  serialized_start=84,
+  serialized_end=142,
 )
 
 
@@ -162,6 +145,20 @@ _CREATEUSERWITHID = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='request_id', full_name='users.CreateUserWithId.request_id', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='worker_id', full_name='users.CreateUserWithId.worker_id', index=2,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -174,20 +171,20 @@ _CREATEUSERWITHID = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=143,
-  serialized_end=173,
+  serialized_start=144,
+  serialized_end=213,
 )
 
 
-_FINDUSERREQUEST = _descriptor.Descriptor(
+_USERREQUEST_FINDUSERREQUEST = _descriptor.Descriptor(
   name='FindUserRequest',
-  full_name='users.FindUserRequest',
+  full_name='users.UserRequest.FindUserRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='id', full_name='users.FindUserRequest.id', index=0,
+      name='id', full_name='users.UserRequest.FindUserRequest.id', index=0,
       number=1, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -205,20 +202,19 @@ _FINDUSERREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=175,
-  serialized_end=204,
+  serialized_start=516,
+  serialized_end=545,
 )
 
-
-_REMOVEUSERREQUEST = _descriptor.Descriptor(
+_USERREQUEST_REMOVEUSERREQUEST = _descriptor.Descriptor(
   name='RemoveUserRequest',
-  full_name='users.RemoveUserRequest',
+  full_name='users.UserRequest.RemoveUserRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='id', full_name='users.RemoveUserRequest.id', index=0,
+      name='id', full_name='users.UserRequest.RemoveUserRequest.id', index=0,
       number=1, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -236,27 +232,26 @@ _REMOVEUSERREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=206,
-  serialized_end=237,
+  serialized_start=547,
+  serialized_end=578,
 )
 
-
-_SUBTRACTCREDITREQUEST = _descriptor.Descriptor(
+_USERREQUEST_SUBTRACTCREDITREQUEST = _descriptor.Descriptor(
   name='SubtractCreditRequest',
-  full_name='users.SubtractCreditRequest',
+  full_name='users.UserRequest.SubtractCreditRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='id', full_name='users.SubtractCreditRequest.id', index=0,
+      name='id', full_name='users.UserRequest.SubtractCreditRequest.id', index=0,
       number=1, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='amount', full_name='users.SubtractCreditRequest.amount', index=1,
+      name='amount', full_name='users.UserRequest.SubtractCreditRequest.amount', index=1,
       number=2, type=3, cpp_type=2, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -274,27 +269,26 @@ _SUBTRACTCREDITREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=239,
-  serialized_end=290,
+  serialized_start=580,
+  serialized_end=631,
 )
 
-
-_ADDCREDITREQUEST = _descriptor.Descriptor(
+_USERREQUEST_ADDCREDITREQUEST = _descriptor.Descriptor(
   name='AddCreditRequest',
-  full_name='users.AddCreditRequest',
+  full_name='users.UserRequest.AddCreditRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='id', full_name='users.AddCreditRequest.id', index=0,
+      name='id', full_name='users.UserRequest.AddCreditRequest.id', index=0,
       number=1, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='amount', full_name='users.AddCreditRequest.amount', index=1,
+      name='amount', full_name='users.UserRequest.AddCreditRequest.amount', index=1,
       number=2, type=3, cpp_type=2, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -312,10 +306,9 @@ _ADDCREDITREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=292,
-  serialized_end=338,
+  serialized_start=633,
+  serialized_end=679,
 )
-
 
 _USERREQUEST = _descriptor.Descriptor(
   name='UserRequest',
@@ -325,29 +318,43 @@ _USERREQUEST = _descriptor.Descriptor(
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='find_user', full_name='users.UserRequest.find_user', index=0,
-      number=1, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
+      name='request_id', full_name='users.UserRequest.request_id', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='remove_user', full_name='users.UserRequest.remove_user', index=1,
-      number=2, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
+      name='worker_id', full_name='users.UserRequest.worker_id', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='subtract_credit', full_name='users.UserRequest.subtract_credit', index=2,
+      name='find_user', full_name='users.UserRequest.find_user', index=2,
       number=3, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='add_credit', full_name='users.UserRequest.add_credit', index=3,
+      name='remove_user', full_name='users.UserRequest.remove_user', index=3,
       number=4, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='subtract_credit', full_name='users.UserRequest.subtract_credit', index=4,
+      number=5, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='add_credit', full_name='users.UserRequest.add_credit', index=5,
+      number=6, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -355,7 +362,7 @@ _USERREQUEST = _descriptor.Descriptor(
   ],
   extensions=[
   ],
-  nested_types=[],
+  nested_types=[_USERREQUEST_FINDUSERREQUEST, _USERREQUEST_REMOVEUSERREQUEST, _USERREQUEST_SUBTRACTCREDITREQUEST, _USERREQUEST_ADDCREDITREQUEST, ],
   enum_types=[
   ],
   serialized_options=None,
@@ -367,21 +374,28 @@ _USERREQUEST = _descriptor.Descriptor(
       name='message', full_name='users.UserRequest.message',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=341,
-  serialized_end=563,
+  serialized_start=216,
+  serialized_end=690,
 )
 
 
-_ADDCREDITRESPONSE = _descriptor.Descriptor(
-  name='AddCreditResponse',
-  full_name='users.AddCreditResponse',
+_USERRESPONSE = _descriptor.Descriptor(
+  name='UserResponse',
+  full_name='users.UserResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='result', full_name='users.AddCreditResponse.result', index=0,
+      name='request_id', full_name='users.UserResponse.request_id', index=0,
       number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='result', full_name='users.UserResponse.result', index=1,
+      number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -398,76 +412,18 @@ _ADDCREDITRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=565,
-  serialized_end=600,
+  serialized_start=692,
+  serialized_end=742,
 )
 
-
-_SUBTRACTCREDITRESPONSE = _descriptor.Descriptor(
-  name='SubtractCreditResponse',
-  full_name='users.SubtractCreditResponse',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='result', full_name='users.SubtractCreditResponse.result', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=602,
-  serialized_end=642,
-)
-
-
-_REMOVEUSERRESPONSE = _descriptor.Descriptor(
-  name='RemoveUserResponse',
-  full_name='users.RemoveUserResponse',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='result', full_name='users.RemoveUserResponse.result', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=644,
-  serialized_end=680,
-)
-
-_USERREQUEST.fields_by_name['find_user'].message_type = _FINDUSERREQUEST
-_USERREQUEST.fields_by_name['remove_user'].message_type = _REMOVEUSERREQUEST
-_USERREQUEST.fields_by_name['subtract_credit'].message_type = _SUBTRACTCREDITREQUEST
-_USERREQUEST.fields_by_name['add_credit'].message_type = _ADDCREDITREQUEST
+_USERREQUEST_FINDUSERREQUEST.containing_type = _USERREQUEST
+_USERREQUEST_REMOVEUSERREQUEST.containing_type = _USERREQUEST
+_USERREQUEST_SUBTRACTCREDITREQUEST.containing_type = _USERREQUEST
+_USERREQUEST_ADDCREDITREQUEST.containing_type = _USERREQUEST
+_USERREQUEST.fields_by_name['find_user'].message_type = _USERREQUEST_FINDUSERREQUEST
+_USERREQUEST.fields_by_name['remove_user'].message_type = _USERREQUEST_REMOVEUSERREQUEST
+_USERREQUEST.fields_by_name['subtract_credit'].message_type = _USERREQUEST_SUBTRACTCREDITREQUEST
+_USERREQUEST.fields_by_name['add_credit'].message_type = _USERREQUEST_ADDCREDITREQUEST
 _USERREQUEST.oneofs_by_name['message'].fields.append(
   _USERREQUEST.fields_by_name['find_user'])
 _USERREQUEST.fields_by_name['find_user'].containing_oneof = _USERREQUEST.oneofs_by_name['message']
@@ -483,16 +439,9 @@ _USERREQUEST.fields_by_name['add_credit'].containing_oneof = _USERREQUEST.oneofs
 DESCRIPTOR.message_types_by_name['UserData'] = _USERDATA
 DESCRIPTOR.message_types_by_name['Count'] = _COUNT
 DESCRIPTOR.message_types_by_name['CreateUserRequest'] = _CREATEUSERREQUEST
-DESCRIPTOR.message_types_by_name['CreateUserResponse'] = _CREATEUSERRESPONSE
 DESCRIPTOR.message_types_by_name['CreateUserWithId'] = _CREATEUSERWITHID
-DESCRIPTOR.message_types_by_name['FindUserRequest'] = _FINDUSERREQUEST
-DESCRIPTOR.message_types_by_name['RemoveUserRequest'] = _REMOVEUSERREQUEST
-DESCRIPTOR.message_types_by_name['SubtractCreditRequest'] = _SUBTRACTCREDITREQUEST
-DESCRIPTOR.message_types_by_name['AddCreditRequest'] = _ADDCREDITREQUEST
 DESCRIPTOR.message_types_by_name['UserRequest'] = _USERREQUEST
-DESCRIPTOR.message_types_by_name['AddCreditResponse'] = _ADDCREDITRESPONSE
-DESCRIPTOR.message_types_by_name['SubtractCreditResponse'] = _SUBTRACTCREDITRESPONSE
-DESCRIPTOR.message_types_by_name['RemoveUserResponse'] = _REMOVEUSERRESPONSE
+DESCRIPTOR.message_types_by_name['UserResponse'] = _USERRESPONSE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 UserData = _reflection.GeneratedProtocolMessageType('UserData', (_message.Message,), {
@@ -516,13 +465,6 @@ CreateUserRequest = _reflection.GeneratedProtocolMessageType('CreateUserRequest'
   })
 _sym_db.RegisterMessage(CreateUserRequest)
 
-CreateUserResponse = _reflection.GeneratedProtocolMessageType('CreateUserResponse', (_message.Message,), {
-  'DESCRIPTOR' : _CREATEUSERRESPONSE,
-  '__module__' : 'users_pb2'
-  # @@protoc_insertion_point(class_scope:users.CreateUserResponse)
-  })
-_sym_db.RegisterMessage(CreateUserResponse)
-
 CreateUserWithId = _reflection.GeneratedProtocolMessageType('CreateUserWithId', (_message.Message,), {
   'DESCRIPTOR' : _CREATEUSERWITHID,
   '__module__' : 'users_pb2'
@@ -530,61 +472,51 @@ CreateUserWithId = _reflection.GeneratedProtocolMessageType('CreateUserWithId', 
   })
 _sym_db.RegisterMessage(CreateUserWithId)
 
-FindUserRequest = _reflection.GeneratedProtocolMessageType('FindUserRequest', (_message.Message,), {
-  'DESCRIPTOR' : _FINDUSERREQUEST,
-  '__module__' : 'users_pb2'
-  # @@protoc_insertion_point(class_scope:users.FindUserRequest)
-  })
-_sym_db.RegisterMessage(FindUserRequest)
-
-RemoveUserRequest = _reflection.GeneratedProtocolMessageType('RemoveUserRequest', (_message.Message,), {
-  'DESCRIPTOR' : _REMOVEUSERREQUEST,
-  '__module__' : 'users_pb2'
-  # @@protoc_insertion_point(class_scope:users.RemoveUserRequest)
-  })
-_sym_db.RegisterMessage(RemoveUserRequest)
-
-SubtractCreditRequest = _reflection.GeneratedProtocolMessageType('SubtractCreditRequest', (_message.Message,), {
-  'DESCRIPTOR' : _SUBTRACTCREDITREQUEST,
-  '__module__' : 'users_pb2'
-  # @@protoc_insertion_point(class_scope:users.SubtractCreditRequest)
-  })
-_sym_db.RegisterMessage(SubtractCreditRequest)
-
-AddCreditRequest = _reflection.GeneratedProtocolMessageType('AddCreditRequest', (_message.Message,), {
-  'DESCRIPTOR' : _ADDCREDITREQUEST,
-  '__module__' : 'users_pb2'
-  # @@protoc_insertion_point(class_scope:users.AddCreditRequest)
-  })
-_sym_db.RegisterMessage(AddCreditRequest)
-
 UserRequest = _reflection.GeneratedProtocolMessageType('UserRequest', (_message.Message,), {
+
+  'FindUserRequest' : _reflection.GeneratedProtocolMessageType('FindUserRequest', (_message.Message,), {
+    'DESCRIPTOR' : _USERREQUEST_FINDUSERREQUEST,
+    '__module__' : 'users_pb2'
+    # @@protoc_insertion_point(class_scope:users.UserRequest.FindUserRequest)
+    })
+  ,
+
+  'RemoveUserRequest' : _reflection.GeneratedProtocolMessageType('RemoveUserRequest', (_message.Message,), {
+    'DESCRIPTOR' : _USERREQUEST_REMOVEUSERREQUEST,
+    '__module__' : 'users_pb2'
+    # @@protoc_insertion_point(class_scope:users.UserRequest.RemoveUserRequest)
+    })
+  ,
+
+  'SubtractCreditRequest' : _reflection.GeneratedProtocolMessageType('SubtractCreditRequest', (_message.Message,), {
+    'DESCRIPTOR' : _USERREQUEST_SUBTRACTCREDITREQUEST,
+    '__module__' : 'users_pb2'
+    # @@protoc_insertion_point(class_scope:users.UserRequest.SubtractCreditRequest)
+    })
+  ,
+
+  'AddCreditRequest' : _reflection.GeneratedProtocolMessageType('AddCreditRequest', (_message.Message,), {
+    'DESCRIPTOR' : _USERREQUEST_ADDCREDITREQUEST,
+    '__module__' : 'users_pb2'
+    # @@protoc_insertion_point(class_scope:users.UserRequest.AddCreditRequest)
+    })
+  ,
   'DESCRIPTOR' : _USERREQUEST,
   '__module__' : 'users_pb2'
   # @@protoc_insertion_point(class_scope:users.UserRequest)
   })
 _sym_db.RegisterMessage(UserRequest)
+_sym_db.RegisterMessage(UserRequest.FindUserRequest)
+_sym_db.RegisterMessage(UserRequest.RemoveUserRequest)
+_sym_db.RegisterMessage(UserRequest.SubtractCreditRequest)
+_sym_db.RegisterMessage(UserRequest.AddCreditRequest)
 
-AddCreditResponse = _reflection.GeneratedProtocolMessageType('AddCreditResponse', (_message.Message,), {
-  'DESCRIPTOR' : _ADDCREDITRESPONSE,
+UserResponse = _reflection.GeneratedProtocolMessageType('UserResponse', (_message.Message,), {
+  'DESCRIPTOR' : _USERRESPONSE,
   '__module__' : 'users_pb2'
-  # @@protoc_insertion_point(class_scope:users.AddCreditResponse)
+  # @@protoc_insertion_point(class_scope:users.UserResponse)
   })
-_sym_db.RegisterMessage(AddCreditResponse)
-
-SubtractCreditResponse = _reflection.GeneratedProtocolMessageType('SubtractCreditResponse', (_message.Message,), {
-  'DESCRIPTOR' : _SUBTRACTCREDITRESPONSE,
-  '__module__' : 'users_pb2'
-  # @@protoc_insertion_point(class_scope:users.SubtractCreditResponse)
-  })
-_sym_db.RegisterMessage(SubtractCreditResponse)
-
-RemoveUserResponse = _reflection.GeneratedProtocolMessageType('RemoveUserResponse', (_message.Message,), {
-  'DESCRIPTOR' : _REMOVEUSERRESPONSE,
-  '__module__' : 'users_pb2'
-  # @@protoc_insertion_point(class_scope:users.RemoveUserResponse)
-  })
-_sym_db.RegisterMessage(RemoveUserResponse)
+_sym_db.RegisterMessage(UserResponse)
 
 
 # @@protoc_insertion_point(module_scope)
