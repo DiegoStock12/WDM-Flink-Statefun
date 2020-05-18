@@ -1,4 +1,4 @@
-FROM flink-statefun:2.0.0
+FROM flink-statefun
 
 RUN mkdir -p /opt/statefun/modules/test
 ADD module.yaml /opt/statefun/modules/test
