@@ -7,35 +7,6 @@ module:
       - function:
           meta:
             kind: http
-            type: example/increment
-          spec:
-            endpoint: http://function-endpoint:8000/statefun
-            states:
-              - user
-            maxNumBatchRequests: 500
-            timeout: 2min
-      
-      - function:
-          meta:
-            kind: http
-            type: example/request
-          spec:
-            endpoint: http://function-endpoint:8000/statefun
-            maxNumBatchRequests: 500
-            timeout: 2min
-
-      - function:
-          meta:
-            kind: http
-            type: example/reply
-          spec:
-            endpoint: http://function-endpoint:8000/statefun
-            maxNumBatchRequests: 500
-            timeout: 2min
-
-      - function:
-          meta:
-            kind: http
             type: users/create
           spec:
             endpoint: http://function-endpoint:8000/statefun

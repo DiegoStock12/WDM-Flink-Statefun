@@ -4,18 +4,22 @@ package = users;
 
 message PaymentData {
     uint64 order_id = 1;
+    string request_id = 2;
+    string worker_id = 3;
 
     enum StatusType {
       UNPAID = 0;
       PAID = 1;
     }
 
-    StatusType status_type = 2;
+    StatusType status_type = 4;
 }
 
 message PaymentRequest {
     uint64 user_id = 1;
     uint64 order_id = 2;
+    string request_id = 3;
+    string worker_id = 4;
 
     enum RequestType {
       PAY = 0;
@@ -23,5 +27,5 @@ message PaymentRequest {
       STATUS = 2;
     }
 
-    RequestType request_type = 3;
+    RequestType request_type = 5;
 }
