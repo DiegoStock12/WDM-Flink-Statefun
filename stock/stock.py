@@ -70,6 +70,7 @@ def manage_stock(context, request: typing.Union[StockRequest, CreateItemWithId])
         logger.debug(f'Created new item with id {request.id}')
 
         response = StockResponse()
+        response.item_id = item_state.id
         response.result = json.dumps({'id': item_state.id})
     elif isinstance(request, StockRequest):
         logger.debug("Received stock request!")
@@ -82,9 +83,11 @@ def manage_stock(context, request: typing.Union[StockRequest, CreateItemWithId])
             if item_state is None:
                 # Item does not exist yet. Return error.
                 response = StockResponse()
+                response.item_id = request.find_item.id
                 response.result = json.dump({'result:': 'not_found'})
             else:
                 response = StockResponse()
+                response.item_id = item_state.id
                 response.result = json.dump({'id:': item_state.id, 'price': item_state.price, 'stock': item_state.stock})
         elif msg_type == "substract_stock":
             new_amount = item_state.stock - request.substract_stock.amount
@@ -96,9 +99,11 @@ def manage_stock(context, request: typing.Union[StockRequest, CreateItemWithId])
                 context.state('item').pack(item_state)
                 logger.debug(
                     f"New credit for user {request.subtract_credit.id} is {item_state.stock}")
+                response.id = item_state.id
                 response.result = json.dumps({'result': 'success'})
             else:
-                response.result = json.dumps({'result': 'failure'})
+                response.id = item_state.id
+                response.result = json.dumps({'result': 'stock is too low.'})
                 logger.debug('Stock is too low.')
 
         elif msg_type == "add_stock":
@@ -110,6 +115,7 @@ def manage_stock(context, request: typing.Union[StockRequest, CreateItemWithId])
 
             # send the reponse.
             response = StockResponse()
+            response.id = item_state.id
             response.result = json.dumps({'result': 'success'})
     if response:
         # Use the same request id in the message body

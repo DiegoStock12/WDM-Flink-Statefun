@@ -52,6 +52,13 @@ services:
             - "8000"
         ports:
             - "8000:8000"
+    stock-endpoint:
+        build:
+            context: ./stock
+        expose:
+            - "8000"
+        ports:
+            - "8000:8000"
     api-endpoint:
         build:
             context: ./endpoints

@@ -29,7 +29,7 @@ module:
             kind: http
             type: stock/create
           spec:
-            endpoint: http://function-endpoint:8000/statefun
+            endpoint: http://stock-endpoint:8000/statefun
             states:
               - count
             maxNumBatchRequests: 500
@@ -39,7 +39,7 @@ module:
             kind: http
             type: stock/stock
           spec:
-            endpoint: http://function-endpoint:8000/statefun
+            endpoint: http://stock-endpoint:8000/statefun
             states:
               - item
             maxNumBatchRequests: 500
