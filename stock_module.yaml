@@ -7,26 +7,6 @@ module:
       - function:
           meta:
             kind: http
-            type: users/create
-          spec:
-            endpoint: http://function-endpoint:8000/statefun
-            states:
-              - count
-            maxNumBatchRequests: 500
-            timeout: 2min
-      - function:
-          meta:
-            kind: http
-            type: users/user
-          spec:
-            endpoint: http://function-endpoint:8000/statefun
-            states:
-              - user
-            maxNumBatchRequests: 500
-            timeout: 2min
-      - function:
-          meta:
-            kind: http
             type: stock/create
           spec:
             endpoint: http://stock-endpoint:9000/statefun
@@ -48,24 +28,24 @@ module:
       - ingress:
           meta:
             type: statefun.kafka.io/routable-protobuf-ingress
-            id: example/names
+            id: stock/in
           spec:
             address: kafka-broker:9092
-            consumerGroupId: my-group-id
+            consumerGroupId: stock-group
             topics:
-              - topic: users-create
-                typeUrl: com.googleapis/users.CreateUserRequest
+              - topic: stock-create
+                typeUrl: com.googleapis/users.CreateStockRequest
                 targets:
-                  - users/create
-              - topic: users
-                typeUrl: com.googleapis/users.UserRequest
+                  - stock/create
+              - topic: stock
+                typeUrl: com.googleapis/users.StockRequest
                 targets:
-                  - users/user
+                  - stock/stock
     egresses:
       - egress:
           meta:
             type: statefun.kafka.io/generic-egress
-            id: users/out
+            id: stock/out
           spec:
             address: kafka-broker:9092
             deliverySemantic:

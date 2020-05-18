@@ -14,6 +14,7 @@ RUN pip install -r requirements.txt
 COPY users.py /app
 COPY async_endpoint.py /app
 COPY users_pb2.py /app
+COPY stock_pb2.py /app
 
 EXPOSE 5000
 

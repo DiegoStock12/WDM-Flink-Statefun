@@ -272,8 +272,6 @@ async def add_credit(request):
     raise web.HTTPOk(
     ) if r_json['result'] == 'success' else web.HTTPBadRequest()
 
-
-
 # create the application object and add routes
 app = web.Application()
 app.add_routes(routes)

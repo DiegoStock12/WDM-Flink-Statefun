@@ -4,7 +4,7 @@ import typing
 import logging
 import json
 
-from endpoints.stock_pb2 import *
+from stock_pb2 import *
 
 from statefun import StatefulFunctions
 from statefun import RequestReplyHandler
@@ -18,7 +18,7 @@ logging.basicConfig(level=logging.DEBUG, format=FORMAT)
 logger = logging.getLogger()
 
 # Topic to output the responses to
-STOCK_EVENTS_TOPIC = "stock-events"
+STOCK_EVENTS_TOPIC = "user-events"
 
 # TODO ADD STOCK ITEM ID IMPL.
 

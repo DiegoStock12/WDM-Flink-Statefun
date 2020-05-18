@@ -28,7 +28,24 @@ services:
             - MASTER_HOST=master
         volumes:
             - ./checkpoint-dir:/checkpoint-dir
-    worker:
+    worker_1:
+        build:
+            context: .
+        expose:
+            - "6121"
+            - "6122"
+        depends_on:
+            - master
+            - kafka-broker
+        links:
+            - "master:master"
+            - "kafka-broker:kafka-broker"
+        environment:
+            - ROLE=worker
+            - MASTER_HOST=master
+        volumes:
+            - ./checkpoint-dir:/checkpoint-dir
+    worker_2:
         build:
             context: .
         expose:
@@ -56,9 +73,9 @@ services:
         build:
             context: ./stock
         expose:
-            - "8000"
+            - "9000"
         ports:
-            - "8000:8000"
+            - "9000:9000"
     api-endpoint:
         build:
             context: ./endpoints
