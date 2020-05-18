@@ -89,7 +89,7 @@ def operate_user(context,
             logger.debug(f'Found user: {state.id}:{state.credit}')
 
             response = UserResponse()
-            response.result = json.dumps({'id': state.id,
+            response.result = json.dumps({'user_id': state.id,
                                           'credit': state.credit})
 
         elif msg_type == 'remove_user':
@@ -139,7 +139,7 @@ def operate_user(context,
         logger.debug(f'Created new user with id {request.id}')
 
         response = UserResponse()
-        response.result = json.dumps({'id': state.id})
+        response.result = json.dumps({'user_id': state.id})
 
     else:
         logger.error('Received unknown message type!')

@@ -1,4 +1,6 @@
-kafka-python
+#kafka-python
 protobuf
-flask==1.1.1
+#flask==1.1.1
 gunicorn==20.0.4
+aiohttp==3.6.2
+aiokafka
