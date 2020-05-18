@@ -10,11 +10,15 @@ message Order{
 
 message CreateOrder{
     int64 userId = 1;
+    string request_id = 2;
+    string worker_id = 3;
 }
 
 message CreateOrderWithId{
     int64 id = 1;
-    int64 userId = 2;
+    string request_id = 2;
+    int64 userId = 3;
+    string worker_id = 4;
 }
 
 message CreateOrderResponse{
@@ -22,29 +26,57 @@ message CreateOrderResponse{
 }
 
 message OrderRequest{
+    message RemoveOrderRequest{
+        int64 id = 1;
+    }
+
+    message FindOrderRequest{
+        int64 id = 1;
+    }
+
+    message AddItemRequest{
+        int64 id = 1;
+        int64 itemId = 2;
+    }
+
+    message RemoveItemRequest{
+        int64 id = 1;
+        int64 itemId = 2;
+    }
+
+    // Request id for identifying the request
+    // in the endpoint and answer
+    string request_id = 1;
+
+    // Worker id used as key of the response
+    // so a given worker just has to save its
+    // own messages
+    string worker_id = 2;
 
     oneof message {
-        RemoveOrderRequest remove_order = 1;
-        FindOrderRequest find_order = 2;
-        AddItemRequest add_item = 3;
-        RemoveItemRequest remove_item = 4;
+        RemoveOrderRequest remove_order = 3;
+        FindOrderRequest find_order = 4;
+        AddItemRequest add_item = 5;
+        RemoveItemRequest remove_item = 6;
     }
 }
 
-message RemoveOrderRequest{
-    int64 id = 1;
+message OrderResponse {
+    string request_id = 1;
+    string result = 2;
 }
 
-message FindOrderRequest{
-    int64 id = 1;
+message OrdersPayFind {
+    int64 order_id = 1;
+    string request_id = 2;
+    string worker_id = 3;
 }
 
-message AddItemRequest{
-    int64 id = 1;
-    int64 itemId = 2;
+message OrdersPayReply{
+    string request_id = 1;
+    string worker_id = 2;
+    int64 total_cost = 3;
+    bool status = 4;
 }
 
-message RemoveItemRequest{
-    int64 id = 1;
-    int64 itemId = 2;
-}
+

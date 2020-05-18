@@ -1,9 +1,12 @@
 """ File including the functions served by the endpoint """
 import logging
 import typing
+import json
 
-from orders_pb2 import Order, CreateOrder, CreateOrderWithId, CreateOrderResponse, OrderRequest
+from orders_pb2 import Order, CreateOrder, CreateOrderWithId, CreateOrderResponse, OrderRequest, OrderResponse
 from users_pb2 import Count
+
+from google.protobuf.json_format import MessageToJson
 
 from statefun import StatefulFunctions, RequestReplyHandler, kafka_egress_record
 
@@ -35,6 +38,7 @@ def create_order(context, msg: CreateOrder):
     request = CreateOrderWithId()
     request.id = state.num
     request.userId = msg.userId
+    request.worker_id = msg.worker_id
     print(f"Sending request to function with id {request.id}", flush=True)
     context.pack_and_send("orders/order", str(request.id), request)
 
@@ -53,12 +57,12 @@ def operate_order(context, msg: typing.Union[CreateOrderWithId, OrderRequest]):
         state = Order()
         state.id = msg.id
         state.userId = msg.userId
-        # state.items.append([1])
 
         context.state('order').pack(state)
         logger.info(f'Created new order with id {msg.id}')
-        response = CreateOrderResponse()
-        response.orderId = msg.id
+
+        response = OrderResponse()
+        response.result = json.dumps({'order_id': state.id})
 
     elif isinstance(msg, OrderRequest):
         logger.info("Received order request!")
@@ -70,27 +74,37 @@ def operate_order(context, msg: typing.Union[CreateOrderWithId, OrderRequest]):
             state = context.state('order').unpack(Order)
             if not state:
                 logger.info("Order does not exists.")
+                response = OrderResponse()
+                response.result = json.dumps({'result': 'failure', 'message': 'Order does not exist.'})
             else:
                 logger.info(f"Deleting the order with id: {msg.remove_order.id}")
                 del context['order']
+                response = OrderResponse()
+                response.result = json.dumps({'result': 'success'})
 
         elif msg_type == 'find_order':
             state = context.state('order').unpack(Order)
             if not state:
                 logger.info("Order does not exist.")
+                response = OrderResponse()
+                response.result = json.dumps({'result': 'failure', 'message': 'Order does not exist.'})
             else:
                 logger.info(f"{state}")
                 logger.info(f"Returning order with id: {msg.find_order.id}")
+                response.result = MessageToJson(state)
 
         elif msg_type == 'add_item':
             state = context.state('order').unpack(Order)
             if not state:
                 logger.info("Order does not exist.")
+                response.result = json.dumps({'result': 'failure', 'message': 'Order does not exist.'})
             else:
                 state.items.append(msg.add_item.itemId)
                 logger.info(f"{state}")
                 context.state('order').pack(state)
                 logger.info(f"Returning order with id: {msg.add_item.id}")
+                response.result = json.dumps({'result': 'success'})
+
 
         elif msg_type == 'remove_item':
             orderId = msg.remove_item.id
@@ -110,8 +124,11 @@ def operate_order(context, msg: typing.Union[CreateOrderWithId, OrderRequest]):
                 if item_index != -1:
                     del state.items[item_index]
                     logger.info(f"Removing item {item_to_delete} from order {orderId}")
+                    response.result = json.dumps({'result': 'success'})
                 else:
                     logger.info(f"Order {orderId} does not contain item with id {item_to_delete}")
+                    response.result = json.dumps({'result': 'failure',
+                                                  'message': 'Order does not contain requested item.'})
 
                 context.state('order').pack(state)
 
@@ -119,9 +136,10 @@ def operate_order(context, msg: typing.Union[CreateOrderWithId, OrderRequest]):
         logger.error('Received unknown message type!')
 
     if response:
+        logger.info("Sending a response.")
         egress_message = kafka_egress_record(
             topic=ORDER_EVENTS_TOPIC,
-            key="example".encode('utf-8'),
+            key=msg.worker_id,
             value=response
             )
         context.pack_and_send_egress("orders/out", egress_message)
