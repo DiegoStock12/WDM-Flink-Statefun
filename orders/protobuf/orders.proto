@@ -1,0 +1,96 @@
+syntax = "proto3";
+
+package orders;
+
+import "general.proto";
+
+message CreateOrder{
+    int64 userId = 1;
+    string request_id = 2;
+    string worker_id = 3;
+}
+
+message CreateOrderWithId{
+    int64 id = 1;
+    string request_id = 2;
+    int64 userId = 3;
+    string worker_id = 4;
+}
+
+message CreateOrderResponse{
+    int64 orderId = 1;
+}
+
+message OrderRequest{
+    message RemoveOrderRequest{
+        int64 id = 1;
+    }
+
+    message FindOrderRequest{
+        int64 id = 1;
+    }
+
+    message AddItemRequest{
+        int64 id = 1;
+        int64 itemId = 2;
+    }
+
+    message RemoveItemRequest{
+        int64 id = 1;
+        int64 itemId = 2;
+    }
+
+    // Request id for identifying the request
+    // in the endpoint and answer
+    string request_id = 1;
+
+    // Worker id used as key of the response
+    // so a given worker just has to save its
+    // own messages
+    string worker_id = 2;
+
+    oneof message {
+        RemoveOrderRequest remove_order = 3;
+        FindOrderRequest find_order = 4;
+        AddItemRequest add_item = 5;
+        RemoveItemRequest remove_item = 6;
+    }
+}
+
+message OrderResponse {
+    string request_id = 1;
+    string result = 2;
+}
+
+message Order {
+    RequestInfo request_info = 1;
+    int64 id = 2;
+    int64 user_id = 3;
+    repeated int64 items = 4;
+    int64 total_cost = 5;
+    bool paid = 6;
+    enum Intent {
+        PAY = 0;
+        CANCEL = 1;
+        STATUS = 2;
+    }
+    Intent intent = 7;
+}
+
+message OrdersPayFind {
+    RequestInfo request_info = 1;
+    int64 order_id = 2;
+}
+
+
+message OrderPaymentCancel {
+    RequestInfo request_info = 1;
+    int64 order_id = 2;
+}
+
+message OrderPaymentCancelReply {
+    RequestInfo request_info = 1;
+    bool success = 2;
+}
+
+

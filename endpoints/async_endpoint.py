@@ -5,7 +5,7 @@ from aiohttp import web
 import asyncio
 
 # Messages exchanged with the stateful functions
-from users_pb2 import CreateUserRequest, UserRequest, UserResponse
+from users_pb2 import UserResponse
 
 # Async kafka producer and consumer
 from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
@@ -26,9 +26,10 @@ logger = logging.getLogger()
 
 # Some parameters to send and read from kafka
 KAFKA_BROKER = "kafka-broker:9092"
-USER_TOPIC = "users"
-USER_CREATION_TOPIC = "users-create"
+
 USER_EVENTS_TOPIC = "user-events"
+ORDER_EVENTS_TOPIC = "order-events"
+STOCK_EVENTS_TOPIC = "stock-events"
 
 # timeout for waiting for a server response
 TIMEOUT = 30
@@ -57,6 +58,8 @@ async def consume_forever(consumer: AIOKafkaConsumer):
         # if the message is for our worker, get it
         if msg.key.decode('utf-8') == WORKER_ID:
             logger.info(f'Received message! {msg.value}')
+
+            # TODO Maybe use some custom Response class with single json to return.
             resp = UserResponse()
             resp.ParseFromString(msg.value)
 
@@ -80,6 +83,8 @@ async def create_kafka_consumer(app: web.Application):
             # all at once and should work flawlessly
             consumer = AIOKafkaConsumer(
                 USER_EVENTS_TOPIC,
+                ORDER_EVENTS_TOPIC,
+                STOCK_EVENTS_TOPIC,
                 loop=asyncio.get_running_loop(),
                 bootstrap_servers=KAFKA_BROKER
             )
@@ -177,104 +182,17 @@ async def send_msg(topic: str, key: str, request):
         del messages[request.request_id]
         raise
 
-
-# Declaration of the user endpoints
-@routes.post('/users/create')
-async def create_user(request):
-    """ Sends a create user request to the cluster"""
-    msg = CreateUserRequest()
-
-    # wait for the response asynchronously
-    result = await send_msg(USER_CREATION_TOPIC, key="create", request=msg)
-
-    return web.Response(text=result, content_type='application/json')
-
-
-@routes.delete('/users/remove/{user_id}')
-async def remove_user(request):
-    """ Sends a remove user request to the statefun cluster"""
-
-    user_id = int(request.match_info['user_id'])
-
-    msg = UserRequest()
-    msg.remove_user.id = user_id
-
-    result = await send_msg(USER_TOPIC, key=user_id, request=msg)
-
-    # return code 200 or 404 in case of success or failure
-    r_json = json.loads(result)
-    raise web.HTTPOk() if r_json['result'] == 'success' else web.HTTPNotFound()
-
-
-@routes.get('/users/find/{user_id}')
-async def find_user(request):
-
-    user_id = int(request.match_info['user_id'])
-
-    msg = UserRequest()
-    msg.find_user.id = user_id
-
-    result = await send_msg(USER_TOPIC, key=user_id, request=msg)
-
-    return web.Response(text=result, content_type='application/json')
-
-
-@routes.get('/users/credit/{user_id}')
-async def get_credit(request):
-    # this can do the same as the find user as long as
-    # we just return the number only
-
-    # we get the result that is a dict of {'id': 0,
-    #                                       ' credit': 100}
-    # and we need to extract the credit from there and return it
-    response: web.Response = await find_user(request)
-
-    r_json = json.loads(response.text)
-
-    return web.Response(
-        text=json.dumps({'credit': r_json['credit']}),
-        content_type='application/json'
-    )
-
-
-@routes.post('/users/credit/subtract/{user_id}/{amount}')
-async def subtract_credit(request):
-
-    user_id = int(request.match_info['user_id'])
-    amount = int(request.match_info['amount'])
-
-    msg = UserRequest()
-    msg.subtract_credit.id = user_id
-    msg.subtract_credit.amount = amount
-
-    result = await send_msg(USER_TOPIC, key=user_id, request=msg)
-
-    # return code 200 or 404 in case of success or failure
-    r_json = json.loads(result)
-    raise web.HTTPOk(
-    ) if r_json['result'] == 'success' else web.HTTPBadRequest()
-
-
-@routes.post('/users/credit/add/{user_id}/{amount}')
-async def add_credit(request):
-
-    user_id = int(request.match_info['user_id'])
-    amount = int(request.match_info['amount'])
-
-    msg = UserRequest()
-    msg.add_credit.id = user_id
-    msg.add_credit.amount = amount
-
-    result = await send_msg(USER_TOPIC, key=user_id, request=msg)
-
-    # return code 200 or 404 in case of success or failure
-    r_json = json.loads(result)
-    raise web.HTTPOk(
-    ) if r_json['result'] == 'success' else web.HTTPBadRequest()
-
 # create the application object and add routes
 app = web.Application()
 app.add_routes(routes)
+
+from orders_async_endpoint import routes_orders
+from users_async_endpoint import routes_users
+from stock_async_endpoint import routes_stock
+
+app.add_routes(routes_orders)
+app.add_routes(routes_users)
+app.add_routes(routes_stock)
 
 # add the background tasks
 app.on_startup.append(create_kafka_producer)
@@ -282,7 +200,6 @@ app.on_startup.append(create_kafka_consumer)
 
 # add the shutdown tasks
 app.on_cleanup.append(shutdown_kafka)
-
 
 if __name__ == "__main__":
     web.run_app(app)

@@ -10,7 +10,7 @@ services:
             - "9092:9092"
         environment:
             HOSTNAME_COMMAND: "route -n | awk '/UG[ \t]/{print $$2}'"
-            KAFKA_CREATE_TOPICS: "users:1:1,users-create:1:1,user-events:1:1,names:1:1"
+            KAFKA_CREATE_TOPICS: "users:1:1,users-create:1:1,user-events:1:1,names:1:1,orders:1:1,orders-create:1:1,order-events:1:1"
             KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
         depends_on:
             - zookeeper
@@ -49,8 +49,8 @@ services:
         build:
             context: .
         expose:
-            - "6121"
-            - "6122"
+            - "6124"
+            - "6125"
         depends_on:
             - master
             - kafka-broker
@@ -69,13 +69,20 @@ services:
             - "8000"
         ports:
             - "8000:8000"
+    orders-endpoint:
+        build:
+            context: ./orders
+        expose:
+            - "8001"
+        ports:
+            - "8001:8001"
     stock-endpoint:
         build:
             context: ./stock
         expose:
-            - "9000"
+            - "8002"
         ports:
-            - "9000:9000"
+            - "8002:8002"
     api-endpoint:
         build:
             context: ./endpoints
@@ -85,4 +92,3 @@ services:
             - "5000"
         ports:
             - "5000:5000"
-        

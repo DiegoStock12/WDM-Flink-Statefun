@@ -6,3 +6,6 @@ checkpoint-dir
 example_pb2*
 test.py*
 .idea
+.idea
+example_pb2*
+test.py*

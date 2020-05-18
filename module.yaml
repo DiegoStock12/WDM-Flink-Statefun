@@ -14,6 +14,7 @@ module:
               - count
             maxNumBatchRequests: 500
             timeout: 2min
+
       - function:
           meta:
             kind: http
@@ -24,26 +25,29 @@ module:
               - user
             maxNumBatchRequests: 500
             timeout: 2min
+
       - function:
           meta:
             kind: http
-            type: stock/create
+            type: orders/create
           spec:
-            endpoint: http://stock-endpoint:9000/statefun
+            endpoint: http://orders-endpoint:8001/statefun
             states:
               - count
             maxNumBatchRequests: 500
             timeout: 2min
+
       - function:
           meta:
             kind: http
-            type: stock/stock
+            type: orders/order
           spec:
-            endpoint: http://stock-endpoint:9000/statefun
+            endpoint: http://orders-endpoint:8001/statefun
             states:
-              - item
+              - order
             maxNumBatchRequests: 500
             timeout: 2min
+
     ingresses:
       - ingress:
           meta:
@@ -53,14 +57,36 @@ module:
             address: kafka-broker:9092
             consumerGroupId: my-group-id
             topics:
+              - topic: names
+                typeUrl: com.googleapis/example.IncreaseUserCount
+                targets:
+                  - example/increment
+
+              - topic: test
+                typeUrl: com.googleapis/example.ExampleRequest
+                targets:
+                  - example/request
+
               - topic: users-create
                 typeUrl: com.googleapis/users.CreateUserRequest
                 targets:
                   - users/create
+
               - topic: users
                 typeUrl: com.googleapis/users.UserRequest
                 targets:
                   - users/user
+
+              - topic: orders-create
+                typeUrl: com.googleapis/orders.CreateOrder
+                targets:
+                  - orders/create
+
+              - topic: orders
+                typeUrl: com.googleapis/orders.OrderRequest
+                targets:
+                  - orders/order
+    
     egresses:
       - egress:
           meta:
@@ -71,5 +97,21 @@ module:
             deliverySemantic:
               type: exactly-once
               transactionTimeoutMillis: 100000
-              
-
+      - egress:
+          meta:
+            type: statefun.kafka.io/generic-egress
+            id: example/greets
+          spec:
+            address: kafka-broker:9092
+            deliverySemantic:
+              type: exactly-once
+              transactionTimeoutMillis: 100000
+      - egress:
+          meta:
+            type: statefun.kafka.io/generic-egress
+            id: orders/out
+          spec:
+            address: kafka-broker:9092
+            deliverySemantic:
+              type: exactly-once
+              transactionTimeoutMillis: 100000

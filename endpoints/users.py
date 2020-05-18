@@ -2,6 +2,9 @@ from flask import Flask, Response
 
 # Import the messages to be sent to the statefun cluster
 from users_pb2 import CreateUserRequest, UserRequest, UserResponse
+from orders_pb2 import CreateOrder, OrderRequest
+
+from flask import jsonify
 
 from kafka import KafkaProducer, KafkaConsumer
 from kafka.errors import NoBrokersAvailable
@@ -183,6 +186,97 @@ def add_credit(user_id, amount):
     result = get_message(request.request_id)
 
     return Response(result, mimetype='application/json')
+
+@app.route('/orders/create/<int:userId>', methods=['POST'])
+def create_order(userId):
+    global producer, consumer
+
+    print("Received request to create order for user", flush=True)
+    request = CreateOrder()
+    request.userId = userId
+
+    if producer is None:
+        print("Creating the producer", flush=True)
+        producer = KafkaProducer(bootstrap_servers=[KAFKA_BROKER])
+        print("Got the broker!", flush=True)
+
+    send_msg("orders-create", "create_order", request)
+
+    return jsonify({'response': 'Created order'})
+
+
+@app.route('/orders/remove/<int:orderId>', methods=['DELETE'])
+def remove_order(orderId):
+    global producer, consumer
+
+    print("Received request to remove order.", flush=True)
+    request = OrderRequest()
+    request.remove_order.id = orderId
+
+    if producer is None:
+        print("Creating the producer", flush=True)
+        producer = KafkaProducer(bootstrap_servers=[KAFKA_BROKER])
+        print("Got the broker!", flush=True)
+
+    send_msg("orders", orderId, request)
+
+    return jsonify({'response': 'Removed order'})
+
+
+@app.route('/orders/find/<int:orderId>', methods=['GET'])
+def get_order(orderId):
+    global producer, consumer
+
+    print("Received request to find an order.", flush=True)
+    request = OrderRequest()
+    request.find_order.id = orderId
+
+    if producer is None:
+        print("Creating the producer", flush=True)
+        producer = KafkaProducer(bootstrap_servers=[KAFKA_BROKER])
+        print("Got the broker!", flush=True)
+
+    send_msg("orders", orderId, request)
+
+    return jsonify({'response': 'Found order'})
+
+
+@app.route('/orders/addItem/<int:orderId>/<int:itemId>', methods=['POST'])
+def add_item_to_order(orderId, itemId):
+    global producer, consumer
+
+    print("Received request to add item to an order.", flush=True)
+    request = OrderRequest()
+    request.add_item.id = orderId
+    request.add_item.itemId = itemId
+
+    if producer is None:
+        print("Creating the producer", flush=True)
+        producer = KafkaProducer(bootstrap_servers=[KAFKA_BROKER])
+        print("Got the broker!", flush=True)
+
+    send_msg("orders", orderId, request)
+
+    return jsonify({'response': 'Added item'})
+
+
+@app.route('/orders/removeItem/<int:orderId>/<int:itemId>', methods=['DELETE'])
+def remove_item_from_order(orderId, itemId):
+    global producer, consumer
+
+    print("Received request to remove item from an order.", flush=True)
+    request = OrderRequest()
+    request.remove_item.id = orderId
+    request.remove_item.itemId = itemId
+
+    if producer is None:
+        print("Creating the producer", flush=True)
+        producer = KafkaProducer(bootstrap_servers=[KAFKA_BROKER])
+        print("Got the broker!", flush=True)
+
+    send_msg("orders", orderId, request)
+
+    return jsonify({'response': 'Removed item'})
 
 
 def send_msg(topic, key, request):
