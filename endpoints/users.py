@@ -2,6 +2,9 @@ from flask import Flask, Response
 
 # Import the messages to be sent to the statefun cluster
 from users_pb2 import CreateUserRequest, UserRequest, UserResponse
+from orders_pb2 import CreateOrder, OrderRequest
+
+from flask import jsonify
 
 from kafka import KafkaProducer, KafkaConsumer
 from kafka.errors import NoBrokersAvailable
