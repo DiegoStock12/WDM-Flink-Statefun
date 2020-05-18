@@ -56,7 +56,7 @@ def operate_order(context, msg: typing.Union[CreateOrderWithId, OrderRequest]):
     if isinstance(msg, CreateOrderWithId):
         state = Order()
         state.id = msg.id
-        state.userId = msg.userId
+        state.userId = msg.user_id
 
         context.state('order').pack(state)
         logger.info(f'Created new order with id {msg.id}')

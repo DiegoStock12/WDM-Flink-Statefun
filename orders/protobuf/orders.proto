@@ -2,11 +2,7 @@ syntax = "proto3";
 
 package orders;
 
-message Order{
-    int64 id = 1;
-    int64 userId = 2;
-    repeated int64 items = 3;
-}
+import "general.proto";
 
 message CreateOrder{
     int64 userId = 1;
@@ -66,17 +62,35 @@ message OrderResponse {
     string result = 2;
 }
 
-message OrdersPayFind {
-    int64 order_id = 1;
-    string request_id = 2;
-    string worker_id = 3;
+message Order {
+    RequestInfo request_info = 1;
+    int64 id = 2;
+    int64 user_id = 3;
+    repeated int64 items = 4;
+    int64 total_cost = 5;
+    bool paid = 6;
+    enum Intent {
+        PAY = 0;
+        CANCEL = 1;
+        STATUS = 2;
+    }
+    Intent intent = 7;
 }
 
-message OrdersPayReply{
-    string request_id = 1;
-    string worker_id = 2;
-    int64 total_cost = 3;
-    bool status = 4;
+message OrdersPayFind {
+    RequestInfo request_info = 1;
+    int64 order_id = 2;
+}
+
+
+message OrderPaymentCancel {
+    RequestInfo request_info = 1;
+    int64 order_id = 2;
+}
+
+message OrderPaymentCancelReply {
+    RequestInfo request_info = 1;
+    bool success = 2;
 }
 
 
