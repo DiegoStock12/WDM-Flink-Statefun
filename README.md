@@ -38,9 +38,16 @@ The stateful functions preserve the state of each user and receive events from t
 
 After processing the requests, the result of the computation is published in the `user-events` topic within a general `UserResponse` protobuf message. The actual response that will be displayed to the caller is embedded in the `result` field of that protobuf in JSON format.
 
-
+# Resources
+- [Stateful functions - keynote](https://www.youtube.com/watch?v=NF0hXZfUyqE&feature=youtu.be)
+- [Stateful functions - demo](https://www.youtube.com/watch?v=tuSylBadNSo)
+- [Kafka client - benchmarks](https://activisiongamescience.github.io/2016/06/15/Kafka-Client-Benchmarking/)
+- [Python WSGI servers - performance analysis](https://www.appdynamics.com/blog/engineering/a-performance-analysis-of-python-wsgi-servers-part-2/)
 
 # Ask Asterios
 
 * How do we scale the Flink side -> not just duplicating containers, need to share state as well -> how to configure and define this in Kubernetes?
 * What about the replies -> should be non-blocking -> save ID per request and listen on an reply output topic?
+* Is return success/failure JSON or simply a status code?
+* Should the ID also be in a JSON field?
+* /orders/find/{order_id} -> what if an order does not exist?
