@@ -170,18 +170,22 @@ def operate_user(context,
 
 @functions.bind('payments/pay')
 def payments_pay(context, request: typing.Union[PaymentRequest, ]):
+
+    # if isinstance(request, UserRequest):
+
+
     if request.request_type == PaymentRequest.RequestType.PAY:
         # send message to orders/find -> blocking wait here? get total price back in another function?
 
         orders_pay_find = OrdersPayFind()
-        orders_pay_find.request_id = request.request_id
-        orders_pay_find.worker_id = request.worker_id
+        orders_pay_find.request_info.request_id = request.request_id
+        orders_pay_find.request_info.worker_id = request.worker_id
         orders_pay_find.order_id = request.order_id
 
         # subtract amount from user -> get success/failure back
-        user_pay_request = UserPay()
-        user_pay_request.request_id = request.request_id
-        user_pay_request.worker_id = request.worker_id
+        user_pay_request = UserPayRequest()
+        user_pay_request.request_info.request_id = request.request_id
+        user_pay_request.request_info.worker_id = request.worker_id
         user_pay_request.amount = 100 # todo: fixme
         context.pack_and_send("users/user", request.user_id, user_pay_request)
 

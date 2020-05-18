@@ -1,11 +1,14 @@
 syntax = "proto3";
 
-package users;
+
+import "general.proto";
 
 /*
 * Messages used to handle requests
 * to the user endpoint
 */
+
+
 
 // Message used to store the user data
 // in the statefun and also what we give back to the
@@ -85,4 +88,27 @@ message UserRequest{
 message UserResponse{
     string request_id = 1;
     string result = 2;
+}
+
+// INTERACTION WITH THE PAYMENT SERVICE
+
+message UserPayRequest{
+    int64 amount = 1;
+
+    // Include the request info
+    RequestInfo request_info = 2;
+}
+
+// Message to cancel the payment
+message UserCancelPayRequest{
+    int64 amount = 1;
+
+    RequestInfo request_info = 2;
+}
+
+// Response returned to the payment
+// service with success or failure
+message UserPayResponse{
+    bool success = 1;
+    RequestInfo request_info = 2;
 }
