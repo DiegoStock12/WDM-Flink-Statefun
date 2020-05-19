@@ -40,6 +40,6 @@ jobs:
         with:
           python-version: '3.7'
       - name: Download statefun and build
-        run: git clone https://github.com/apache/flink-statefun-docker && cd flink-statefun-docker/2.0.0 && docker build -t flink-statefun:2.0.0 .
+        run: git clone https://github.com/apache/flink-statefun-docker && cd flink-statefun-docker/2.0.0 && docker build -t flink-statefun .
       - name: Build images
         run: docker-compose build
