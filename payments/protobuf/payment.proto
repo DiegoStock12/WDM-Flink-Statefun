@@ -7,8 +7,7 @@ package payment;
 message PaymentRequest {
     uint64 user_id = 1;
     uint64 order_id = 2;
-    string request_id = 3;
-    string worker_id = 4;
+    RequestInfo request_info = 3;
 
     enum RequestType {
       PAY = 0;
@@ -16,7 +15,12 @@ message PaymentRequest {
       STATUS = 2;
     }
 
-    RequestType request_type = 5;
+    RequestType request_type = 4;
+}
+
+message PaymentResponse {
+  string request_id = 1;
+  string result = 2;
 }
 
 message PaymentStatus {

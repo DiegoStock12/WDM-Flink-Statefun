@@ -27,41 +27,75 @@ USER_EVENTS_TOPIC = "user-events"
 functions = StatefulFunctions()
 
 @functions.bind('payments/pay')
-def payments_pay(context, request: typing.Union[PaymentRequest, Order, OrdersPayReply, OrderPaymentCancelReply]):
+def payments_pay(context, request: typing.Union[PaymentRequest, UserPayRequest, Order, OrdersPayFind, UserPayResponse, OrdersPayReply, OrderPaymentCancelReply]):
 
-    # if isinstance(request, UserRequest):
-
-
-    if request.request_type == PaymentRequest.RequestType.PAY:
-        # send message to orders/find -> blocking wait here? get total price back in another function?
-
-        orders_pay_find = OrdersPayFind()
-        orders_pay_find.request_info.request_id = request.request_id
-        orders_pay_find.request_info.worker_id = request.worker_id
-        orders_pay_find.order_id = request.order_id
-
-        # subtract amount from user -> get success/failure back
-        user_pay_request = UserPayRequest()
-        user_pay_request.request_info.request_id = request.request_id
-        user_pay_request.request_info.worker_id = request.worker_id
-        user_pay_request.amount = 100 # todo: fixme
-        context.pack_and_send("users/user", request.user_id, user_pay_request)
-
-
-
-        # return success / failure to orders function
-        pass
-    elif request.request_type == PaymentRequest.RequestType.CANCEL:
-        # send message to orders/find -> get total price back in another function?
-
-        # send message to user add to add the amount of the order -> get success/failure back
-
-        # send message to orders to mark orders as unpaid
-        pass
-    elif: request.request_type == PaymentRequest.RequestType.STATUS:
-        # call orders/find and return status from there
-
-        pass
+    if isinstance(request, Order):
+        if request.intent == Order.Intent.PAY:
+            user_pay_request = UserPayRequest()
+            user_pay_request.request_info.request_id = request.request_info.request_id
+            user_pay_request.request_info.worker_id = request.request_info.worker_id
+            user_pay_request.order_id = request.order_id
+            user_pay_request.amount = request.total_cost
+            context.pack_and_send("users/user", request.user_id, user_pay_request)
+        elif request.intent == Order.Intent.CANCEL:
+            if request.paid == False:
+                # Payment cannot be cancelled cause it is not paid
+                payment_response = ResponseMessage()
+                payment_response.result = json.dumps({'result': 'failure'})
+                # TODO: is this correct?
+                egress_message = kafka_egress_record(
+                    topic=PAYMENT_EVENTS_TOPIC,
+                    key=request.worker_id,
+                    value=payment_response
+                )
+                context.pack_and_send_egress("payments/out", egress_message)
+            # Otherwise send request to user to subtract the amount
+            elif request.paid == True:
+                user_pay_request = UserCancelPayRequest()
+                user_pay_request.request_info.request_id = request.request_info.request_id
+                user_pay_request.request_info.worker_id = request.request_info.worker_id
+                user_pay_request.order_id = request.order_id
+                user_pay_request.amount = request.total_cost
+                context.pack_and_send("users/user", request.user_id, user_pay_request)
+        elif request.intent == Order.Intent.STATUS:
+            payment_response = ResponseMessage()
+            payment_response.result = json.dumps({'paid': True}) if request.paid else json.dumps({'paid': False})
+            # TODO: is this correct?
+            egress_message = kafka_egress_record(
+                topic=PAYMENT_EVENTS_TOPIC,
+                key=request.worker_id,
+                value=payment_response
+            )
+            context.pack_and_send_egress("payments/out", egress_message)
+    elif isinstance(request, UserPayResponse):
+        payment_status = PaymentStatus()
+        payment_status.order_id = request.order_id
+        payment_status.actually_paid = request.success
+        payment_status.request_info.request_id = request.request_info.request_id
+        payment_status.request_info.worker_id = request.request_info.worker_id
+        context.pack_and_send("orders/checkout", request.user_id, payment_status)
+    elif isinstance(request, PaymentRequest):
+        if request.request_type == PaymentRequest.RequestType.CANCEL:
+            order_payment_cancel_request = OrderPaymentCancel()
+            order_payment_cancel_request.order_id = request.order_id
+            order_payment_cancel_request.request_info.request_id = request.request_info.request_id
+            order_payment_cancel_request.request_info.worker_id = request.request_info.worker_id
+            context.pack_and_send("orders/checkout", request.user_id, order_payment_cancel_request)
+        elif request.request_type == PaymentRequest.RequestType.STATUS:
+            orders_pay_find_request = OrdersPayFind()
+            orders_pay_find_request.order_id = request.order_id
+            orders_pay_find_request.request_info.request_id = request.request_info.request_id
+            orders_pay_find_request.request_info.worker_id = request.request_info.worker_id
+            context.pack_and_send("orders/order", request.user_id, orders_pay_find_request)
+    elif isinstance(request, OrderPaymentCancelReply):
+        payment_response = ResponseMessage()
+        payment_response.result = json.dumps({'result': 'success'}) if request.success else json.dumps({'result': 'failure'})
+        egress_message = kafka_egress_record(
+            topic=PAYMENT_EVENTS_TOPIC,
+            key=request.worker_id,
+            value=payment_response
+        )
+        context.pack_and_send_egress("payments/out", egress_message)
 
 
 # Use the handler and expose the endpoint

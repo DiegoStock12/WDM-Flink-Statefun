@@ -19,9 +19,9 @@ logger = logging.getLogger()
 KAFKA_BROKER = "kafka-broker:9092"
 PAYMENT_TOPIC = "payment-create"
 
+# This endpoint will never be used, the orders function calls directly
 @routes_payments.post('/payment/pay/{user_id}/{order_id}')
 async def order_pay(request):
-
     user_id = int(request.match_info['user_id'])
     order_id = int(request.match_info['order_id'])
 
@@ -29,39 +29,42 @@ async def order_pay(request):
     msg.user_id = user_id
     msg.order_id = order_id
     msg.request_type = PaymentRequest.RequestType.PAY
-    msg.request_id = str(uuid.uuid4())
+    msg.request_info.request_id = str(uuid.uuid4())
+    msg.request_info.worker_id = 1 #TODO: FIXME
 
-    send_msg(PAYMENT_TOPIC, key='payment_pay', request=msg)
+    result = await send_msg(PAYMENT_TOPIC, key='payment_pay', request=msg)
 
-    result = get_message(msg.request_id)
+    r_json = json.loads(result)
+    raise web.HTTPOk() if r_json['result'] == 'success' else web.HTTPNotFound()
 
-    return result
-
-# todo: fixme
 @routes_payments.post('/payment/cancel/{user_id}/{order_id}')
-def order_cancel(user_id, order_id):
-    request = PaymentRequest()
-    request.user_id = user_id
-    request.order_id = order_id
-    request.request_type = PaymentRequest.RequestType.CANCEL
-    request.request_id = str(uuid.uuid4())
+async def order_cancel(request):
+    user_id = int(request.match_info['user_id'])
+    order_id = int(request.match_info['order_id'])
 
-    send_msg(PAYMENT_TOPIC, key=user_id, request=request)
+    msg = PaymentRequest()
+    msg.user_id = user_id
+    msg.order_id = order_id
+    msg.request_type = PaymentRequest.RequestType.CANCEL
+    msg.request_info.request_id = str(uuid.uuid4())
+    msg.request_info.worker_id = 1 #TODO: FIXME
 
-    result = get_message(request.request_id)
+    result = await send_msg(PAYMENT_TOPIC, key='payment_pay', request=msg)
 
-    return result
+    r_json = json.loads(result)
+    raise web.HTTPOk() if r_json['result'] == 'success' else web.HTTPNotFound()
 
-# todo: fixme
-@routes_payments.get('/payment/status/{order_id}', methods=['GET'])
-def order_status(order_id):
-    request = PaymentRequest()
-    request.order_id = order_id
-    request.request_type = PaymentRequest.RequestType.STATUS
-    requests.request_id = str(uuid.uuid4())
+@routes_payments.get('/payment/status/{order_id}')
+async def order_status(request):
+    order_id = int(request.match_info['order_id'])
 
-    send_msg(PAYMENT_TOPIC, key=user_id, request=request)
+    msg = PaymentRequest()
+    msg.order_id = order_id
+    msg.request_type = PaymentRequest.RequestType.STATUS
+    msg.request_info.request_id = str(uuid.uuid4())
+    msg.request_info.worker_id = 1 #TODO: FIXME
 
-    result = get_message(request.request_id)
+    result = await send_msg(PAYMENT_TOPIC, key='payment_pay', request=msg)
 
-    return result
+    r_json = json.loads(result)
+    raise web.HTTPOk() if r_json['result'] == 'success' else web.HTTPNotFound()
