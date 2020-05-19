@@ -38,15 +38,10 @@ def payments_pay(context, request: typing.Union[PaymentRequest, UserPayRequest, 
         elif request.intent == Order.Intent.CANCEL:
             if request.paid == False:
                 # Payment cannot be cancelled cause it is not paid
-                payment_response = ResponseMessage()
-                payment_response.result = json.dumps({'result': 'failure'})
-                # TODO: is this correct?
-                egress_message = kafka_egress_record(
-                    topic=PAYMENT_EVENTS_TOPIC,
-                    key=request.worker_id,
-                    value=payment_response
-                )
-                context.pack_and_send_egress("payments/out", egress_message)
+                response = ResponseMessage()
+                response.request_id = request.request_info.request_id
+                response.result = json.dumps({'result': 'failure'})
+                send_response(request.request_info.worker_id, response)
             # Otherwise send request to user to subtract the amount
             elif request.paid == True:
                 user_pay_request =  set_worker_and_request_ids(request, UserCancelPayRequest())
@@ -54,15 +49,10 @@ def payments_pay(context, request: typing.Union[PaymentRequest, UserPayRequest, 
                 user_pay_request.amount = request.total_cost
                 context.pack_and_send("users/user", request.user_id, user_pay_request)
         elif request.intent == Order.Intent.STATUS:
-            payment_response = ResponseMessage()
-            payment_response.result = json.dumps({'paid': True}) if request.paid else json.dumps({'paid': False})
-            # TODO: is this correct?
-            egress_message = kafka_egress_record(
-                topic=PAYMENT_EVENTS_TOPIC,
-                key=request.worker_id,
-                value=payment_response
-            )
-            context.pack_and_send_egress("payments/out", egress_message)
+            response = ResponseMessage()
+            response.request_id = request.request_info.request_id
+            response.result = json.dumps({'paid': True}) if request.paid else json.dumps({'paid': False})
+            send_response(request.request_info.worker_id, response)
     elif isinstance(request, UserPayResponse):
         payment_status = set_worker_and_request_ids(request, PaymentStatus())
         payment_status.order_id = request.order_id
@@ -78,19 +68,23 @@ def payments_pay(context, request: typing.Union[PaymentRequest, UserPayRequest, 
             orders_pay_find_request.order_id = request.order_id
             context.pack_and_send("orders/order", request.user_id, orders_pay_find_request)
     elif isinstance(request, OrderPaymentCancelReply):
-        payment_response = ResponseMessage()
-        payment_response.result = json.dumps({'result': 'success'}) if request.success else json.dumps({'result': 'failure'})
-        egress_message = kafka_egress_record(
-            topic=PAYMENT_EVENTS_TOPIC,
-            key=request.worker_id,
-            value=payment_response
-        )
-        context.pack_and_send_egress("payments/out", egress_message)
+        response = ResponseMessage()
+        response.response_id = request.request_info.request_id
+        response.result = json.dumps({'result': 'success'}) if request.success else json.dumps({'result': 'failure'})
+        send_response(response, request.request_info.worker_id)
 
 def set_worker_and_request_ids(message_in, message_out):
     message_out.request_info.request_id = message_in.request_info.request_id
     message_out.request_info.worker_id = message_in.request_info.worker_id
     return message_out
+
+def send_response(response_message, worker_id):
+    egress_message = kafka_egress_record(
+        topic=PAYMENT_EVENTS_TOPIC,
+        key=worker_id,
+        value=response_message
+    )
+    context.pack_and_send_egress("payments/out", egress_message)
 
 # Use the handler and expose the endpoint
 handler = RequestReplyHandler(functions)
