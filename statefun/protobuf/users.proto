@@ -85,11 +85,6 @@ message UserRequest{
 
 }
 
-// Global response given for user operationsusers_pb2.py
-message UserResponse{
-    string request_id = 1;
-    string result = 2;
-}
 
 // INTERACTION WITH THE PAYMENT SERVICE 
 
