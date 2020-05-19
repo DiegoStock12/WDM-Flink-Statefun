@@ -14,13 +14,7 @@ message PaymentRequest {
       CANCEL = 1;
       STATUS = 2;
     }
-
     RequestType request_type = 4;
-}
-
-message PaymentResponse {
-  string request_id = 1;
-  string result = 2;
 }
 
 message PaymentStatus {

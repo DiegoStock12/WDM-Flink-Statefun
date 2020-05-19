@@ -5,7 +5,10 @@ import logging
 import json
 
 # Messages and internal states of the functions
-from users_pb2 import CreateUserRequest, UserRequest, UserResponse, UserData, Count, CreateUserWithId, UserPay
+from users_pb2 import UserPayRequest, UserCancelPayRequest, UserPayResponse
+from general_pb2 import ResponseMessage
+from payment_pb2 import PaymentRequest, PaymentStatus
+from orders_pb2 import Order, OrdersPayFind, UserPayResponse, OrdersPayReply, OrderPaymentCancelReply
 
 from statefun import StatefulFunctions
 from statefun import RequestReplyHandler
