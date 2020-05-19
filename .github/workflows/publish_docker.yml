@@ -1,0 +1,43 @@
+name: Publish Docker image
+
+on:
+  push:
+    # Publish `master` as Docker `latest` image.
+    branches:
+      - master
+
+    # Publish `v1.2.3` tags as releases.
+    tags:
+      - v*
+
+  # Run tests for any PRs.
+  pull_request:
+    branches:
+    - master
+
+env:
+  STOCK_SERVICE_IMAGE: wdm.stock_service
+  ORDER_SERVICE_IMAGE: wdm.order_service
+  USER_SERVICE_IMAGE: wdm.user_service
+  PAYMENT_SERVICE_IMAGE: wdm.payment_service
+  ASYNC_ENDPOINT_IMAGE: wdm.endpoint
+  FLINK_WORKER: wdm.flink_worker
+  FLINK_MASTER: wdm.flink_master
+
+jobs:
+
+  # Push image to GitHub Packages.
+  # See also https://docs.docker.com/docker-hub/builds/
+  push:
+
+    runs-on: ubuntu-18.04
+    if: github.event_name == 'push'
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+      - name: Build images
+        run: docker-compose build
