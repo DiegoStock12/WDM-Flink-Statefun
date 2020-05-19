@@ -81,7 +81,7 @@ async def add_item_to_order(request):
     return web.Response(text=result, status=201, content_type='application/json')
 
 
-@routes_orders.delete('/orders/removeItem/{orderId}/{int:itemId}')
+@routes_orders.delete('/orders/removeItem/{orderId}/{itemId}')
 async def remove_item_from_order(request):
     print("Received request to remove item from an order.", flush=True)
 
