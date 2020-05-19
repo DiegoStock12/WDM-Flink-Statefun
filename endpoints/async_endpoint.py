@@ -6,6 +6,7 @@ import asyncio
 
 # Messages exchanged with the stateful functions
 from users_pb2 import UserResponse
+from stock_pb2 import StockResponse
 
 # Async kafka producer and consumer
 from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
@@ -60,7 +61,7 @@ async def consume_forever(consumer: AIOKafkaConsumer):
             logger.info(f'Received message! {msg.value}')
 
             # TODO Maybe use some custom Response class with single json to return.
-            resp = UserResponse()
+            resp = StockResponse()
             resp.ParseFromString(msg.value)
 
             # set the result of the future in the dict

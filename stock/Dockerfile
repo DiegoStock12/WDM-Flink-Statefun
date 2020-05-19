@@ -12,4 +12,4 @@ COPY stock_pb2.py /app
 
 EXPOSE 8002
 
-CMD ["gunicorn", "-b", "0.0.0.0:8000", "-w 4", "stock:app"]
+CMD ["gunicorn", "-b", "0.0.0.0:8002", "-w 4", "stock:app"]

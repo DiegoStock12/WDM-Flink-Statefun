@@ -28,29 +28,12 @@ services:
             - MASTER_HOST=master
         volumes:
             - ./checkpoint-dir:/checkpoint-dir
-    worker_1:
+    worker:
         build:
             context: .
         expose:
             - "6121"
             - "6122"
-        depends_on:
-            - master
-            - kafka-broker
-        links:
-            - "master:master"
-            - "kafka-broker:kafka-broker"
-        environment:
-            - ROLE=worker
-            - MASTER_HOST=master
-        volumes:
-            - ./checkpoint-dir:/checkpoint-dir
-    worker_2:
-        build:
-            context: .
-        expose:
-            - "6124"
-            - "6125"
         depends_on:
             - master
             - kafka-broker

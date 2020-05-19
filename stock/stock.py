@@ -18,9 +18,7 @@ logging.basicConfig(level=logging.DEBUG, format=FORMAT)
 logger = logging.getLogger()
 
 # Topic to output the responses to
-STOCK_EVENTS_TOPIC = "user-events"
-
-# TODO ADD STOCK ITEM ID IMPL.
+STOCK_EVENTS_TOPIC = "stock-events"
 
 # Functions to deal with stock management
 
@@ -46,9 +44,9 @@ def create_item(context, request: CreateItemRequest):
     item_request.id = state.num
     item_request.price = request.price
     item_request.request_id = request.request_id
-    item_request.worked_id = request.worked_id
-    print(f"Sending request to function with id {request.id}", flush=True)
-    context.pack_and_send("stock/stock", str(request.id), request)
+    item_request.worker_id = request.worker_id
+    print(f"Sending request to function with id {item_request.id}", flush=True)
+    context.pack_and_send("stock/stock", str(item_request.id), item_request)
 
     # update the next id to assign and save
     state.num += 1
@@ -71,7 +69,7 @@ def manage_stock(context, request: typing.Union[StockRequest, CreateItemWithId])
 
         response = StockResponse()
         response.item_id = item_state.id
-        response.result = json.dumps({'id': item_state.id})
+        response.result = json.dumps({'item_id': item_state.id})
     elif isinstance(request, StockRequest):
         logger.debug("Received stock request!")
 
@@ -84,38 +82,33 @@ def manage_stock(context, request: typing.Union[StockRequest, CreateItemWithId])
                 # Item does not exist yet. Return error.
                 response = StockResponse()
                 response.item_id = request.find_item.id
-                response.result = json.dump({'result:': 'not_found'})
+                response.result = json.dumps({'result:': 'not_found'})
             else:
                 response = StockResponse()
                 response.item_id = item_state.id
-                response.result = json.dump({'id:': item_state.id, 'price': item_state.price, 'stock': item_state.stock})
-        elif msg_type == "substract_stock":
-            new_amount = item_state.stock - request.substract_stock.amount
+                response.result = json.dumps({'id:': item_state.id, 'price': item_state.price, 'stock': item_state.stock})
+        elif msg_type == "subtract_stock":
+            new_amount = item_state.stock - request.subtract_stock.amount
             response = StockResponse()
 
             if new_amount >= 0:
-                item_state.credit -= request.subtract_stock.amount
+                item_state.stock -= request.subtract_stock.amount
 
                 context.state('item').pack(item_state)
-                logger.debug(
-                    f"New credit for user {request.subtract_credit.id} is {item_state.stock}")
-                response.id = item_state.id
+                response.item_id = item_state.id
                 response.result = json.dumps({'result': 'success'})
             else:
-                response.id = item_state.id
+                response.item_id = item_state.id
                 response.result = json.dumps({'result': 'stock is too low.'})
                 logger.debug('Stock is too low.')
 
         elif msg_type == "add_stock":
-            item_state.credit += request.add_stock.amount
+            item_state.stock += request.add_stock.amount
             context.state('item').pack(item_state)
-
-            logger.debug(
-                f"New credit for user {request.add_credit.id} is {item_state.credit}")
 
             # send the reponse.
             response = StockResponse()
-            response.id = item_state.id
+            response.item_id = item_state.id
             response.result = json.dumps({'result': 'success'})
     if response:
         # Use the same request id in the message body
@@ -133,7 +126,7 @@ def manage_stock(context, request: typing.Union[StockRequest, CreateItemWithId])
             value=response
         )
 
-        logger.debug(f'Created egress message: {egress_message}')
+        logger.debug(f'Created egress message: {response}')
 
         context.pack_and_send_egress("stock/out", egress_message)
 
