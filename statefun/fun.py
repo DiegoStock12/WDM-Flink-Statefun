@@ -5,8 +5,12 @@ import logging
 import json
 
 # Messages and internal states of the functions
-from users_pb2 import CreateUserRequest, UserRequest, UserResponse, UserData, Count, CreateUserWithId
+from users_pb2 import CreateUserRequest, UserRequest, UserData, Count, CreateUserWithId
 
+# Import the general response message
+from general_pb2 import ResponseMessage
+
+# import the basic statefun members
 from statefun import StatefulFunctions
 from statefun import RequestReplyHandler
 from statefun import kafka_egress_record
@@ -88,7 +92,7 @@ def operate_user(context,
 
             logger.debug(f'Found user: {state.id}:{state.credit}')
 
-            response = UserResponse()
+            response = ResponseMessage()
             response.result = json.dumps({'user_id': state.id,
                                           'credit': state.credit})
 
@@ -96,7 +100,7 @@ def operate_user(context,
             logger.debug(f"Deleting user {request.remove_user.id}")
             del context['user']
 
-            response = UserResponse()
+            response = ResponseMessage()
             response.result = json.dumps({'result': 'success'})
 
         elif msg_type == 'add_credit':
@@ -108,13 +112,13 @@ def operate_user(context,
                 f"New credit for user {request.add_credit.id} is {state.credit}")
 
             # send the reponse
-            response = UserResponse()
+            response = ResponseMessage()
             response.result = json.dumps({'result': 'success'})
 
         elif msg_type == 'subtract_credit':
             # try to subtract the amount from the user credit
             new_amount = state.credit - request.subtract_credit.amount
-            response = UserResponse()
+            response = ResponseMessage()
 
             if new_amount >= 0:
                 state.credit -= request.subtract_credit.amount
@@ -138,7 +142,7 @@ def operate_user(context,
         context.state('user').pack(state)
         logger.debug(f'Created new user with id {request.id}')
 
-        response = UserResponse()
+        response = ResponseMessage()
         response.result = json.dumps({'user_id': state.id})
 
     else:
