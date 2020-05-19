@@ -31,9 +31,7 @@ def payments_pay(context, request: typing.Union[PaymentRequest, UserPayRequest, 
 
     if isinstance(request, Order):
         if request.intent == Order.Intent.PAY:
-            user_pay_request = UserPayRequest()
-            user_pay_request.request_info.request_id = request.request_info.request_id
-            user_pay_request.request_info.worker_id = request.request_info.worker_id
+            user_pay_request = set_worker_and_request_ids(request, UserPayRequest())
             user_pay_request.order_id = request.order_id
             user_pay_request.amount = request.total_cost
             context.pack_and_send("users/user", request.user_id, user_pay_request)
@@ -51,9 +49,7 @@ def payments_pay(context, request: typing.Union[PaymentRequest, UserPayRequest, 
                 context.pack_and_send_egress("payments/out", egress_message)
             # Otherwise send request to user to subtract the amount
             elif request.paid == True:
-                user_pay_request = UserCancelPayRequest()
-                user_pay_request.request_info.request_id = request.request_info.request_id
-                user_pay_request.request_info.worker_id = request.request_info.worker_id
+                user_pay_request =  set_worker_and_request_ids(request, UserCancelPayRequest())
                 user_pay_request.order_id = request.order_id
                 user_pay_request.amount = request.total_cost
                 context.pack_and_send("users/user", request.user_id, user_pay_request)
@@ -68,24 +64,18 @@ def payments_pay(context, request: typing.Union[PaymentRequest, UserPayRequest, 
             )
             context.pack_and_send_egress("payments/out", egress_message)
     elif isinstance(request, UserPayResponse):
-        payment_status = PaymentStatus()
+        payment_status = set_worker_and_request_ids(request, PaymentStatus())
         payment_status.order_id = request.order_id
         payment_status.actually_paid = request.success
-        payment_status.request_info.request_id = request.request_info.request_id
-        payment_status.request_info.worker_id = request.request_info.worker_id
         context.pack_and_send("orders/checkout", request.user_id, payment_status)
     elif isinstance(request, PaymentRequest):
         if request.request_type == PaymentRequest.RequestType.CANCEL:
-            order_payment_cancel_request = OrderPaymentCancel()
+            order_payment_cancel_request = set_worker_and_request_ids(request, OrderPaymentCancel())
             order_payment_cancel_request.order_id = request.order_id
-            order_payment_cancel_request.request_info.request_id = request.request_info.request_id
-            order_payment_cancel_request.request_info.worker_id = request.request_info.worker_id
             context.pack_and_send("orders/checkout", request.user_id, order_payment_cancel_request)
         elif request.request_type == PaymentRequest.RequestType.STATUS:
-            orders_pay_find_request = OrdersPayFind()
+            orders_pay_find_request = set_worker_and_request_ids(request, OrdersPayFind())
             orders_pay_find_request.order_id = request.order_id
-            orders_pay_find_request.request_info.request_id = request.request_info.request_id
-            orders_pay_find_request.request_info.worker_id = request.request_info.worker_id
             context.pack_and_send("orders/order", request.user_id, orders_pay_find_request)
     elif isinstance(request, OrderPaymentCancelReply):
         payment_response = ResponseMessage()
@@ -97,6 +87,10 @@ def payments_pay(context, request: typing.Union[PaymentRequest, UserPayRequest, 
         )
         context.pack_and_send_egress("payments/out", egress_message)
 
+def set_worker_and_request_ids(message_in, message_out):
+    message_out.request_info.request_id = message_in.request_info.request_id
+    message_out.request_info.worker_id = message_in.request_info.worker_id
+    return message_out
 
 # Use the handler and expose the endpoint
 handler = RequestReplyHandler(functions)
