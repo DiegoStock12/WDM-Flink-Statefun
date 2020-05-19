@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='users',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=b'\n\x0busers.proto\x12\x05users\x1a\rgeneral.proto\"&\n\x08UserData\x12\n\n\x02id\x18\x01 \x01(\x04\x12\x0e\n\x06\x63redit\x18\x02 \x01(\x03\"\x14\n\x05\x43ount\x12\x0b\n\x03num\x18\x01 \x01(\x04\":\n\x11\x43reateUserRequest\x12\x12\n\nrequest_id\x18\x01 \x01(\t\x12\x11\n\tworker_id\x18\x02 \x01(\t\"E\n\x10\x43reateUserWithId\x12\n\n\x02id\x18\x01 \x01(\x04\x12\x12\n\nrequest_id\x18\x02 \x01(\t\x12\x11\n\tworker_id\x18\x03 \x01(\t\"\xda\x03\n\x0bUserRequest\x12\x12\n\nrequest_id\x18\x01 \x01(\t\x12\x11\n\tworker_id\x18\x02 \x01(\t\x12\x37\n\tfind_user\x18\x03 \x01(\x0b\x32\".users.UserRequest.FindUserRequestH\x00\x12;\n\x0bremove_user\x18\x04 \x01(\x0b\x32$.users.UserRequest.RemoveUserRequestH\x00\x12\x43\n\x0fsubtract_credit\x18\x05 \x01(\x0b\x32(.users.UserRequest.SubtractCreditRequestH\x00\x12\x39\n\nadd_credit\x18\x06 \x01(\x0b\x32#.users.UserRequest.AddCreditRequestH\x00\x1a\x1d\n\x0f\x46indUserRequest\x12\n\n\x02id\x18\x01 \x01(\x04\x1a\x1f\n\x11RemoveUserRequest\x12\n\n\x02id\x18\x01 \x01(\x04\x1a\x33\n\x15SubtractCreditRequest\x12\n\n\x02id\x18\x01 \x01(\x04\x12\x0e\n\x06\x61mount\x18\x02 \x01(\x03\x1a.\n\x10\x41\x64\x64\x43reditRequest\x12\n\n\x02id\x18\x01 \x01(\x04\x12\x0e\n\x06\x61mount\x18\x02 \x01(\x03\x42\t\n\x07message\"2\n\x0cUserResponse\x12\x12\n\nrequest_id\x18\x01 \x01(\t\x12\x0e\n\x06result\x18\x02 \x01(\t\"D\n\x0eUserPayRequest\x12\x0e\n\x06\x61mount\x18\x01 \x01(\x03\x12\"\n\x0crequest_info\x18\x02 \x01(\x0b\x32\x0c.RequestInfo\"J\n\x14UserCancelPayRequest\x12\x0e\n\x06\x61mount\x18\x01 \x01(\x03\x12\"\n\x0crequest_info\x18\x02 \x01(\x0b\x32\x0c.RequestInfo\"F\n\x0fUserPayResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\"\n\x0crequest_info\x18\x02 \x01(\x0b\x32\x0c.RequestInfob\x06proto3'
+  serialized_pb=b'\n\x0busers.proto\x12\x05users\x1a\rgeneral.proto\"&\n\x08UserData\x12\n\n\x02id\x18\x01 \x01(\x04\x12\x0e\n\x06\x63redit\x18\x02 \x01(\x03\"\x14\n\x05\x43ount\x12\x0b\n\x03num\x18\x01 \x01(\x04\":\n\x11\x43reateUserRequest\x12\x12\n\nrequest_id\x18\x01 \x01(\t\x12\x11\n\tworker_id\x18\x02 \x01(\t\"E\n\x10\x43reateUserWithId\x12\n\n\x02id\x18\x01 \x01(\x04\x12\x12\n\nrequest_id\x18\x02 \x01(\t\x12\x11\n\tworker_id\x18\x03 \x01(\t\"\xda\x03\n\x0bUserRequest\x12\x12\n\nrequest_id\x18\x01 \x01(\t\x12\x11\n\tworker_id\x18\x02 \x01(\t\x12\x37\n\tfind_user\x18\x03 \x01(\x0b\x32\".users.UserRequest.FindUserRequestH\x00\x12;\n\x0bremove_user\x18\x04 \x01(\x0b\x32$.users.UserRequest.RemoveUserRequestH\x00\x12\x43\n\x0fsubtract_credit\x18\x05 \x01(\x0b\x32(.users.UserRequest.SubtractCreditRequestH\x00\x12\x39\n\nadd_credit\x18\x06 \x01(\x0b\x32#.users.UserRequest.AddCreditRequestH\x00\x1a\x1d\n\x0f\x46indUserRequest\x12\n\n\x02id\x18\x01 \x01(\x04\x1a\x1f\n\x11RemoveUserRequest\x12\n\n\x02id\x18\x01 \x01(\x04\x1a\x33\n\x15SubtractCreditRequest\x12\n\n\x02id\x18\x01 \x01(\x04\x12\x0e\n\x06\x61mount\x18\x02 \x01(\x03\x1a.\n\x10\x41\x64\x64\x43reditRequest\x12\n\n\x02id\x18\x01 \x01(\x04\x12\x0e\n\x06\x61mount\x18\x02 \x01(\x03\x42\t\n\x07message\"D\n\x0eUserPayRequest\x12\x0e\n\x06\x61mount\x18\x01 \x01(\x03\x12\"\n\x0crequest_info\x18\x02 \x01(\x0b\x32\x0c.RequestInfo\"J\n\x14UserCancelPayRequest\x12\x0e\n\x06\x61mount\x18\x01 \x01(\x03\x12\"\n\x0crequest_info\x18\x02 \x01(\x0b\x32\x0c.RequestInfo\"F\n\x0fUserPayResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\"\n\x0crequest_info\x18\x02 \x01(\x0b\x32\x0c.RequestInfob\x06proto3'
   ,
   dependencies=[general__pb2.DESCRIPTOR,])
 
@@ -381,44 +381,6 @@ _USERREQUEST = _descriptor.Descriptor(
 )
 
 
-_USERRESPONSE = _descriptor.Descriptor(
-  name='UserResponse',
-  full_name='users.UserResponse',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='request_id', full_name='users.UserResponse.request_id', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='result', full_name='users.UserResponse.result', index=1,
-      number=2, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=707,
-  serialized_end=757,
-)
-
-
 _USERPAYREQUEST = _descriptor.Descriptor(
   name='UserPayRequest',
   full_name='users.UserPayRequest',
@@ -452,8 +414,8 @@ _USERPAYREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=759,
-  serialized_end=827,
+  serialized_start=707,
+  serialized_end=775,
 )
 
 
@@ -490,8 +452,8 @@ _USERCANCELPAYREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=829,
-  serialized_end=903,
+  serialized_start=777,
+  serialized_end=851,
 )
 
 
@@ -528,8 +490,8 @@ _USERPAYRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=905,
-  serialized_end=975,
+  serialized_start=853,
+  serialized_end=923,
 )
 
 _USERREQUEST_FINDUSERREQUEST.containing_type = _USERREQUEST
@@ -560,7 +522,6 @@ DESCRIPTOR.message_types_by_name['Count'] = _COUNT
 DESCRIPTOR.message_types_by_name['CreateUserRequest'] = _CREATEUSERREQUEST
 DESCRIPTOR.message_types_by_name['CreateUserWithId'] = _CREATEUSERWITHID
 DESCRIPTOR.message_types_by_name['UserRequest'] = _USERREQUEST
-DESCRIPTOR.message_types_by_name['UserResponse'] = _USERRESPONSE
 DESCRIPTOR.message_types_by_name['UserPayRequest'] = _USERPAYREQUEST
 DESCRIPTOR.message_types_by_name['UserCancelPayRequest'] = _USERCANCELPAYREQUEST
 DESCRIPTOR.message_types_by_name['UserPayResponse'] = _USERPAYRESPONSE
@@ -632,13 +593,6 @@ _sym_db.RegisterMessage(UserRequest.FindUserRequest)
 _sym_db.RegisterMessage(UserRequest.RemoveUserRequest)
 _sym_db.RegisterMessage(UserRequest.SubtractCreditRequest)
 _sym_db.RegisterMessage(UserRequest.AddCreditRequest)
-
-UserResponse = _reflection.GeneratedProtocolMessageType('UserResponse', (_message.Message,), {
-  'DESCRIPTOR' : _USERRESPONSE,
-  '__module__' : 'users_pb2'
-  # @@protoc_insertion_point(class_scope:users.UserResponse)
-  })
-_sym_db.RegisterMessage(UserResponse)
 
 UserPayRequest = _reflection.GeneratedProtocolMessageType('UserPayRequest', (_message.Message,), {
   'DESCRIPTOR' : _USERPAYREQUEST,

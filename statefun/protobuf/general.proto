@@ -1,6 +1,14 @@
 syntax = "proto3";
 
 
+// Default response returned to all the endpoints
+message ResponseMessage{
+    string request_id = 1; 
+    
+    // JSON as string
+    string result = 2;
+}
+
 // Message used to store the request 
 // data in the multiple messages
 message RequestInfo{

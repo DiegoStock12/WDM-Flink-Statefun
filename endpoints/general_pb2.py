@@ -18,10 +18,48 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=b'\n\rgeneral.proto\"4\n\x0bRequestInfo\x12\x12\n\nrequest_id\x18\x01 \x01(\t\x12\x11\n\tworker_id\x18\x02 \x01(\tb\x06proto3'
+  serialized_pb=b'\n\rgeneral.proto\"5\n\x0fResponseMessage\x12\x12\n\nrequest_id\x18\x01 \x01(\t\x12\x0e\n\x06result\x18\x02 \x01(\t\"4\n\x0bRequestInfo\x12\x12\n\nrequest_id\x18\x01 \x01(\t\x12\x11\n\tworker_id\x18\x02 \x01(\tb\x06proto3'
 )
 
 
+
+
+_RESPONSEMESSAGE = _descriptor.Descriptor(
+  name='ResponseMessage',
+  full_name='ResponseMessage',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='request_id', full_name='ResponseMessage.request_id', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='result', full_name='ResponseMessage.result', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=17,
+  serialized_end=70,
+)
 
 
 _REQUESTINFO = _descriptor.Descriptor(
@@ -57,12 +95,20 @@ _REQUESTINFO = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=17,
-  serialized_end=69,
+  serialized_start=72,
+  serialized_end=124,
 )
 
+DESCRIPTOR.message_types_by_name['ResponseMessage'] = _RESPONSEMESSAGE
 DESCRIPTOR.message_types_by_name['RequestInfo'] = _REQUESTINFO
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
+
+ResponseMessage = _reflection.GeneratedProtocolMessageType('ResponseMessage', (_message.Message,), {
+  'DESCRIPTOR' : _RESPONSEMESSAGE,
+  '__module__' : 'general_pb2'
+  # @@protoc_insertion_point(class_scope:ResponseMessage)
+  })
+_sym_db.RegisterMessage(ResponseMessage)
 
 RequestInfo = _reflection.GeneratedProtocolMessageType('RequestInfo', (_message.Message,), {
   'DESCRIPTOR' : _REQUESTINFO,

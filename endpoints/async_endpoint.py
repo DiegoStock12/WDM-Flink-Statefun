@@ -5,8 +5,7 @@ from aiohttp import web
 import asyncio
 
 # Messages exchanged with the stateful functions
-from users_pb2 import UserResponse
-from stock_pb2 import StockResponse
+from general_pb2 import ResponseMessage
 
 # Async kafka producer and consumer
 from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
@@ -49,7 +48,7 @@ routes = web.RouteTableDef()
 
 # Consume from the kafka topics forever
 async def consume_forever(consumer: AIOKafkaConsumer):
-    """ Infinite loop reading the messages 
+    """ Infinite loop reading the messages
     sent from the flink cluster back to the application"""
 
     # Iterate through the messages and change the
@@ -61,7 +60,7 @@ async def consume_forever(consumer: AIOKafkaConsumer):
             logger.info(f'Received message! {msg.value}')
 
             # TODO Maybe use some custom Response class with single json to return.
-            resp = StockResponse()
+            resp = ResponseMessage()
             resp.ParseFromString(msg.value)
 
             # set the result of the future in the dict
@@ -108,7 +107,7 @@ async def create_kafka_consumer(app: web.Application):
 
 
 async def create_kafka_producer(app: web.Application):
-    """ Creates the producer that the different endpoints 
+    """ Creates the producer that the different endpoints
     will use to communicate with the statefuk functions """
 
     logger.info('Creating kafka producer...')
@@ -148,8 +147,8 @@ async def shutdown_kafka(app: web.Application):
 # from the server. Set the response for a given request
 # to a future and then wait for completion of that future
 async def send_msg(topic: str, key: str, request):
-    """ Sends a message to a topic and wait for the 
-    future response which is then returned to the caller 
+    """ Sends a message to a topic and wait for the
+    future response which is then returned to the caller
     endpoint"""
 
     # set the worker id
