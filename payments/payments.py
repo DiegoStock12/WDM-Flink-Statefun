@@ -27,7 +27,7 @@ USER_EVENTS_TOPIC = "user-events"
 functions = StatefulFunctions()
 
 @functions.bind('payments/pay')
-def payments_pay(context, request: typing.Union[PaymentRequest, ]):
+def payments_pay(context, request: typing.Union[PaymentRequest, Order, OrdersPayReply, OrderPaymentCancelReply]):
 
     # if isinstance(request, UserRequest):
 

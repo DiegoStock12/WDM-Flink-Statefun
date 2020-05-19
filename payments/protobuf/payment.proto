@@ -1,19 +1,8 @@
 syntax = "proto3";
 
-package = users;
+import "general.proto";
 
-message PaymentData {
-    uint64 order_id = 1;
-    string request_id = 2;
-    string worker_id = 3;
-
-    enum StatusType {
-      UNPAID = 0;
-      PAID = 1;
-    }
-
-    StatusType status_type = 4;
-}
+package payment;
 
 message PaymentRequest {
     uint64 user_id = 1;
@@ -28,4 +17,10 @@ message PaymentRequest {
     }
 
     RequestType request_type = 5;
+}
+
+message PaymentStatus {
+  uint64 order_id = 1;
+  bool actually_paid = 2;
+  RequestInfo request_info = 3;
 }
