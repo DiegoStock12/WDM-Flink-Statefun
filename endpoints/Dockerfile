@@ -11,11 +11,10 @@ WORKDIR /app
 COPY requirements.txt /app
 RUN pip install -r requirements.txt
 
-# COPY users.py /app
 COPY async_endpoint.py /app
-COPY users_async_endpoint.py /app
-COPY orders_async_endpoint.py /app
-COPY *_pb2.py /app/
+COPY services/users_async_endpoint.py /app
+COPY services/orders_async_endpoint.py /app
+COPY proto/*_pb2.py /app
 
 EXPOSE 5000
 

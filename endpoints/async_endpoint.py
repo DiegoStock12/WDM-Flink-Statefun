@@ -5,7 +5,7 @@ from aiohttp import web
 import asyncio
 
 # Messages exchanged with the stateful functions
-from general_pb2 import ResponseMessage
+from general_pb2 import ResponseMessage, RequestInfo
 
 # Async kafka producer and consumer
 from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
@@ -59,7 +59,6 @@ async def consume_forever(consumer: AIOKafkaConsumer):
         if msg.key.decode('utf-8') == WORKER_ID:
             logger.info(f'Received message! {msg.value}')
 
-            # TODO Maybe use some custom Response class with single json to return.
             resp = ResponseMessage()
             resp.ParseFromString(msg.value)
 
