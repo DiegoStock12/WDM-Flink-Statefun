@@ -5,16 +5,14 @@ package orders;
 import "general.proto";
 
 message CreateOrder{
-    int64 userId = 1;
-    string request_id = 2;
-    string worker_id = 3;
+    int64 user_id = 1;
+    RequestInfo request_info = 2;
 }
 
 message CreateOrderWithId{
     int64 id = 1;
-    string request_id = 2;
-    int64 userId = 3;
-    string worker_id = 4;
+    int64 user_id = 2;
+    RequestInfo request_info = 3;
 }
 
 message CreateOrderResponse{
@@ -40,20 +38,18 @@ message OrderRequest{
         int64 itemId = 2;
     }
 
-    // Request id for identifying the request
-    // in the endpoint and answer
-    string request_id = 1;
+    message OrderCheckoutRequest {
+        int64 id = 1;
+    }
 
-    // Worker id used as key of the response
-    // so a given worker just has to save its
-    // own messages
-    string worker_id = 2;
+    RequestInfo request_info = 1;
 
     oneof message {
-        RemoveOrderRequest remove_order = 3;
-        FindOrderRequest find_order = 4;
-        AddItemRequest add_item = 5;
-        RemoveItemRequest remove_item = 6;
+        RemoveOrderRequest remove_order = 2;
+        FindOrderRequest find_order = 3;
+        AddItemRequest add_item = 4;
+        RemoveItemRequest remove_item = 5;
+        OrderCheckoutRequest order_checkout = 6;
     }
 }
 
@@ -63,8 +59,8 @@ message OrderResponse {
 }
 
 message Order {
-    RequestInfo request_info = 1;
-    int64 id = 2;
+    int64 id = 1;
+    RequestInfo request_info = 2;
     int64 user_id = 3;
     repeated int64 items = 4;
     int64 total_cost = 5;

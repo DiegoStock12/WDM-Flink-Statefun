@@ -33,7 +33,7 @@ async def create_order(request):
 
     userId = int(request.match_info['userId'])
     request = CreateOrder()
-    request.userId = userId
+    request.user_id = userId
 
     result = await send_msg(ORDER_CREATION_TOPIC, key=userId, request=request)
 
@@ -47,6 +47,7 @@ async def remove_order(request):
     orderId = int(request.match_info['orderId'])
     request = OrderRequest()
     request.remove_order.id = orderId
+
     result = await send_msg(ORDER_TOPIC, key=orderId, request=request)
 
     return web.Response(text=result, content_type='application/json')
@@ -59,7 +60,6 @@ async def get_order(request):
     orderId = int(request.match_info['orderId'])
     request = OrderRequest()
     request.find_order.id = orderId
-
 
     result = await send_msg(ORDER_TOPIC, key=orderId, request=request)
 

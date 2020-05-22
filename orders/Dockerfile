@@ -9,6 +9,7 @@ RUN pip install -r requirements.txt
 COPY orders.py /app
 COPY orders_pb2.py /app
 COPY users_pb2.py /app
+COPY general_pb2.py /app
 
 EXPOSE 8001
 
