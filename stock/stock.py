@@ -58,11 +58,7 @@ def manage_stock(context, request: typing.Union[StockRequest, CreateItemWithId])
     # Get the current state.
     item_state: ItemData = context.state('item').unpack(ItemData)
 
-    if item_state is None:
-        # Item does not exist yet. Return error.
-        response = ResponseMessage()
-        response.result = json.dumps({'result:': 'not_found'})
-    elif isinstance(request, CreateItemWithId):
+    if isinstance(request, CreateItemWithId):
         item_state = ItemData()
         item_state.id = request.id
         item_state.price = request.price
@@ -73,6 +69,10 @@ def manage_stock(context, request: typing.Union[StockRequest, CreateItemWithId])
 
         response = ResponseMessage()
         response.result = json.dumps({'item_id': item_state.id})
+    elif item_state is None:
+        # Item does not exist yet. Return error.
+        response = ResponseMessage()
+        response.result = json.dumps({'result:': 'not_found'})
     elif isinstance(request, StockRequest):
         logger.debug("Received stock request!")
 
@@ -93,7 +93,6 @@ def manage_stock(context, request: typing.Union[StockRequest, CreateItemWithId])
                 context.state('item').pack(item_state)
                 response.result = json.dumps({'result': 'success', 'item_id': item_state.id})
             else:
-                response.item_id = item_state.id
                 response.result = json.dumps({'result': 'stock too low', 'item_id': item_state.id})
 
         elif msg_type == "add_stock":

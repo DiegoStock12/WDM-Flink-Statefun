@@ -57,6 +57,9 @@ async def item_add_stock(request):
 
     result = await send_msg(STOCK_TOPIC, key=item_id, request=msg)
 
+    if "not_found" in result:
+        return web.Response(text=result, status=404, content_type='application/json')
+
     return web.Response(text=result, content_type='application/json')
 
 @routes_stock.post('/stock/subtract/{item_id}/{number}')
@@ -70,7 +73,10 @@ async def item_substract_stock(request):
 
     result = await send_msg(STOCK_TOPIC, key=item_id, request=msg)
 
-    if "stock is too low." in result:
-        return web.Response(text=result, status="400", content_type='application/json')
+    if "not_found" in result:
+        return web.Response(text=result, status=404, content_type='application/json')
+
+    if "stock too low" in result:
+        return web.Response(text=result, status=400, content_type='application/json')
 
     return web.Response(text=result, content_type='application/json')
