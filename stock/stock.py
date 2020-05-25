@@ -5,6 +5,7 @@ import logging
 import json
 
 from stock_pb2 import *
+from general_pb2 import ResponseMessage
 
 from statefun import StatefulFunctions
 from statefun import RequestReplyHandler
@@ -36,7 +37,6 @@ def create_item(context, request: CreateItemRequest):
     # get the current id to assign
     state = context.state('count').unpack(Count)
     if not state:
-        logger.info("First item ever!")
         state = Count()
         state.num = 0
 
@@ -58,7 +58,11 @@ def manage_stock(context, request: typing.Union[StockRequest, CreateItemWithId])
     # Get the current state.
     item_state: ItemData = context.state('item').unpack(ItemData)
 
-    if isinstance(request, CreateItemWithId):
+    if item_state is None:
+        # Item does not exist yet. Return error.
+        response = ResponseMessage()
+        response.result = json.dumps({'result:': 'not_found'})
+    elif isinstance(request, CreateItemWithId):
         item_state = ItemData()
         item_state.id = request.id
         item_state.price = request.price
@@ -67,8 +71,7 @@ def manage_stock(context, request: typing.Union[StockRequest, CreateItemWithId])
         context.state('item').pack(item_state)
         logger.debug(f'Created new item with id {request.id}')
 
-        response = StockResponse()
-        response.item_id = item_state.id
+        response = ResponseMessage()
         response.result = json.dumps({'item_id': item_state.id})
     elif isinstance(request, StockRequest):
         logger.debug("Received stock request!")
@@ -78,38 +81,28 @@ def manage_stock(context, request: typing.Union[StockRequest, CreateItemWithId])
         logger.debug(f'Got message of type {msg_type}')
 
         if msg_type == "find_item":
-            if item_state is None:
-                # Item does not exist yet. Return error.
-                response = StockResponse()
-                response.item_id = request.find_item.id
-                response.result = json.dumps({'result:': 'not_found'})
-            else:
-                response = StockResponse()
-                response.item_id = item_state.id
-                response.result = json.dumps({'id:': item_state.id, 'price': item_state.price, 'stock': item_state.stock})
+            response = ResponseMessage()
+            response.result = json.dumps({'id:': item_state.id, 'price': item_state.price, 'stock': item_state.stock})
         elif msg_type == "subtract_stock":
             new_amount = item_state.stock - request.subtract_stock.amount
-            response = StockResponse()
+            response = ResponseMessage()
 
             if new_amount >= 0:
                 item_state.stock -= request.subtract_stock.amount
 
                 context.state('item').pack(item_state)
-                response.item_id = item_state.id
-                response.result = json.dumps({'result': 'success'})
+                response.result = json.dumps({'result': 'success', 'item_id': item_state.id})
             else:
                 response.item_id = item_state.id
-                response.result = json.dumps({'result': 'stock is too low.'})
-                logger.debug('Stock is too low.')
+                response.result = json.dumps({'result': 'stock too low', 'item_id': item_state.id})
 
         elif msg_type == "add_stock":
             item_state.stock += request.add_stock.amount
             context.state('item').pack(item_state)
 
             # send the reponse.
-            response = StockResponse()
-            response.item_id = item_state.id
-            response.result = json.dumps({'result': 'success'})
+            response = ResponseMessage()
+            response.result = json.dumps({'result': 'success', 'item_id': item_state.id})
     if response:
         # Use the same request id in the message body
         # and use the request worker_id as key of the message
