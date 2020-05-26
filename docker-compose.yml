@@ -59,10 +59,17 @@ services:
             - "8001"
         ports:
             - "8001:8001"
+    payments-endpoint:
+        build:
+            context: ./payments
+        expose:
+            - "8003"
+        ports:
+            - "8003:8003"
     api-endpoint:
         build:
             context: ./endpoints
-        depends_on: 
+        depends_on:
             - kafka-broker
         expose:
             - "5000"

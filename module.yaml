@@ -86,7 +86,7 @@ module:
                 typeUrl: com.googleapis/orders.OrderRequest
                 targets:
                   - orders/order
-    
+
     egresses:
       - egress:
           meta:
@@ -110,6 +110,15 @@ module:
           meta:
             type: statefun.kafka.io/generic-egress
             id: orders/out
+          spec:
+            address: kafka-broker:9092
+            deliverySemantic:
+              type: exactly-once
+              transactionTimeoutMillis: 100000
+      - egress:
+          meta:
+            type: statefun.kafka.io/generic-egress
+            id: payments/out
           spec:
             address: kafka-broker:9092
             deliverySemantic:

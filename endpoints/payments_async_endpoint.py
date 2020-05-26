@@ -17,7 +17,7 @@ logger = logging.getLogger()
 
 # Some parameters to send and read from kafka
 KAFKA_BROKER = "kafka-broker:9092"
-PAYMENT_TOPIC = "payment-create"
+PAYMENT_TOPIC = "payment-events"
 
 # This endpoint will never be used, the orders function calls directly
 @routes_payments.post('/payment/pay/{user_id}/{order_id}')
