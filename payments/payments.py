@@ -60,16 +60,16 @@ def payments_pay(context, request: typing.Union[PaymentRequest, UserPayRequest, 
         payment_status = set_worker_and_request_ids(request, PaymentStatus())
         payment_status.order_id = request.order_id
         payment_status.actually_paid = request.success
-        context.pack_and_send("orders/checkout", request.user_id, payment_status)
+        context.pack_and_send("orders/order", request.order_id, payment_status)
     elif isinstance(request, PaymentRequest):
         if request.request_type == PaymentRequest.RequestType.CANCEL:
             order_payment_cancel_request = set_worker_and_request_ids(request, OrderPaymentCancel())
             order_payment_cancel_request.order_id = request.order_id
-            context.pack_and_send("orders/checkout", request.user_id, order_payment_cancel_request)
+            context.pack_and_send("orders/order", request.order_id, order_payment_cancel_request)
         elif request.request_type == PaymentRequest.RequestType.STATUS:
             orders_pay_find_request = set_worker_and_request_ids(request, OrdersPayFind())
             orders_pay_find_request.order_id = request.order_id
-            context.pack_and_send("orders/order", request.user_id, orders_pay_find_request)
+            context.pack_and_send("orders/order", request.order_id, orders_pay_find_request)
     elif isinstance(request, OrderPaymentCancelReply):
         response = ResponseMessage()
         response.response_id = request.request_info.request_id
