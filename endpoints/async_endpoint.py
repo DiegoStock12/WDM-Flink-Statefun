@@ -148,9 +148,9 @@ async def send_msg(topic: str, key: str, request):
     future response which is then returned to the caller 
     endpoint"""
 
-    # set the worker id
-    request.worker_id = WORKER_ID
-    request.request_id = str(uuid.uuid4())
+    # set the request info
+    request.request_info.worker_id = WORKER_ID
+    request.request_info.request_id = str(uuid.uuid4())
 
     k = str(key).encode('utf-8')
     v = request.SerializeToString()
@@ -160,7 +160,7 @@ async def send_msg(topic: str, key: str, request):
     fut = loop.create_future()
     # add that future
     # the future will be set later by the kafka consumer
-    messages[request.request_id] = fut
+    messages[request.request_info.request_id] = fut
 
     await app['producer'].send_and_wait(topic, key=k, value=v)
 
@@ -169,20 +169,21 @@ async def send_msg(topic: str, key: str, request):
         result = await asyncio.wait_for(fut, timeout=TIMEOUT)
 
         # once we get the result (a json) delete the entry and return
-        del messages[request.request_id]
+        del messages[request.request_info.request_id]
         return result
 
     except asyncio.TimeoutError:
         logger.error('Timeout while waiting for message')
 
         # clean the entry and raise
-        del messages[request.request_id]
+        del messages[request.request_info.request_id]
         raise
 
 # create the application object and add routes
 app = web.Application()
 app.add_routes(routes)
 
+# get the routes from the particular endpoints
 from orders_async_endpoint import routes_orders
 from users_async_endpoint import routes_users
 

@@ -9,7 +9,7 @@ module:
             kind: http
             type: users/create
           spec:
-            endpoint: http://function-endpoint:8000/statefun
+            endpoint: http://users-endpoint:8000/statefun
             states:
               - count
             maxNumBatchRequests: 500
@@ -20,7 +20,7 @@ module:
             kind: http
             type: users/user
           spec:
-            endpoint: http://function-endpoint:8000/statefun
+            endpoint: http://users-endpoint:8000/statefun
             states:
               - user
             maxNumBatchRequests: 500
@@ -57,15 +57,6 @@ module:
             address: kafka-broker:9092
             consumerGroupId: my-group-id
             topics:
-              - topic: names
-                typeUrl: com.googleapis/example.IncreaseUserCount
-                targets:
-                  - example/increment
-
-              - topic: test
-                typeUrl: com.googleapis/example.ExampleRequest
-                targets:
-                  - example/request
 
               - topic: users-create
                 typeUrl: com.googleapis/users.CreateUserRequest
@@ -92,15 +83,6 @@ module:
           meta:
             type: statefun.kafka.io/generic-egress
             id: users/out
-          spec:
-            address: kafka-broker:9092
-            deliverySemantic:
-              type: exactly-once
-              transactionTimeoutMillis: 100000
-      - egress:
-          meta:
-            type: statefun.kafka.io/generic-egress
-            id: example/greets
           spec:
             address: kafka-broker:9092
             deliverySemantic:

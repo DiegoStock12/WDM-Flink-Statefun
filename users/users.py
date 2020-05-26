@@ -7,6 +7,9 @@ import json
 # Messages and internal states of the functions
 from users_pb2 import CreateUserRequest, UserRequest, UserData, Count, CreateUserWithId
 
+# messages from the payment service
+from users_pb2 import UserPayRequest, UserPayResponse, UserCancelPayRequest
+
 # Import the general response message
 from general_pb2 import ResponseMessage
 
@@ -50,8 +53,9 @@ def create_user(context, create_user_request: CreateUserRequest):
     # also send the request and worker id with it
     request = CreateUserWithId()
     request.id = state.num
-    request.request_id = create_user_request.request_id
-    request.worker_id = create_user_request.worker_id
+
+    # copy the request_info stuff
+    request = copy_request_info(create_user_request, request)
 
     logger.debug(f"Sending request to function with id {request.id}")
     context.pack_and_send("users/user", str(request.id), request)
@@ -61,13 +65,19 @@ def create_user(context, create_user_request: CreateUserRequest):
     context.state('count').pack(state)
     logger.debug('Next state to assign is {}'.format(state.num))
 
+def copy_request_info(origin, destination):
+    """ Copies the request_info field of two messages"""
+    destination.request_info.request_id = origin.request_info.request_id
+    destination.request_info.worker_id =origin.request_info.worker_id
+    return destination
+
 
 # Managing the user finding and credit management operations
 # The function holds a UserData() object as its state and updates everything
 # there
 @functions.bind("users/user")
 def operate_user(context,
-                 request: typing.Union[UserRequest, CreateUserWithId]):
+                 request: typing.Union[UserPayRequest, UserCancelPayRequest, UserRequest, CreateUserWithId]):
     """ Does all the operations with a single user
 
     Has the state of a user in a UserData() object that includes
@@ -79,8 +89,65 @@ def operate_user(context,
 
     response = None
 
-    # depending on the message do one thing or the other
-    if isinstance(request, UserRequest):
+    # ----------------------------------------
+    # Messages from the payment endpoint
+    # ----------------------------------------
+
+    if isinstance(request, UserPayRequest):
+        # calculate if the credit is enough to pay for the product
+        # get the credit
+        response = UserPayResponse()
+        response.order_id = request.order_id
+
+        # copy the information of the request_info
+        response = copy_request_info(request, response)
+
+        # if the user exists then do the checks
+        if state:
+            # see whether we should return success or failure
+            if state.credit - request.amount < 0:
+                response.success = False
+            else:
+                state.credit -= request.amount
+                context.state('user').pack(state)
+                response.success = True
+        
+        else: 
+            response.success = False
+            
+        # respond to the payment service
+        context.pack_and_reply(response)
+
+    
+    elif isinstance(request, UserCancelPayRequest):
+        # add the amount specified to the user credit
+        response = UserPayResponse()
+        response.order_id = request.order_id
+
+        # copy the information
+        response = copy_request_info(request, response)
+
+        if state:
+            state.credit += request.amount
+
+            # pack the state
+            context.state('user').pack(state)
+
+            #reply
+            response.success = True
+
+        else:
+            response.success = False
+
+        # reply to the sender function
+        context.pack_and_reply(response)       
+
+
+    # -------------------------------------
+    # Interaction with the user endpoint
+    # -------------------------------------
+
+    elif isinstance(request, UserRequest):
         logger.debug("Received user request!")
 
         # check which field we have
@@ -153,15 +220,16 @@ def operate_user(context,
         # Use the same request id in the message body
         # and use the request worker_id as key of the message
 
-        response.request_id = request.request_id
+        if isinstance(response, ResponseMessage):
+            response.request_id = request.request_info.request_id
         logger.debug(
-            f'Sending response {response} with key {request.worker_id}')
+            f'Sending response {response} with key {request.request_info.worker_id}')
 
         # create the egress message and send it to the
         # users/out egress
         egress_message = kafka_egress_record(
             topic=USER_EVENTS_TOPIC,
-            key=request.worker_id,
+            key=request.request_info.worker_id,
             value=response
         )
 
