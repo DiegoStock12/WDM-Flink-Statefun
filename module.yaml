@@ -14,7 +14,6 @@ module:
               - count
             maxNumBatchRequests: 500
             timeout: 2min
-
       - function:
           meta:
             kind: http
@@ -47,37 +46,59 @@ module:
               - order
             maxNumBatchRequests: 500
             timeout: 2min
-
+      - function:
+          meta:
+            kind: http
+            type: stock/create
+          spec:
+            endpoint: http://stock-endpoint:8002/statefun
+            states:
+              - count
+            maxNumBatchRequests: 500
+            timeout: 2min
+      - function:
+          meta:
+            kind: http
+            type: stock/stock
+          spec:
+            endpoint: http://stock-endpoint:8002/statefun
+            states:
+              - item
+            maxNumBatchRequests: 500
+            timeout: 2min
     ingresses:
       - ingress:
           meta:
             type: statefun.kafka.io/routable-protobuf-ingress
-            id: example/names
+            id: api-endpoint/in
           spec:
             address: kafka-broker:9092
             consumerGroupId: my-group-id
             topics:
-
               - topic: users-create
                 typeUrl: com.googleapis/users.CreateUserRequest
                 targets:
                   - users/create
-
               - topic: users
                 typeUrl: com.googleapis/users.UserRequest
                 targets:
                   - users/user
-
               - topic: orders-create
                 typeUrl: com.googleapis/orders.CreateOrder
                 targets:
                   - orders/create
-
               - topic: orders
                 typeUrl: com.googleapis/orders.OrderRequest
                 targets:
                   - orders/order
-    
+              - topic: stock-create
+                typeUrl: com.googleapis/stock.CreateItemRequest
+                targets:
+                  - stock/create
+              - topic: stock
+                typeUrl: com.googleapis/stock.StockRequest
+                targets:
+                  - stock/stock
     egresses:
       - egress:
           meta:
@@ -92,6 +113,15 @@ module:
           meta:
             type: statefun.kafka.io/generic-egress
             id: orders/out
+          spec:
+            address: kafka-broker:9092
+            deliverySemantic:
+              type: exactly-once
+              transactionTimeoutMillis: 100000
+      - egress:
+          meta:
+            type: statefun.kafka.io/generic-egress
+            id: stock/out
           spec:
             address: kafka-broker:9092
             deliverySemantic:

@@ -68,3 +68,10 @@ services:
             - "5000"
         ports:
             - "5000:5000"
+    stock-endpoint:
+        build:
+            context: ./stock
+        expose:
+            - "8002"
+        ports:
+            - "8002:8002"

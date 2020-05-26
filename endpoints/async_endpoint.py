@@ -29,6 +29,7 @@ KAFKA_BROKER = "kafka-broker:9092"
 
 USER_EVENTS_TOPIC = "user-events"
 ORDER_EVENTS_TOPIC = "order-events"
+STOCK_EVENTS_TOPIC = "stock-events"
 
 # timeout for waiting for a server response
 TIMEOUT = 30
@@ -47,7 +48,7 @@ routes = web.RouteTableDef()
 
 # Consume from the kafka topics forever
 async def consume_forever(consumer: AIOKafkaConsumer):
-    """ Infinite loop reading the messages 
+    """ Infinite loop reading the messages
     sent from the flink cluster back to the application"""
 
     # Iterate through the messages and change the
@@ -82,6 +83,8 @@ async def create_kafka_consumer(app: web.Application):
             # all at once and should work flawlessly
             consumer = AIOKafkaConsumer(
                 USER_EVENTS_TOPIC,
+                ORDER_EVENTS_TOPIC,
+                STOCK_EVENTS_TOPIC,
                 loop=asyncio.get_running_loop(),
                 bootstrap_servers=KAFKA_BROKER
             )
@@ -104,7 +107,7 @@ async def create_kafka_consumer(app: web.Application):
 
 
 async def create_kafka_producer(app: web.Application):
-    """ Creates the producer that the different endpoints 
+    """ Creates the producer that the different endpoints
     will use to communicate with the statefuk functions """
 
     logger.info('Creating kafka producer...')
@@ -144,8 +147,8 @@ async def shutdown_kafka(app: web.Application):
 # from the server. Set the response for a given request
 # to a future and then wait for completion of that future
 async def send_msg(topic: str, key: str, request):
-    """ Sends a message to a topic and wait for the 
-    future response which is then returned to the caller 
+    """ Sends a message to a topic and wait for the
+    future response which is then returned to the caller
     endpoint"""
 
     # set the request info
@@ -186,9 +189,11 @@ app.add_routes(routes)
 # get the routes from the particular endpoints
 from orders_async_endpoint import routes_orders
 from users_async_endpoint import routes_users
+from stock_async_endpoint import routes_stock
 
 app.add_routes(routes_orders)
 app.add_routes(routes_users)
+app.add_routes(routes_stock)
 
 # add the background tasks
 app.on_startup.append(create_kafka_producer)
@@ -196,7 +201,6 @@ app.on_startup.append(create_kafka_consumer)
 
 # add the shutdown tasks
 app.on_cleanup.append(shutdown_kafka)
-
 
 if __name__ == "__main__":
     web.run_app(app)

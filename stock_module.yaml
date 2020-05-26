@@ -1,0 +1,55 @@
+version: "1.0"
+module:
+  meta:
+    type: remote
+  spec:
+    functions:
+      - function:
+          meta:
+            kind: http
+            type: stock/create
+          spec:
+            endpoint: http://stock-endpoint:8002/statefun
+            states:
+              - count
+            maxNumBatchRequests: 500
+            timeout: 2min
+      - function:
+          meta:
+            kind: http
+            type: stock/stock
+          spec:
+            endpoint: http://stock-endpoint:8002/statefun
+            states:
+              - item
+            maxNumBatchRequests: 500
+            timeout: 2min
+    ingresses:
+      - ingress:
+          meta:
+            type: statefun.kafka.io/routable-protobuf-ingress
+            id: stock/in
+          spec:
+            address: kafka-broker:9092
+            consumerGroupId: stock-group
+            topics:
+              - topic: stock-create
+                typeUrl: com.googleapis/users.CreateStockRequest
+                targets:
+                  - stock/create
+              - topic: stock
+                typeUrl: com.googleapis/users.StockRequest
+                targets:
+                  - stock/stock
+    egresses:
+      - egress:
+          meta:
+            type: statefun.kafka.io/generic-egress
+            id: stock/out
+          spec:
+            address: kafka-broker:9092
+            deliverySemantic:
+              type: exactly-once
+              transactionTimeoutMillis: 100000
+              
+
