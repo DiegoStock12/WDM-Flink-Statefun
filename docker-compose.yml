@@ -45,9 +45,9 @@ services:
             - MASTER_HOST=master
         volumes:
             - ./checkpoint-dir:/checkpoint-dir
-    function-endpoint:
+    users-endpoint:
         build:
-            context: ./statefun
+            context: ./users
         expose:
             - "8000"
         ports:
@@ -59,13 +59,6 @@ services:
             - "8001"
         ports:
             - "8001:8001"
-    stock-endpoint:
-        build:
-            context: ./stock
-        expose:
-            - "8002"
-        ports:
-            - "8002:8002"
     api-endpoint:
         build:
             context: ./endpoints
@@ -75,3 +68,10 @@ services:
             - "5000"
         ports:
             - "5000:5000"
+    stock-endpoint:
+        build:
+            context: ./stock
+        expose:
+            - "8002"
+        ports:
+            - "8002:8002"

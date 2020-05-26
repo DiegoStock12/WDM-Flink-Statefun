@@ -9,7 +9,7 @@ module:
             kind: http
             type: users/create
           spec:
-            endpoint: http://function-endpoint:8000/statefun
+            endpoint: http://users-endpoint:8000/statefun
             states:
               - count
             maxNumBatchRequests: 500
@@ -19,7 +19,7 @@ module:
             kind: http
             type: users/user
           spec:
-            endpoint: http://function-endpoint:8000/statefun
+            endpoint: http://users-endpoint:8000/statefun
             states:
               - user
             maxNumBatchRequests: 500
