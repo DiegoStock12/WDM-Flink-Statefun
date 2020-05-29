@@ -43,3 +43,7 @@ jobs:
         run: git clone https://github.com/apache/flink-statefun-docker && cd flink-statefun-docker/2.0.0 && docker build -t flink-statefun .
       - name: Build images
         run: docker-compose build
+      - name: Push images
+        run: |
+          docker tag wdm-flink-statefun_stock-endpoint:latest ${STOCK_SERVICE_IMAGE}:${GITHUB_SHA::8}
+          docker tag wdm-flinl-statefun_users-endpoint:latest ${USER_SERVICE_IMAGE}:${GITHUB_SHA::8}
