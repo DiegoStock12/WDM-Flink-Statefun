@@ -29,6 +29,7 @@ KAFKA_BROKER = "kafka-broker:9092"
 
 USER_EVENTS_TOPIC = "user-events"
 ORDER_EVENTS_TOPIC = "order-events"
+STOCK_EVENTS_TOPIC = "stock-events"
 
 # timeout for waiting for a server response
 TIMEOUT = 30
@@ -82,6 +83,8 @@ async def create_kafka_consumer(app: web.Application):
             # all at once and should work flawlessly
             consumer = AIOKafkaConsumer(
                 USER_EVENTS_TOPIC,
+                ORDER_EVENTS_TOPIC,
+                STOCK_EVENTS_TOPIC,
                 loop=asyncio.get_running_loop(),
                 bootstrap_servers=KAFKA_BROKER
             )
@@ -148,9 +151,9 @@ async def send_msg(topic: str, key: str, request):
     future response which is then returned to the caller
     endpoint"""
 
-    # set the worker id
-    request.worker_id = WORKER_ID
-    request.request_id = str(uuid.uuid4())
+    # set the request info
+    request.request_info.worker_id = WORKER_ID
+    request.request_info.request_id = str(uuid.uuid4())
 
     k = str(key).encode('utf-8')
     v = request.SerializeToString()
@@ -160,7 +163,7 @@ async def send_msg(topic: str, key: str, request):
     fut = loop.create_future()
     # add that future
     # the future will be set later by the kafka consumer
-    messages[request.request_id] = fut
+    messages[request.request_info.request_id] = fut
 
     await app['producer'].send_and_wait(topic, key=k, value=v)
 
@@ -169,27 +172,30 @@ async def send_msg(topic: str, key: str, request):
         result = await asyncio.wait_for(fut, timeout=TIMEOUT)
 
         # once we get the result (a json) delete the entry and return
-        del messages[request.request_id]
+        del messages[request.request_info.request_id]
         return result
 
     except asyncio.TimeoutError:
         logger.error('Timeout while waiting for message')
 
         # clean the entry and raise
-        del messages[request.request_id]
+        del messages[request.request_info.request_id]
         raise
 
 # create the application object and add routes
 app = web.Application()
 app.add_routes(routes)
 
+# get the routes from the particular endpoints
 from orders_async_endpoint import routes_orders
 from users_async_endpoint import routes_users
 from payments_async_endpoint import routes_payments
+from stock_async_endpoint import routes_stock
 
 app.add_routes(routes_orders)
 app.add_routes(routes_users)
 app.add_routes(routes_payments)
+app.add_routes(routes_stock)
 
 # add the background tasks
 app.on_startup.append(create_kafka_producer)
@@ -197,7 +203,6 @@ app.on_startup.append(create_kafka_consumer)
 
 # add the shutdown tasks
 app.on_cleanup.append(shutdown_kafka)
-
 
 if __name__ == "__main__":
     web.run_app(app)

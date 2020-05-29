@@ -45,16 +45,20 @@ services:
             - MASTER_HOST=master
         volumes:
             - ./checkpoint-dir:/checkpoint-dir
-    function-endpoint:
+
+    users-endpoint:
         build:
-            context: ./statefun
+            context: .
+            dockerfile: ./users/Dockerfile
         expose:
             - "8000"
         ports:
             - "8000:8000"
+
     orders-endpoint:
         build:
-            context: ./orders
+            context: .
+            dockerfile: ./orders/Dockerfile
         expose:
             - "8001"
         ports:
@@ -66,12 +70,24 @@ services:
             - "8003"
         ports:
             - "8003:8003"
+
+    stock-endpoint:
+        build:
+            context: .
+            dockerfile: ./stock/Dockerfile
+        expose:
+            - "8002"
+        ports:
+            - "8002:8002"
+
     api-endpoint:
         build:
-            context: ./endpoints
-        depends_on:
+            context: .
+            dockerfile: ./endpoints/Dockerfile
+        depends_on: 
             - kafka-broker
         expose:
             - "5000"
         ports:
             - "5000:5000"
+

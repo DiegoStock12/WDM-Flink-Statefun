@@ -2,6 +2,10 @@ __pycache__
 venv/
 checkpoint-dir
 .vscode
+.DS_Store
+example_pb2*
+test.py*
+.idea
 .idea
 example_pb2*
 test.py*

@@ -9,18 +9,17 @@ module:
             kind: http
             type: users/create
           spec:
-            endpoint: http://function-endpoint:8000/statefun
+            endpoint: http://users-endpoint:8000/statefun
             states:
               - count
             maxNumBatchRequests: 500
             timeout: 2min
-
       - function:
           meta:
             kind: http
             type: users/user
           spec:
-            endpoint: http://function-endpoint:8000/statefun
+            endpoint: http://users-endpoint:8000/statefun
             states:
               - user
             maxNumBatchRequests: 500
@@ -47,46 +46,59 @@ module:
               - order
             maxNumBatchRequests: 500
             timeout: 2min
-
+      - function:
+          meta:
+            kind: http
+            type: stock/create
+          spec:
+            endpoint: http://stock-endpoint:8002/statefun
+            states:
+              - count
+            maxNumBatchRequests: 500
+            timeout: 2min
+      - function:
+          meta:
+            kind: http
+            type: stock/stock
+          spec:
+            endpoint: http://stock-endpoint:8002/statefun
+            states:
+              - item
+            maxNumBatchRequests: 500
+            timeout: 2min
     ingresses:
       - ingress:
           meta:
             type: statefun.kafka.io/routable-protobuf-ingress
-            id: example/names
+            id: api-endpoint/in
           spec:
             address: kafka-broker:9092
             consumerGroupId: my-group-id
             topics:
-              - topic: names
-                typeUrl: com.googleapis/example.IncreaseUserCount
-                targets:
-                  - example/increment
-
-              - topic: test
-                typeUrl: com.googleapis/example.ExampleRequest
-                targets:
-                  - example/request
-
               - topic: users-create
                 typeUrl: com.googleapis/users.CreateUserRequest
                 targets:
                   - users/create
-
               - topic: users
                 typeUrl: com.googleapis/users.UserRequest
                 targets:
                   - users/user
-
               - topic: orders-create
                 typeUrl: com.googleapis/orders.CreateOrder
                 targets:
                   - orders/create
-
               - topic: orders
                 typeUrl: com.googleapis/orders.OrderRequest
                 targets:
                   - orders/order
-
+              - topic: stock-create
+                typeUrl: com.googleapis/stock.CreateItemRequest
+                targets:
+                  - stock/create
+              - topic: stock
+                typeUrl: com.googleapis/stock.StockRequest
+                targets:
+                  - stock/stock
     egresses:
       - egress:
           meta:
@@ -100,7 +112,7 @@ module:
       - egress:
           meta:
             type: statefun.kafka.io/generic-egress
-            id: example/greets
+            id: orders/out
           spec:
             address: kafka-broker:9092
             deliverySemantic:
@@ -109,7 +121,7 @@ module:
       - egress:
           meta:
             type: statefun.kafka.io/generic-egress
-            id: orders/out
+            id: stock/out
           spec:
             address: kafka-broker:9092
             deliverySemantic:
