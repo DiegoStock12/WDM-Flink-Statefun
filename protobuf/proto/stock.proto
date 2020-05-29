@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 package stock;
+import "general.proto";
 
 // Message used to store the user data
 // in the statefun and also what we give back to the
@@ -17,12 +18,10 @@ message Count{
     uint64 num = 1;
 }
 
-
 // Create an item with a certain price.
 message CreateItemRequest{
     int64 price = 1;
-    string request_id = 2;
-    string worker_id = 3;
+    RequestInfo request_info = 2;
 }
 
 // internal to be used by the statefun
@@ -30,8 +29,9 @@ message CreateItemRequest{
 message CreateItemWithId{
     uint64 id = 1;
     int64 price = 2;
-    string request_id = 3;
-    string worker_id = 4;
+
+    RequestInfo request_info = 3;
+    bool internal = 4;
 }
 
 message StockRequest {
@@ -53,25 +53,23 @@ message StockRequest {
         int64 amount = 2;
     }
 
-    // Request id for identifying the request
-    // in the endpoint and answer
-    string request_id = 1;
-
-    // Worker id used as key of the response
-    // so a given worker just has to save its
-    // own messages
-    string worker_id = 2;
+    // Request info
+    RequestInfo request_info = 1;
 
     oneof message {
-        FindItemRequest find_item = 3;
-        SubtractItemStockRequest subtract_stock = 4;
-        AddItemStockRequest add_stock = 5;
+        FindItemRequest find_item = 2;
+        SubtractItemStockRequest subtract_stock = 3;
+        AddItemStockRequest add_stock = 4;
 
     }
+
+    // Internal messages for order service.
+    bool internal = 6;
+    string order_id = 7;
 }
 
 message StockResponse {
-    string request_id = 1;
+    RequestInfo request_info = 1;
     uint64 item_id = 2;
     string result = 3;
 }
