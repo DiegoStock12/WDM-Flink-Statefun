@@ -169,12 +169,6 @@ def add_item(context, msg):
 
         context.pack_and_send("stock/stock", str(msg.add_item.id), subtract_stock_request)
 
-        # state.items.append(msg.add_item.itemId)
-        # logger.info(f"{state}")
-        # context.state('order').pack(state)
-        # logger.info(f"Returning order with id: {msg.add_item.id}")
-        # response.result = json.dumps({'result': 'success'})
-
     return response
 
 
@@ -278,6 +272,7 @@ def order_add_item_reply(context, msg):
         response.result = json.dumps({'result': 'failure', 'message': 'No items left in stock.'})
 
     return response
+
 
 # Use the handler and expose the endpoint
 handler = RequestReplyHandler(functions)
