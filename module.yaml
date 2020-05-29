@@ -66,6 +66,17 @@ module:
               - item
             maxNumBatchRequests: 500
             timeout: 2min
+
+      - function:
+          meta:
+            kind: http
+            type: payments/pay
+          spec:
+            endpoint: http://payments-endpoint:8003/statefun
+            maxNumBatchRequests: 500
+            timeout: 2min
+
+
     ingresses:
       - ingress:
           meta:
@@ -122,6 +133,15 @@ module:
           meta:
             type: statefun.kafka.io/generic-egress
             id: stock/out
+          spec:
+            address: kafka-broker:9092
+            deliverySemantic:
+              type: exactly-once
+              transactionTimeoutMillis: 100000
+      - egress:
+          meta:
+            type: statefun.kafka.io/generic-egress
+            id: payments/out
           spec:
             address: kafka-broker:9092
             deliverySemantic:

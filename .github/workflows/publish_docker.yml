@@ -43,7 +43,14 @@ jobs:
         run: git clone https://github.com/apache/flink-statefun-docker && cd flink-statefun-docker/2.0.0 && docker build -t flink-statefun . && docker tag flink-statefun flink-statefun:2.0.0
       - name: Build images
         run: docker-compose build
-      - name: Push images
+      - name: Tag images
         run: |
           docker tag wdm-flink-statefun_stock-endpoint:latest ${STOCK_SERVICE_IMAGE}:${GITHUB_SHA::8}
           docker tag wdm-flink-statefun_users-endpoint:latest ${USER_SERVICE_IMAGE}:${GITHUB_SHA::8}
+      - name: Publish to Registry
+        uses: elgohr/Publish-Docker-Github-Action@master
+        with:
+          name: wzorgdrager/wdm
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          tags: "latest,${GITHUB_SHA::8}" 
