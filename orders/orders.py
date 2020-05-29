@@ -37,7 +37,7 @@ def create_order(context, msg: CreateOrder):
 
     if not state:
         state = Count()
-        state.num = 0
+        state.num = 1
 
     request = CreateOrderWithId()
     request.id = state.num
@@ -120,7 +120,8 @@ def create_order_with_id(context, msg):
     logger.info(f'Created new order with id {msg.id}')
 
     response = ResponseMessage()
-    response.result = json.dumps({'order_id': state.id})
+    response.result = json.dumps({'result': 'success',
+                                  'order_id': state.id})
     return response
 
 
@@ -147,7 +148,13 @@ def find_order(context, msg):
     else:
         logger.info(f"{state}")
         logger.info(f"Returning order with id: {msg.find_order.id}")
-        response.result = MessageToJson(state)
+        response.result = MessageToJson(state, including_default_value_fields=True, preserving_proto_field_name=True)
+        logger.info(f"{response.result}")
+        # response.result = json.dumps({'id': state.id,
+        #                               'user_id': state.user_id,
+        #                               'paid': state.paid,
+        #                               'items': MessageToJson(state.items),
+        #                               'total_cost': state.total_cost})
 
     return response
 

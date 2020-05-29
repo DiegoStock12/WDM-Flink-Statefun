@@ -94,15 +94,16 @@ def test_orders_basic():
 
     # Check if everything is properly initialized
     order = order_find(order['order_id']).json()
-    assert order['order_id'] == order_id
-    assert order['paid'] == 'false'
+    print(order)
+    assert order['id'] == str(order_id)
+    assert order['paid'] == False
     assert order['items'] == []
-    assert order['user_id'] == user_id
-    assert order['total_cost'] == 0
+    assert order['user_id'] == str(user_id)
+    assert order['total_cost'] == str(0)
 
     # Remove the order
     assert order_remove(order_id).status_code == 200
-
+    #
     # Non-existing user
     assert order_create(-1).status_code == 404
     # Non-existing order
