@@ -3,12 +3,13 @@ FROM python:3.7-alpine
 RUN mkdir -p /app
 WORKDIR /app
 
-COPY requirements.txt /app
+COPY ./orders/requirements.txt /app
 RUN pip install -r requirements.txt
 
-COPY orders.py /app
-COPY orders_pb2.py /app
-COPY users_pb2.py /app
+COPY ./orders/orders.py /app
+COPY ./protobuf/orders_pb2.py /app
+COPY ./protobuf/users_pb2.py /app
+COPY ./protobuf/general_pb2.py /app
 
 EXPOSE 8001
 

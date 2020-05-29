@@ -189,10 +189,12 @@ app.add_routes(routes)
 # get the routes from the particular endpoints
 from orders_async_endpoint import routes_orders
 from users_async_endpoint import routes_users
+from payments_async_endpoint import routes_payments
 from stock_async_endpoint import routes_stock
 
 app.add_routes(routes_orders)
 app.add_routes(routes_users)
+app.add_routes(routes_payments)
 app.add_routes(routes_stock)
 
 # add the background tasks

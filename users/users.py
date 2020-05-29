@@ -4,6 +4,7 @@ import typing
 import logging
 import json
 
+
 # Messages and internal states of the functions
 from users_pb2 import CreateUserRequest, UserRequest, UserData, Count, CreateUserWithId
 
@@ -36,8 +37,8 @@ functions = StatefulFunctions()
 # sends a creation request to that new user function
 @functions.bind("users/create")
 def create_user(context, create_user_request: CreateUserRequest):
-    """ Creates a user by sending a message to the user function 
-    - Only has one state (int) that saves the current id to be 
+    """ Creates a user by sending a message to the user function
+    - Only has one state (int) that saves the current id to be
     asigned to the next user """
 
     logger.debug("Creating user...")
