@@ -13,9 +13,7 @@ RUN pip install -r requirements.txt
 
 # COPY users.py /app
 COPY ./endpoints/async_endpoint.py /app
-COPY ./endpoints/users_async_endpoint.py /app
-COPY ./endpoints/orders_async_endpoint.py /app
-COPY ./endpoints/stock_async_endpoint.py /app
+COPY ./endpoints/*_async_endpoint.py /app/
 
 COPY ./protobuf/*_pb2.py /app/
 

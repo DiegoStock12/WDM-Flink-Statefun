@@ -66,6 +66,17 @@ module:
               - item
             maxNumBatchRequests: 500
             timeout: 2min
+
+      - function:
+          meta:
+            kind: http
+            type: payments/pay
+          spec:
+            endpoint: http://payments-endpoint:8003/statefun
+            maxNumBatchRequests: 500
+            timeout: 2min
+
+
     ingresses:
       - ingress:
           meta:

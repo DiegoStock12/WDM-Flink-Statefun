@@ -63,13 +63,7 @@ services:
             - "8001"
         ports:
             - "8001:8001"
-    payments-endpoint:
-        build:
-            context: ./payments
-        expose:
-            - "8003"
-        ports:
-            - "8003:8003"
+
 
     stock-endpoint:
         build:
@@ -79,6 +73,15 @@ services:
             - "8002"
         ports:
             - "8002:8002"
+
+    payments-endpoint:
+        build:
+            context: .
+            dockerfile: ./payments/Dockerfile
+        expose:
+            - "8003"
+        ports:
+            - "8003:8003"
 
     api-endpoint:
         build:
