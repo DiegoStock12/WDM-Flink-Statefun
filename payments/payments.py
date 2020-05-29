@@ -8,7 +8,7 @@ import json
 from users_pb2 import UserPayRequest, UserCancelPayRequest, UserPayResponse
 from general_pb2 import ResponseMessage
 from payment_pb2 import PaymentRequest, PaymentStatus
-from orders_pb2 import Order, OrdersPayFind, UserPayResponse, OrdersPayReply, OrderPaymentCancelReply
+from orders_pb2 import Order, OrdersPayFind, OrdersPayReply, OrderPaymentCancelReply
 
 from statefun import StatefulFunctions
 from statefun import RequestReplyHandler
@@ -69,13 +69,13 @@ def payments_pay(context, request: typing.Union[PaymentRequest, UserPayRequest, 
             orders_pay_find_request = set_worker_and_request_ids(request, OrdersPayFind())
             orders_pay_find_request.order_id = request.order_id
             context.pack_and_send("orders/order", request.order_id, orders_pay_find_request)
-    # Incoming from Users
+    # Reply from Users
     elif isinstance(request, UserPayResponse):
         payment_status = set_worker_and_request_ids(request, PaymentStatus())
         payment_status.order_id = request.order_id
         payment_status.actually_paid = request.success
         context.pack_and_send("orders/order", request.order_id, payment_status)
-    # Incoming from Users
+    # Reply from Users
     elif isinstance(request, OrderPaymentCancelReply):
         response = ResponseMessage()
         response.response_id = request.request_info.request_id
