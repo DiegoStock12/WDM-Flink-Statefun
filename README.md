@@ -10,6 +10,8 @@ Run the whole demo:
 Rebuild single container:
 * `docker-compose up -d --no-deps --build <service-name>`
 
+Compile proto files example:
+* `protoc --proto_path=payments/protobuf/ --python_out=payments/ payments/protobuf/orders.proto`
 
 
 ## User Service

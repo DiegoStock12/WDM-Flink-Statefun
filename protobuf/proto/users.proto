@@ -11,7 +11,7 @@ import "general.proto";
 
 
 
-// Message used to store the user data 
+// Message used to store the user data
 // in the statefun and also what we give back to the
 // queries
 message UserData{
@@ -77,7 +77,7 @@ message UserRequest{
 }
 
 
-// INTERACTION WITH THE PAYMENT SERVICE 
+// INTERACTION WITH THE PAYMENT SERVICE
 
 message UserPayRequest{
     int64 amount = 1;
@@ -95,7 +95,7 @@ message UserCancelPayRequest{
     RequestInfo request_info = 3;
 }
 
-// Response returned to the payment 
+// Response returned to the payment
 // service with success or failure
 message UserPayResponse{
     bool success = 1;

@@ -10,7 +10,7 @@ services:
             - "9092:9092"
         environment:
             HOSTNAME_COMMAND: "route -n | awk '/UG[ \t]/{print $$2}'"
-            KAFKA_CREATE_TOPICS: "users:1:1,users-create:1:1,user-events:1:1,names:1:1,orders:1:1,orders-create:1:1,order-events:1:1"
+            KAFKA_CREATE_TOPICS: "users:1:1,users-create:1:1,user-events:1:1,names:1:1,orders:1:1,orders-create:1:1,order-events:1:1,payments:1:1,payment-events:1:1"
             KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
         depends_on:
             - zookeeper
@@ -45,33 +45,52 @@ services:
             - MASTER_HOST=master
         volumes:
             - ./checkpoint-dir:/checkpoint-dir
+
     users-endpoint:
         build:
-            context: ./users
+            context: .
+            dockerfile: ./users/Dockerfile
         expose:
             - "8000"
         ports:
             - "8000:8000"
+
     orders-endpoint:
         build:
-            context: ./orders
+            context: .
+            dockerfile: ./orders/Dockerfile
         expose:
             - "8001"
         ports:
             - "8001:8001"
+
+
+    stock-endpoint:
+        build:
+            context: .
+            dockerfile: ./stock/Dockerfile
+        expose:
+            - "8002"
+        ports:
+            - "8002:8002"
+
+    payments-endpoint:
+        build:
+            context: .
+            dockerfile: ./payments/Dockerfile
+        expose:
+            - "8003"
+        ports:
+            - "8003:8003"
+
     api-endpoint:
         build:
-            context: ./endpoints
+            context: .
+            dockerfile: ./endpoints/Dockerfile
         depends_on: 
             - kafka-broker
         expose:
             - "5000"
         ports:
             - "5000:5000"
-    stock-endpoint:
-        build:
-            context: ./stock
-        expose:
-            - "8002"
-        ports:
-            - "8002:8002"
+

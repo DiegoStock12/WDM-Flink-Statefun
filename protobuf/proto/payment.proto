@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+import "general.proto";
+
+package payment;
+
+message PaymentRequest {
+    uint64 user_id = 1;
+    uint64 order_id = 2;
+    RequestInfo request_info = 3;
+
+    enum RequestType {
+      PAY = 0;
+      CANCEL = 1;
+      STATUS = 2;
+    }
+    RequestType request_type = 4;
+}
+
+message PaymentStatus {
+  uint64 order_id = 1;
+  bool actually_paid = 2;
+  RequestInfo request_info = 3;
+}
