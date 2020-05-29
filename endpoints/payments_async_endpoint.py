@@ -2,7 +2,6 @@ from aiohttp import web
 import asyncio
 
 from async_endpoint import app, send_msg, messages, WORKER_ID
-from users_pb2 import CreateUserRequest, UserRequest, UserResponse
 
 # create the logger and configure
 import logging

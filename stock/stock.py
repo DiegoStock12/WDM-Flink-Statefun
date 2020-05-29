@@ -43,8 +43,8 @@ def create_item(context, request: CreateItemRequest):
     item_request = CreateItemWithId()
     item_request.id = state.num
     item_request.price = request.price
-    item_request.request_id = request.request_id
-    item_request.worker_id = request.worker_id
+    item_request.request_info.request_id = request.request_info.request_id
+    item_request.request_info.worker_id = request.request_info.worker_id
     print(f"Sending request to function with id {item_request.id}", flush=True)
     context.pack_and_send("stock/stock", str(item_request.id), item_request)
 
@@ -106,22 +106,16 @@ def manage_stock(context, request: typing.Union[StockRequest, CreateItemWithId])
         # Use the same request id in the message body
         # and use the request worker_id as key of the message
 
-        response.request_id = request.request_id
-        logger.debug(
-            f'Sending response {response} with key {request.worker_id}')
-
+        response.request_id = request.request_info.request_id
 
         if not request.internal:
             # create the egress message and send it to the
             # users/out egress
             egress_message = kafka_egress_record(
                 topic=STOCK_EVENTS_TOPIC,
-                key=request.worker_id,
+                key=request.request_info.worker_id,
                 value=response
             )
-
-            logger.debug(f'Created egress message: {response}')
-
             context.pack_and_send_egress("stock/out", egress_message)
         else:
             context.pack_and_send("orders/order", str(request.order_id), response)
