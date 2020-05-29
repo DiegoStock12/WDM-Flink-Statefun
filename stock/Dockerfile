@@ -4,12 +4,12 @@ RUN mkdir -p /app
 WORKDIR /app
 
 
-COPY requirements.txt /app
+COPY ./stock/requirements.txt /app
 RUN pip install -r requirements.txt
 
-COPY stock.py /app
-COPY stock_pb2.py /app
-COPY general_pb2.py /app
+COPY ./stock/stock.py /app
+COPY ./protobuf/stock_pb2.py /app
+COPY ./protobuf/general_pb2.py /app
 
 EXPOSE 8002
 

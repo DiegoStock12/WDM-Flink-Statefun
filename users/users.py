@@ -4,6 +4,7 @@ import typing
 import logging
 import json
 
+
 # Messages and internal states of the functions
 from users_pb2 import CreateUserRequest, UserRequest, UserData, Count, CreateUserWithId
 

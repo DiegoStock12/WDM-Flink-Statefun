@@ -8,14 +8,16 @@ WORKDIR /app
 
 # RUN apk add gcc
 
-COPY requirements.txt /app
+COPY ./endpoints/requirements.txt /app
 RUN pip install -r requirements.txt
 
 # COPY users.py /app
-COPY async_endpoint.py /app
-COPY users_async_endpoint.py /app
-COPY orders_async_endpoint.py /app
-COPY *_pb2.py /app/
+COPY ./endpoints/async_endpoint.py /app
+COPY ./endpoints/users_async_endpoint.py /app
+COPY ./endpoints/orders_async_endpoint.py /app
+COPY ./endpoints/stock_async_endpoint.py /app
+
+COPY ./protobuf/*_pb2.py /app/
 
 EXPOSE 5000
 
