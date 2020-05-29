@@ -7,6 +7,8 @@ from orders_pb2 import Order, CreateOrder, CreateOrderWithId, CreateOrderRespons
     OrdersPayFind, OrderPaymentCancel, OrderPaymentCancelReply
 from users_pb2 import Count
 from general_pb2 import ResponseMessage
+from payment_pb2 import PaymentStatus
+from stock_pb2 import StockRequest, StockResponse
 
 from google.protobuf.json_format import MessageToJson
 
@@ -87,6 +89,12 @@ def operate_order(context, msg: typing.Union[CreateOrderWithId, OrderRequest, Or
     elif isinstance(msg, OrderPaymentCancel):
         order_payment_cancel(context, msg)
 
+    elif isinstance(msg, PaymentStatus):
+        order_payment_confirm(context, msg)
+
+    elif isinstance(msg, StockResponse):
+        order_add_item_reply(context, msg)
+
     else:
         logger.error('Received unknown message type!')
 
@@ -151,11 +159,21 @@ def add_item(context, msg):
         logger.info("Order does not exist.")
         response.result = json.dumps({'result': 'failure', 'message': 'Order does not exist.'})
     else:
-        state.items.append(msg.add_item.itemId)
-        logger.info(f"{state}")
-        context.state('order').pack(state)
-        logger.info(f"Returning order with id: {msg.add_item.id}")
-        response.result = json.dumps({'result': 'success'})
+        # call stock service to reduce the stock
+        subtract_stock_request = StockRequest()
+        subtract_stock_request.request_info = msg.request_info
+        subtract_stock_request.subtract_stock.id = msg.add_item.id
+        subtract_stock_request.subtract_stock.amount = 1
+        subtract_stock_request.internal = True
+        subtract_stock_request.order_id = state.id
+
+        context.pack_and_send("stock/stock", str(msg.add_item.id), subtract_stock_request)
+
+        # state.items.append(msg.add_item.itemId)
+        # logger.info(f"{state}")
+        # context.state('order').pack(state)
+        # logger.info(f"Returning order with id: {msg.add_item.id}")
+        # response.result = json.dumps({'result': 'success'})
 
     return response
 
@@ -231,6 +249,35 @@ def order_payment_cancel(context, msg):
 
     context.pack_and_send("payments/pay", str(msg.order_id), response)
 
+
+def order_payment_confirm(context, msg):
+    response = ResponseMessage()
+    if msg.actually_paid:
+        state = context.state('order').unpack(Order)
+        state.paid = True
+        context.state('order').pack(state)
+
+        logger.info("Checkout succeeded.")
+        response.result = json.dumps({'result': 'success', 'message': 'Checkout succeeded.'})
+    else:
+        logger.info("Payment cancelling failed.")
+        response.result = json.dumps({'result': 'failure', 'message': 'Payment cancelling failed.'})
+
+    return response
+
+
+def order_add_item_reply(context, msg):
+    state = context.state('order').unpack(Order)
+    response = ResponseMessage()
+    if msg.result:
+        state.items.append(msg.item_id)
+        logger.info(f"{state}")
+        context.state('order').pack(state)
+        response.result = json.dumps({'result': 'success'})
+    else:
+        response.result = json.dumps({'result': 'failure', 'message': 'No items left in stock.'})
+
+    return response
 
 # Use the handler and expose the endpoint
 handler = RequestReplyHandler(functions)
