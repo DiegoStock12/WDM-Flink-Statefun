@@ -68,6 +68,10 @@ message StockRequest {
         AddItemStockRequest add_stock = 5;
 
     }
+
+    // Internal messages for order service.
+    bool internal = 6;
+    string order_id = 7;
 }
 
 message StockResponse {

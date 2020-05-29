@@ -18,7 +18,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='stock',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=b'\n\x0bstock.proto\x12\x05stock\"4\n\x08ItemData\x12\n\n\x02id\x18\x01 \x01(\x04\x12\r\n\x05price\x18\x02 \x01(\x03\x12\r\n\x05stock\x18\x03 \x01(\x03\"\x14\n\x05\x43ount\x12\x0b\n\x03num\x18\x01 \x01(\x04\"I\n\x11\x43reateItemRequest\x12\r\n\x05price\x18\x01 \x01(\x03\x12\x12\n\nrequest_id\x18\x02 \x01(\t\x12\x11\n\tworker_id\x18\x03 \x01(\t\"T\n\x10\x43reateItemWithId\x12\n\n\x02id\x18\x01 \x01(\x04\x12\r\n\x05price\x18\x02 \x01(\x03\x12\x12\n\nrequest_id\x18\x03 \x01(\t\x12\x11\n\tworker_id\x18\x04 \x01(\t\"\x8a\x03\n\x0cStockRequest\x12\x12\n\nrequest_id\x18\x01 \x01(\t\x12\x11\n\tworker_id\x18\x02 \x01(\t\x12\x38\n\tfind_item\x18\x03 \x01(\x0b\x32#.stock.StockRequest.FindItemRequestH\x00\x12\x46\n\x0esubtract_stock\x18\x04 \x01(\x0b\x32,.stock.StockRequest.SubtractItemStockRequestH\x00\x12<\n\tadd_stock\x18\x05 \x01(\x0b\x32\'.stock.StockRequest.AddItemStockRequestH\x00\x1a\x1d\n\x0f\x46indItemRequest\x12\n\n\x02id\x18\x01 \x01(\x04\x1a\x36\n\x18SubtractItemStockRequest\x12\n\n\x02id\x18\x01 \x01(\x04\x12\x0e\n\x06\x61mount\x18\x02 \x01(\x03\x1a\x31\n\x13\x41\x64\x64ItemStockRequest\x12\n\n\x02id\x18\x01 \x01(\x04\x12\x0e\n\x06\x61mount\x18\x02 \x01(\x03\x42\t\n\x07message\"D\n\rStockResponse\x12\x12\n\nrequest_id\x18\x01 \x01(\t\x12\x0f\n\x07item_id\x18\x02 \x01(\x04\x12\x0e\n\x06result\x18\x03 \x01(\tb\x06proto3'
+  serialized_pb=b'\n\x0bstock.proto\x12\x05stock\"4\n\x08ItemData\x12\n\n\x02id\x18\x01 \x01(\x04\x12\r\n\x05price\x18\x02 \x01(\x03\x12\r\n\x05stock\x18\x03 \x01(\x03\"\x14\n\x05\x43ount\x12\x0b\n\x03num\x18\x01 \x01(\x04\"I\n\x11\x43reateItemRequest\x12\r\n\x05price\x18\x01 \x01(\x03\x12\x12\n\nrequest_id\x18\x02 \x01(\t\x12\x11\n\tworker_id\x18\x03 \x01(\t\"T\n\x10\x43reateItemWithId\x12\n\n\x02id\x18\x01 \x01(\x04\x12\r\n\x05price\x18\x02 \x01(\x03\x12\x12\n\nrequest_id\x18\x03 \x01(\t\x12\x11\n\tworker_id\x18\x04 \x01(\t\"\xae\x03\n\x0cStockRequest\x12\x12\n\nrequest_id\x18\x01 \x01(\t\x12\x11\n\tworker_id\x18\x02 \x01(\t\x12\x38\n\tfind_item\x18\x03 \x01(\x0b\x32#.stock.StockRequest.FindItemRequestH\x00\x12\x46\n\x0esubtract_stock\x18\x04 \x01(\x0b\x32,.stock.StockRequest.SubtractItemStockRequestH\x00\x12<\n\tadd_stock\x18\x05 \x01(\x0b\x32\'.stock.StockRequest.AddItemStockRequestH\x00\x12\x10\n\x08internal\x18\x06 \x01(\x08\x12\x10\n\x08order_id\x18\x07 \x01(\t\x1a\x1d\n\x0f\x46indItemRequest\x12\n\n\x02id\x18\x01 \x01(\x04\x1a\x36\n\x18SubtractItemStockRequest\x12\n\n\x02id\x18\x01 \x01(\x04\x12\x0e\n\x06\x61mount\x18\x02 \x01(\x03\x1a\x31\n\x13\x41\x64\x64ItemStockRequest\x12\n\n\x02id\x18\x01 \x01(\x04\x12\x0e\n\x06\x61mount\x18\x02 \x01(\x03\x42\t\n\x07message\"D\n\rStockResponse\x12\x12\n\nrequest_id\x18\x01 \x01(\t\x12\x0f\n\x07item_id\x18\x02 \x01(\x04\x12\x0e\n\x06result\x18\x03 \x01(\tb\x06proto3'
 )
 
 
@@ -223,8 +223,8 @@ _STOCKREQUEST_FINDITEMREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=507,
-  serialized_end=536,
+  serialized_start=543,
+  serialized_end=572,
 )
 
 _STOCKREQUEST_SUBTRACTITEMSTOCKREQUEST = _descriptor.Descriptor(
@@ -260,8 +260,8 @@ _STOCKREQUEST_SUBTRACTITEMSTOCKREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=538,
-  serialized_end=592,
+  serialized_start=574,
+  serialized_end=628,
 )
 
 _STOCKREQUEST_ADDITEMSTOCKREQUEST = _descriptor.Descriptor(
@@ -297,8 +297,8 @@ _STOCKREQUEST_ADDITEMSTOCKREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=594,
-  serialized_end=643,
+  serialized_start=630,
+  serialized_end=679,
 )
 
 _STOCKREQUEST = _descriptor.Descriptor(
@@ -343,6 +343,20 @@ _STOCKREQUEST = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='internal', full_name='stock.StockRequest.internal', index=5,
+      number=6, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='order_id', full_name='stock.StockRequest.order_id', index=6,
+      number=7, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -359,7 +373,7 @@ _STOCKREQUEST = _descriptor.Descriptor(
       index=0, containing_type=None, fields=[]),
   ],
   serialized_start=260,
-  serialized_end=654,
+  serialized_end=690,
 )
 
 
@@ -403,8 +417,8 @@ _STOCKRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=656,
-  serialized_end=724,
+  serialized_start=692,
+  serialized_end=760,
 )
 
 _STOCKREQUEST_FINDITEMREQUEST.containing_type = _STOCKREQUEST
