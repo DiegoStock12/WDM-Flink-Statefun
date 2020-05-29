@@ -81,6 +81,9 @@ def operate_order(context, msg: typing.Union[CreateOrderWithId, OrderRequest, Or
         elif msg_type == 'order_checkout':
             order_checkout(context, msg)
 
+    elif isinstance(msg, OrdersPayFind):
+        order_payment_find(context, msg)
+
     elif isinstance(msg, OrderPaymentCancel):
         order_payment_cancel(context, msg)
 
@@ -200,6 +203,21 @@ def order_checkout(context, msg):
 
     # send to payment service
     context.pack_and_send("payments/pay", str(request.id), request)
+
+
+def order_payment_find(context, msg):
+    state = context.state('order').unpack(Order)
+
+    response = Order()
+    request.id = msg.id
+    request.request_info = msg.request_info
+    request.user_id = state.user_id
+    request.items = state.items
+    request.total_cost = state.total_cost
+    request.paid = state.paid
+    request.intent = OrderRequest.Intent.STATUS
+
+    context.pack_and_send("payments/pay", str(msg.order_id), response)
 
 
 def order_payment_cancel(context, msg):
