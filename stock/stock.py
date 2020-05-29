@@ -110,17 +110,21 @@ def manage_stock(context, request: typing.Union[StockRequest, CreateItemWithId])
         logger.debug(
             f'Sending response {response} with key {request.worker_id}')
 
-        # create the egress message and send it to the
-        # users/out egress
-        egress_message = kafka_egress_record(
-            topic=STOCK_EVENTS_TOPIC,
-            key=request.worker_id,
-            value=response
-        )
 
-        logger.debug(f'Created egress message: {response}')
+        if not request.internal:
+            # create the egress message and send it to the
+            # users/out egress
+            egress_message = kafka_egress_record(
+                topic=STOCK_EVENTS_TOPIC,
+                key=request.worker_id,
+                value=response
+            )
 
-        context.pack_and_send_egress("stock/out", egress_message)
+            logger.debug(f'Created egress message: {response}')
+
+            context.pack_and_send_egress("stock/out", egress_message)
+        else:
+            context.pack_and_send("orders/order", str(request.order_id), response)
 
 # Use the handler and expose the endpoint
 handler = RequestReplyHandler(functions)
