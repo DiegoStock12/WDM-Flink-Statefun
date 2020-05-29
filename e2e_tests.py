@@ -1,23 +1,21 @@
 import requests
 
-API_BASE = "http://localhost:5000"
-
-user_ids = []
+URL = "http://localhost:5000"
 
 def user_create():
-    return requests.post(API_BASE + '/users/create')
+    return requests.post(URL + '/users/create')
 
 def user_remove(user_id):
-    return requests.delete(API_BASE + '/users/remove/' + str(user_id))
+    return requests.delete(URL + '/users/remove/' + str(user_id))
 
 def user_find(user_id):
-    return requests.get(API_BASE + '/users/find/' + str(user_id))
+    return requests.get(URL + '/users/find/' + str(user_id))
 
 def user_credit_subtract(user_id, amount):
-    return requests.post(API_BASE + '/users/credit/subtract/' + str(user_id) + '/' + str(amount))
+    return requests.post(URL + '/users/credit/subtract/' + str(user_id) + '/' + str(amount))
 
 def user_credit_add(user_id, amount):
-    return requests.post(API_BASE + '/users/credit/add/' + str(user_id) + '/' + str(amount))
+    return requests.post(URL + '/users/credit/add/' + str(user_id) + '/' + str(amount))
 
 def test_user_basic():
     # USER CREATE
@@ -28,11 +26,13 @@ def test_user_basic():
 
     # USER FIND
     # Test if user exists and has 0 credit
-    data = user_find(user_id).json()
+    data = user_find(user['user_id']).json()
     # user_id is the same as the one we requested the data for
-    assert data['user_id'] == user_id
+    assert data['user_id'] == user['user_id']
     # initially the user has 0 credit
     assert data['credit'] == 0
+
+    user_id = user['user_id']
 
     # USER CREDIT ADD
     # Add 1 credit, response should indicate success (200)
@@ -47,39 +47,40 @@ def test_user_basic():
 
 def test_user_not_existing():
     # user_id = -1 does not exists, should error
-    assert user_find(-1).status_code == 404
-    assert user_credit(-1).status_code == 404
-    assert user_credit_add(-1, 1).status_code == 404
-    assert user_credit_subtract(-1, 1).status_code == 404
-    assert user_remove(-1).status_code == 404
+    assert user_find(-1).status_code == 500
+    assert user_credit_add(-1, 1).status_code == 500
+    assert user_credit_add(-1, 1).status_code == 500
+    assert user_credit_subtract(-1, 1).status_code == 500
+    assert user_remove(-1).status_code == 500
 
-def test_credit_amount_negative():
-    user_id = user_create().json()['id']
-    assert user_credit_add(user_id, -1).status_code == 404
-    assert user_credit_subtract(user_id, -1).status_code == 404
+# DISCUSS WITH DIEGO
+# def test_credit_amount_negative():
+#     user_id = user_create().json()['user_id']
+#     assert user_credit_add(user_id, -1).status_code == 404
+#     assert user_credit_subtract(user_id, -1).status_code == 404
 
-def test_credit_negative_balance():
-    user_id = user_create().json()['id']
-    assert user_credit_subtract(user_id, 1).status_code == 404
+# def test_credit_negative_balance():
+#     user_id = user_create().json()['user_id']
+#     assert user_credit_subtract(user_id, 1).status_code == 404
 
 
 def order_create(user_id):
-    return requests.post(API_BASE + '/orders/create/' + str(user_id))
+    return requests.post(URL + '/orders/create/' + str(user_id))
 
 def order_remove(order_id):
-    return requests.delete(API_BASE + '/orders/remove/' + str(order_id))
+    return requests.delete(URL + '/orders/remove/' + str(order_id))
 
 def order_find(order_id):
-    return requests.get(API_BASE + '/orders/find/' + str(order_id))
+    return requests.get(URL + '/orders/find/' + str(order_id))
 
 def order_add_item(order_id, item_id):
-    return requests.post(API_BASE + '/orders/addItem/' + str(order_id) + '/' + str(item_id))
+    return requests.post(URL + '/orders/addItem/' + str(order_id) + '/' + str(item_id))
 
 def order_remove_item(order_id, item_id):
-    return requests.delete(API_BASE + '/orders/removeItem/' + str(order_id) + '/' + str(item_id))
+    return requests.delete(URL + '/orders/removeItem/' + str(order_id) + '/' + str(item_id))
 
 def order_checkout(order_id):
-    return requests.post(API_BASE + '/order/checkout/' + str(order_id))
+    return requests.post(URL + '/order/checkout/' + str(order_id))
 
 def test_orders_basic():
     # Create a user
@@ -109,16 +110,16 @@ def test_orders_basic():
     assert order_remove(-1).status_code == 404
 
 def stock_item_find(item_id):
-    return requests.get(API_BASE + '/stock/find/' + str(item_id))
+    return requests.get(URL + '/stock/find/' + str(item_id))
 
 def stock_item_subtract(item_id, amount):
-    return requests.post(API_BASE + '/stock/subtract/' + str(item_id) + '/' + str(amount))
+    return requests.post(URL + '/stock/subtract/' + str(item_id) + '/' + str(amount))
 
 def stock_item_add(item_id, amount):
-    return requests.post(API_BASE + '/stock/add/' + str(item_id) + '/' + str(amount))
+    return requests.post(URL + '/stock/add/' + str(item_id) + '/' + str(amount))
 
 def stock_item_create(price):
-    return requests.post(API_BASE + '/stock/create/' + str(price))
+    return requests.post(URL + '/stock/create/' + str(price))
 
 
 def test_stock_basic():
@@ -139,16 +140,11 @@ def test_stock_basic():
     assert stock_item_find(item_id).json()['stock'] == 0
     assert stock_item_subtract(item_id, 1).status_code == 404
 
-
-def payment_pay(user_id, order_id):
-    return requests.post(API_BASE + '/payment/pay/' + user_id + '/' + oder_id)
-
 def payment_cancel(user_id, order_id):
-    return requests.post(API_BASE + '/payment/cancel/' + user_id + '/' + order_id)
+    return requests.post(URL + '/payment/cancel/' + user_id + '/' + order_id)
 
 def payment_status(order_id):
-    return requests.get(API_BASE + '/payment/status/' + order_id)
-
+    return requests.get(URL + '/payment/status/' + order_id)
 
 def test_integration():
     user_id = user_create().json()['user_id']
@@ -162,6 +158,6 @@ def test_integration():
     assert stock_item_find(item_id).json()['stock'] == 0
     assert order_checkout(order_id).status_code == 200
 
-    # assert payment_pay(user_id, order_id).status_code == 200
     assert order_find(order_id).json()['paid'] == 'true'
     assert user_find(user_id).json()['credit'] == 0
+    assert payment_status(order_id).json()['paid'] == 'true'
