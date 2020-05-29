@@ -120,7 +120,7 @@ def stock_item_add(item_id, amount):
     return requests.post(URL + '/stock/add/' + str(item_id) + '/' + str(amount))
 
 def stock_item_create(price):
-    return requests.post(URL + '/stock/create/' + str(price))
+    return requests.post(URL + '/stock/item/create/' + str(price))
 
 
 def test_stock_basic():
@@ -139,7 +139,7 @@ def test_stock_basic():
     assert stock_item_find(item_id).json()['stock'] == 1
     assert stock_item_subtract(item_id, 1).status_code == 200
     assert stock_item_find(item_id).json()['stock'] == 0
-    assert stock_item_subtract(item_id, 1).status_code == 404
+    assert stock_item_subtract(item_id, 1).status_code == 400
 
 def payment_cancel(user_id, order_id):
     return requests.post(URL + '/payment/cancel/' + user_id + '/' + order_id)
@@ -149,10 +149,10 @@ def payment_status(order_id):
 
 def test_integration():
     user_id = user_create().json()['user_id']
-    assert user_credit_add(user_id, 1) == 200
+    assert user_credit_add(user_id, 1).status_code == 200
 
     order_id = order_create(user_id).json()['order_id']
-    item_id = stock_item_create().json()['item_id']
+    item_id = stock_item_create(1).json()['item_id']
     assert stock_item_add(item_id, 1).status_code == 200
     assert order_add_item(order_id, item_id).status_code == 200
     assert order_find(order_id).json()['total_cost'] == 1

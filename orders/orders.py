@@ -168,7 +168,8 @@ def add_item(context, msg):
     else:
         # call stock service to reduce the stock
         subtract_stock_request = StockRequest()
-        subtract_stock_request.request_info = msg.request_info
+        subtract_stock_request.request_info.worker_id = msg.request_info.worker_id
+        subtract_stock_request.request_info.request_id = msg.request_info.request_id
         subtract_stock_request.subtract_stock.id = msg.add_item.id
         subtract_stock_request.subtract_stock.amount = 1
         subtract_stock_request.internal = True
@@ -213,7 +214,8 @@ def order_checkout(context, msg):
     state = context.state('order').unpack(Order)
     request = Order()
     request.id = msg.id
-    request.request_info = msg.request_info
+    request.request_info.worker_id = msg.request_info.worker_id
+    request.request_info.request_id = msg.request_info.request_id
     request.user_id = state.user_id
     request.items = state.items
     request.total_cost = state.total_cost
@@ -229,7 +231,8 @@ def order_payment_find(context, msg):
 
     response = Order()
     request.id = msg.id
-    request.request_info = msg.request_info
+    request.request_info.worker_id = msg.request_info.worker_id
+    request.request_info.request_id = msg.request_info.request_id
     request.user_id = state.user_id
     request.items = state.items
     request.total_cost = state.total_cost
@@ -245,7 +248,8 @@ def order_payment_cancel(context, msg):
     context.state('order').pack(state)
 
     response = OrderPaymentCancelReply()
-    response.request_info = msg.request_info
+    response.request_info.worker_id = msg.request_info.worker_id
+    response.request_info.request_id = msg.request_info.request_id
     response.success = 1
 
     context.pack_and_send("payments/pay", str(msg.order_id), response)
