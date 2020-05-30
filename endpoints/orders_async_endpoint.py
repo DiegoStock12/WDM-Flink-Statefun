@@ -119,3 +119,20 @@ async def remove_item_from_order(request):
         return web.Response(text=result, content_type='application/json')
     else:
         return web.HTTPNotFound()
+
+
+@routes_orders.delete('/orders/checkout/{orderId}')
+async def checkout_order(request):
+    print("Received request to checkout the order.", flush=True)
+
+    orderId = int(request.match_info['orderId'])
+    request = OrderRequest()
+    request.order_checkout.id = orderId
+
+    result = await send_msg(ORDER_TOPIC, key=orderId, request=request)
+    r_json = json.loads(result)
+
+    if r_json['result'] == 'success':
+        return web.Response(text=result, content_type='application/json')
+    else:
+        return web.HTTPNotFound()

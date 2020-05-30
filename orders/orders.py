@@ -55,7 +55,8 @@ def create_order(context, msg: CreateOrder):
 
 
 @functions.bind("orders/order")
-def operate_order(context, msg: typing.Union[CreateOrderWithId, OrderRequest, OrderPaymentCancel]):
+def operate_order(context, msg: typing.Union[CreateOrderWithId, OrderRequest, OrdersPayFind,
+                                             OrderPaymentCancel, PaymentStatus, StockResponse]):
     """ Does all the operations with a single order """
     response = None
 
@@ -90,10 +91,10 @@ def operate_order(context, msg: typing.Union[CreateOrderWithId, OrderRequest, Or
         order_payment_cancel(context, msg)
 
     elif isinstance(msg, PaymentStatus):
-        order_payment_confirm(context, msg)
+        response = order_payment_confirm(context, msg)
 
     elif isinstance(msg, StockResponse):
-        order_add_item_reply(context, msg)
+        response = order_add_item_reply(context, msg)
 
     else:
         logger.error('Received unknown message type!')
@@ -150,34 +151,30 @@ def find_order(context, msg):
         logger.info(f"Returning order with id: {msg.find_order.id}")
         response.result = MessageToJson(state, including_default_value_fields=True, preserving_proto_field_name=True)
         logger.info(f"{response.result}")
-        # response.result = json.dumps({'id': state.id,
-        #                               'user_id': state.user_id,
-        #                               'paid': state.paid,
-        #                               'items': MessageToJson(state.items),
-        #                               'total_cost': state.total_cost})
 
     return response
 
 
 def add_item(context, msg):
     state = context.state('order').unpack(Order)
-    response = ResponseMessage()
     if not state:
+        response = ResponseMessage()
         logger.info("Order does not exist.")
         response.result = json.dumps({'result': 'failure', 'message': 'Order does not exist.'})
+
+        return response
     else:
         # call stock service to reduce the stock
         subtract_stock_request = StockRequest()
         subtract_stock_request.request_info.worker_id = msg.request_info.worker_id
         subtract_stock_request.request_info.request_id = msg.request_info.request_id
-        subtract_stock_request.subtract_stock.id = msg.add_item.id
+        subtract_stock_request.subtract_stock.id = msg.add_item.itemId
         subtract_stock_request.subtract_stock.amount = 1
         subtract_stock_request.internal = True
         subtract_stock_request.order_id = state.id
 
-        context.pack_and_send("stock/stock", str(msg.add_item.id), subtract_stock_request)
-
-    return response
+        context.pack_and_send("stock/stock", str(msg.add_item.itemId), subtract_stock_request)
+        logger.info("Sent request to ")
 
 
 def remove_item(context, msg):
@@ -212,6 +209,8 @@ def remove_item(context, msg):
 
 def order_checkout(context, msg):
     state = context.state('order').unpack(Order)
+    logger.info(f"Checkouting order {msg.id}.")
+
     request = Order()
     request.id = msg.id
     request.request_info.worker_id = msg.request_info.worker_id
@@ -274,12 +273,14 @@ def order_payment_confirm(context, msg):
 def order_add_item_reply(context, msg):
     state = context.state('order').unpack(Order)
     response = ResponseMessage()
-    if msg.result:
+    if msg.result == 'success':
+        logger.info("Successfully added item to order.")
         state.items.append(msg.item_id)
         logger.info(f"{state}")
         context.state('order').pack(state)
         response.result = json.dumps({'result': 'success'})
     else:
+        logger.info("No items left in stock.")
         response.result = json.dumps({'result': 'failure', 'message': 'No items left in stock.'})
 
     return response
