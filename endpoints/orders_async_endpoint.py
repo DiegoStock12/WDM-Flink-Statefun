@@ -43,7 +43,7 @@ async def create_order(request):
     r_json = json.loads(result)
 
     if r_json['result'] == 'success':
-        return web.Response(text=result, status=201, content_type='application/json')
+        return web.Response(text=result, status=200, content_type='application/json')
     else:
         return web.HTTPNotFound()
 
@@ -97,7 +97,7 @@ async def add_item_to_order(request):
     r_json = json.loads(result)
 
     if r_json['result'] == 'success':
-        return web.Response(text=result, status=201, content_type='application/json')
+        return web.Response(text=result, status=200, content_type='application/json')
     else:
         return web.HTTPNotFound()
 
