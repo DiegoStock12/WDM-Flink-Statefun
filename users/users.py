@@ -4,7 +4,6 @@ import typing
 import logging
 import json
 
-
 # Messages and internal states of the functions
 from users_pb2 import CreateUserRequest, UserRequest, UserData, Count, CreateUserWithId
 
@@ -25,12 +24,12 @@ logging.basicConfig(level=logging.DEBUG, format=FORMAT)
 
 logger = logging.getLogger()
 
-
 # Topic to output the responses to
 USER_EVENTS_TOPIC = "user-events"
 
 # Functions where to bind
 functions = StatefulFunctions()
+
 
 # Function to create users
 # extracts the next free user id from its state and
@@ -66,10 +65,11 @@ def create_user(context, create_user_request: CreateUserRequest):
     context.state('count').pack(state)
     logger.debug('Next state to assign is {}'.format(state.num))
 
+
 def copy_request_info(origin, destination):
     """ Copies the request_info field of two messages"""
     destination.request_info.request_id = origin.request_info.request_id
-    destination.request_info.worker_id =origin.request_info.worker_id
+    destination.request_info.worker_id = origin.request_info.worker_id
     return destination
 
 
@@ -95,6 +95,8 @@ def operate_user(context,
     # ----------------------------------------
 
     if isinstance(request, UserPayRequest):
+
+        logger.info('Received request to decrement user credit')
         # calculate if the credit is enough to pay for the product
         # get the credit
         response = UserPayResponse()
@@ -112,15 +114,18 @@ def operate_user(context,
                 state.credit -= request.amount
                 context.state('user').pack(state)
                 response.success = True
-        
-        else: 
+
+        else:
             response.success = False
-            
+
         # respond to the payment service
         context.pack_and_reply(response)
+        return
 
-    
+
     elif isinstance(request, UserCancelPayRequest):
+
+        logger.info('Received request to cancel a payment')
         # add the amount specified to the user credit
         response = UserPayResponse()
         response.order_id = request.order_id
@@ -134,17 +139,17 @@ def operate_user(context,
             # pack the state
             context.state('user').pack(state)
 
-            #reply
+            # reply
             response.success = True
 
         else:
             response.success = False
 
         # reply to the sender function
-        context.pack_and_reply(response)       
+        context.pack_and_reply(response)
+        return
 
-
-    # -------------------------------------
+        # -------------------------------------
     # Interaction with the user endpoint
     # -------------------------------------
 
@@ -242,7 +247,6 @@ def operate_user(context,
 # Use the handler and expose the endpoint
 handler = RequestReplyHandler(functions)
 
-
 app = Flask(__name__)
 
 
@@ -252,6 +256,7 @@ def handle():
     response = make_response(response_data)
     response.headers.set('Content-Type', 'application/octet-stream')
     return response
+
 
 if __name__ == "__main__":
     app.run()

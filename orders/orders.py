@@ -10,7 +10,7 @@ from general_pb2 import ResponseMessage
 from payment_pb2 import PaymentStatus
 from stock_pb2 import StockRequest, StockResponse
 
-from google.protobuf.json_format import MessageToJson
+
 
 from statefun import StatefulFunctions, RequestReplyHandler, kafka_egress_record
 
@@ -149,7 +149,11 @@ def find_order(context, msg):
     else:
         logger.info(f"{state}")
         logger.info(f"Returning order with id: {msg.find_order.id}")
-        response.result = MessageToJson(state, including_default_value_fields=True, preserving_proto_field_name=True)
+
+        # Have to assign all like this so they're not casted to string
+        response.result = json.dumps({'id': state.id, 'user_id': state.user_id,
+                                      'items': [i for i in state.items], 'total_cost': state.total_cost,
+                                      'paid': state.paid, 'intent': state.intent})
         logger.info(f"{response.result}")
 
     return response
@@ -209,36 +213,42 @@ def remove_item(context, msg):
 
 def order_checkout(context, msg):
     state = context.state('order').unpack(Order)
-    logger.info(f"Checkouting order {msg.id}.")
+    logger.info(f"Checkouting order {msg.order_checkout.id}.")
+    logger.info(f'Currently the state is {state}')
+
+    request = Order()
+    request.id = msg.order_checkout.id
+    request.request_info.worker_id = msg.request_info.worker_id
+    request.request_info.request_id = msg.request_info.request_id
+    request.user_id = state.user_id
+    # to assign a repeated field we need to call extend
+    request.items.extend(state.items)
+    request.total_cost = state.total_cost
+    request.paid = state.paid
+    request.intent = Order.Intent.PAY
+
+    logger.info(f'Sending message to payments {request}')
+
+    # send to payment service
+    context.pack_and_send("payments/pay", str(request.id), request)
+
+    logger.info('Sent the message to payments')
+
+
+def order_payment_find(context, msg):
+    state = context.state('order').unpack(Order)
 
     request = Order()
     request.id = msg.id
     request.request_info.worker_id = msg.request_info.worker_id
     request.request_info.request_id = msg.request_info.request_id
     request.user_id = state.user_id
-    request.items = state.items
+    request.items.extend(state.items)
     request.total_cost = state.total_cost
     request.paid = state.paid
-    request.intent = OrderRequest.Intent.PAY
+    request.intent = Order.Intent.STATUS
 
-    # send to payment service
-    context.pack_and_send("payments/pay", str(request.id), request)
-
-
-def order_payment_find(context, msg):
-    state = context.state('order').unpack(Order)
-
-    response = Order()
-    request.id = msg.id
-    request.request_info.worker_id = msg.request_info.worker_id
-    request.request_info.request_id = msg.request_info.request_id
-    request.user_id = state.user_id
-    request.items = state.items
-    request.total_cost = state.total_cost
-    request.paid = state.paid
-    request.intent = OrderRequest.Intent.STATUS
-
-    context.pack_and_send("payments/pay", str(msg.order_id), response)
+    context.pack_and_send("payments/pay", str(msg.order_id), request)
 
 
 def order_payment_cancel(context, msg):
@@ -276,6 +286,7 @@ def order_add_item_reply(context, msg):
     if msg.result == 'success':
         logger.info("Successfully added item to order.")
         state.items.append(msg.item_id)
+        state.total_cost += msg.price
         logger.info(f"{state}")
         context.state('order').pack(state)
         response.result = json.dumps({'result': 'success'})

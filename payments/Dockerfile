@@ -15,4 +15,4 @@ COPY ./protobuf/orders_pb2.py /app
 
 EXPOSE 8003
 
-CMD ["gunicorn", "-b", "0.0.0.0:8000", "-w 4", "payments:app"]
+CMD ["gunicorn", "-b", "0.0.0.0:8003", "-w 4", "payments:app"]

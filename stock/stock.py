@@ -96,16 +96,21 @@ def manage_stock(context, request: typing.Union[StockRequest, CreateItemWithId])
             if new_amount >= 0:
                 item_state.stock -= request.subtract_stock.amount
 
+
                 context.state('item').pack(item_state)
+
                 if not request.internal:
                     response.result = json.dumps({'result': 'success', 'item_id': item_state.id})
                 else:
+                    # Include the item id and price
+                    response.price = item_state.price
                     response.item_id = item_state.id
                     response.result = 'success'
             else:
                 if not request.internal:
                     response.result = json.dumps({'result': 'stock too low', 'item_id': item_state.id})
                 else:
+                    response.price = item_state.price
                     response.item_id = item_state.id
                     response.result = 'failure'
 

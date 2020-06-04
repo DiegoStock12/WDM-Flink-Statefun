@@ -71,5 +71,6 @@ message StockRequest {
 message StockResponse {
     RequestInfo request_info = 1;
     uint64 item_id = 2;
-    string result = 3;
+    uint64 price = 3;
+    string result = 4;
 }

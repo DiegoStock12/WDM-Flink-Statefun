@@ -121,7 +121,7 @@ async def remove_item_from_order(request):
         return web.HTTPNotFound()
 
 
-@routes_orders.delete('/orders/checkout/{orderId}')
+@routes_orders.post('/orders/checkout/{orderId}')
 async def checkout_order(request):
     print("Received request to checkout the order.", flush=True)
 
