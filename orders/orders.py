@@ -23,6 +23,8 @@ logger = logging.getLogger()
 
 ORDER_EVENTS_TOPIC = "order-events"
 
+item_to_price = {}
+
 
 @functions.bind("orders/create")
 def create_order(context, msg: CreateOrder):
@@ -199,8 +201,19 @@ def remove_item(context, msg):
                 item_index = i
         if item_index != -1:
             del state.items[item_index]
+            logger.info(f'{item_to_price}')
+            state.total_cost -= item_to_price[item_to_delete]
             logger.info(f"Removing item {item_to_delete} from order {orderId}")
             response.result = json.dumps({'result': 'success'})
+
+            add_stock_request = StockRequest()
+            add_stock_request.request_info.worker_id = msg.request_info.worker_id
+            add_stock_request.request_info.request_id = msg.request_info.request_id
+            add_stock_request.add_stock.id = item_to_delete
+            add_stock_request.add_stock.amount = 1
+
+            context.pack_and_send("stock/stock", str(item_to_delete), add_stock_request)
+
         else:
             logger.info(f"Order {orderId} does not contain item with id {item_to_delete}")
             response.result = json.dumps({'result': 'failure',
@@ -287,6 +300,7 @@ def order_add_item_reply(context, msg):
         logger.info("Successfully added item to order.")
         state.items.append(msg.item_id)
         state.total_cost += msg.price
+        item_to_price[msg.item_id] = msg.price
         logger.info(f"{state}")
         context.state('order').pack(state)
         response.result = json.dumps({'result': 'success'})
