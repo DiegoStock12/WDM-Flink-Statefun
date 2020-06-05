@@ -4,7 +4,7 @@ import typing
 import json
 
 from orders_pb2 import Order, CreateOrder, CreateOrderWithId, CreateOrderResponse, OrderRequest, OrderResponse, \
-    OrdersPayFind, OrderPaymentCancel, OrderPaymentCancelReply
+    OrdersPayFind, OrderPaymentCancel, OrderPaymentCancelReply, Item
 from users_pb2 import Count
 from general_pb2 import ResponseMessage
 from payment_pb2 import PaymentStatus
@@ -21,7 +21,7 @@ logger = logging.getLogger()
 
 ORDER_EVENTS_TOPIC = "order-events"
 
-item_to_price = {}
+# item_to_price = {}
 
 
 @functions.bind("orders/create")
@@ -133,7 +133,25 @@ def remove_order(context, msg):
         logger.debug("Order does not exists.")
         response.result = json.dumps({'result': 'failure', 'message': 'Order does not exist.'})
     else:
-        logger.debug(f"Deleting the order with id: {msg.remove_order.id}")
+        logger.info(f"Deleting the order with id: {msg.remove_order.id}")
+        item_to_count = {}
+        items = state.items
+        for i in range(len(items)):
+            id = items[i].item_id
+            if id not in item_to_count.keys():
+                item_to_count[id] = 1
+            else:
+                item_to_count[id] = item_to_count[id] + 1
+
+        for id, cnt in item_to_count.items():
+            add_stock_request = StockRequest()
+            add_stock_request.request_info.worker_id = msg.request_info.worker_id
+            add_stock_request.request_info.request_id = msg.request_info.request_id
+            add_stock_request.add_stock.id = id
+            add_stock_request.add_stock.amount = cnt
+
+            context.pack_and_send("stock/stock", str(id), add_stock_request)
+
         del context['order']
         response.result = json.dumps({'result': 'success'})
 
@@ -153,7 +171,7 @@ def find_order(context, msg):
 
         # Have to assign all like this so they're not casted to string
         response.result = json.dumps({'id': state.id, 'user_id': state.user_id,
-                                      'items': [i for i in state.items], 'total_cost': state.total_cost,
+                                      'items': [i.item_id for i in state.items], 'total_cost': state.total_cost,
                                       'paid': state.paid, 'intent': state.intent})
         logger.debug(f"{response.result}")
 
@@ -199,14 +217,13 @@ def remove_item(context, msg):
         item_to_delete = msg.remove_item.itemId
         item_index = -1
         for i in range(len(items)):
-            logger.debug(f"{items[i]}")
-            if items[i] == item_to_delete:
+            logger.info(f"{items[i].item_id}")
+            if items[i].item_id == item_to_delete:
                 item_index = i
         if item_index != -1:
+            state.total_cost -= items[item_index].price
             del state.items[item_index]
-            logger.debug(f'{item_to_price}')
-            state.total_cost -= item_to_price[item_to_delete]
-            logger.debug(f"Removing item {item_to_delete} from order {orderId}")
+            logger.info(f"Removing item {item_to_delete} from order {orderId}")
             response.result = json.dumps({'result': 'success'})
 
             add_stock_request = StockRequest()
@@ -303,10 +320,13 @@ def order_add_item_reply(context, msg):
     state = context.state('order').unpack(Order)
     response = ResponseMessage()
     if msg.result == 'success':
-        logger.debug("Successfully added item to order.")
-        state.items.append(msg.item_id)
+        logger.info("Successfully added item to order.")
+        new_item = Item()
+        new_item.item_id = msg.item_id
+        new_item.price = msg.price
+        state.items.append(new_item)
         state.total_cost += msg.price
-        item_to_price[msg.item_id] = msg.price
+        logger.info(f"{state}")
         context.state('order').pack(state)
         response.result = json.dumps({'result': 'success'})
     else:
