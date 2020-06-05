@@ -184,3 +184,5 @@ def test_integration():
     assert order_find(order_id).json()['paid'] is True
     assert user_find(user_id).json()['credit'] == 0
     assert payment_status(order_id).json()['paid'] is True
+    resp = payment_cancel(user_id, order_id)
+    return user_id, order_id, item_id, resp

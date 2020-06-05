@@ -10,8 +10,6 @@ from general_pb2 import ResponseMessage
 from payment_pb2 import PaymentStatus
 from stock_pb2 import StockRequest, StockResponse
 
-
-
 from statefun import StatefulFunctions, RequestReplyHandler, kafka_egress_record
 
 functions = StatefulFunctions()
@@ -108,7 +106,7 @@ def operate_order(context, msg: typing.Union[CreateOrderWithId, OrderRequest, Or
             topic=ORDER_EVENTS_TOPIC,
             key=msg.request_info.worker_id,
             value=response
-            )
+        )
         context.pack_and_send_egress("orders/out", egress_message)
 
 
@@ -252,7 +250,7 @@ def order_payment_find(context, msg):
     state = context.state('order').unpack(Order)
 
     request = Order()
-    request.id = msg.id
+    request.id = msg.order_id
     request.request_info.worker_id = msg.request_info.worker_id
     request.request_info.request_id = msg.request_info.request_id
     request.user_id = state.user_id
@@ -266,13 +264,19 @@ def order_payment_find(context, msg):
 
 def order_payment_cancel(context, msg):
     state = context.state('order').unpack(Order)
-    state.paid = 0
+    response = OrderPaymentCancelReply()
+
+    # if it's not yet paid return failure
+    if state.paid == 0:
+        response.success = 0
+    else:
+        state.paid = 0
+        response.success = 1
+
     context.state('order').pack(state)
 
-    response = OrderPaymentCancelReply()
     response.request_info.worker_id = msg.request_info.worker_id
     response.request_info.request_id = msg.request_info.request_id
-    response.success = 1
 
     context.pack_and_send("payments/pay", str(msg.order_id), response)
 
@@ -334,5 +338,3 @@ def welcome():
 
 if __name__ == "__main__":
     app.run()
-
-

@@ -30,6 +30,7 @@ KAFKA_BROKER = "kafka-broker:9092"
 USER_EVENTS_TOPIC = "user-events"
 ORDER_EVENTS_TOPIC = "order-events"
 STOCK_EVENTS_TOPIC = "stock-events"
+PAYMENT_EVENTS_TOPIC = "payment-events"
 
 # timeout for waiting for a server response
 TIMEOUT = 30
@@ -84,6 +85,7 @@ async def create_kafka_consumer(app: web.Application):
                 USER_EVENTS_TOPIC,
                 ORDER_EVENTS_TOPIC,
                 STOCK_EVENTS_TOPIC,
+                PAYMENT_EVENTS_TOPIC,
                 loop=asyncio.get_running_loop(),
                 bootstrap_servers=KAFKA_BROKER
             )
