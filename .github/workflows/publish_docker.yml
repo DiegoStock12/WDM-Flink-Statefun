@@ -47,12 +47,11 @@ jobs:
         run: |
           docker tag wdm-flink-statefun_stock-endpoint:latest ${STOCK_SERVICE_IMAGE}:${GITHUB_SHA::8}
           docker tag wdm-flink-statefun_users-endpoint:latest ${USER_SERVICE_IMAGE}:${GITHUB_SHA::8}
-      - name: Publish stock image
-        uses: raccoondev/push-docker-gcr
+    
+      - name: Deploy stock image
+        uses: RafikFarhad/push-to-gcr-github-action@v1
         with:
-          gcr_host: gcr.io
-          image_name: ${STOCK_SERVICE_IMAGE}
-          image_tag: ${GITHUB_SHA::8}
-          env: 
-            GCLOUD_SERVICE_KEY: ${{ secrets.GCLOUD_SERVICE_KEY }}
-            GOOGLE_PROJECT_ID: ${{ secrets.GOOGLE_PROJECT_ID }} 
+          gcloud_service_key: ${{ secrets.GCLOUD_SERVICE_KEY}}
+          registry: gcr.io
+          project_name: ${{ secrets.GOOGLE_PROJECT_ID}}
+          image_name: ${USER_SERVICE_IMAGE}:${GITHUB_SHA::8}
