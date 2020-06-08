@@ -45,8 +45,8 @@ jobs:
         run: docker-compose build
       - name: Tag images
         run: |
-          docker tag wdm-flink-statefun_stock-endpoint:latest $STOCK_SERVICE_IMAGE:${{GITHUB_SHA::8}}
-          docker tag wdm-flink-statefun_users-endpoint:latest $USER_SERVICE_IMAGE:${{GITHUB_SHA::8}}
+          docker tag wdm-flink-statefun_stock-endpoint:latest $STOCK_SERVICE_IMAGE:${GITHUB_SHA::8}
+          docker tag wdm-flink-statefun_users-endpoint:latest $USER_SERVICE_IMAGE:${GITHUB_SHA::8}
     
       - name: Deploy the stock image
         uses: RafikFarhad/push-to-gcr-github-action@v1
@@ -54,4 +54,4 @@ jobs:
           gcloud_service_key: ${{ secrets.GCLOUD_SERVICE_KEY}}
           registry: gcr.io
           project_name: wdm-statefun
-          image_name: $USER_SERVICE_IMAGE:${{GITHUB_SHA::8}}
+          image_name: $USER_SERVICE_IMAGE:${GITHUB_SHA::8}
