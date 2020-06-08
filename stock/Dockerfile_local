@@ -11,6 +11,6 @@ COPY ./stock/stock.py /app
 COPY ./protobuf/stock_pb2.py /app
 COPY ./protobuf/general_pb2.py /app
 
-EXPOSE 80
+EXPOSE 8002
 
-CMD ["gunicorn", "-b", "0.0.0.0:80", "-w 4", "stock:app"]
+CMD ["gunicorn", "-b", "0.0.0.0:8002", "-w 4", "stock:app"]

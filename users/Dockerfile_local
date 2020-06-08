@@ -12,6 +12,6 @@ COPY ./users/users.py /app
 COPY ./protobuf/users_pb2.py /app
 COPY ./protobuf/general_pb2.py /app
 
-EXPOSE 80
+EXPOSE 8000
 
-CMD ["gunicorn", "-b", "0.0.0.0:80", "-w 4", "users:app"]
+CMD ["gunicorn", "-b", "0.0.0.0:8000", "-w 4", "users:app"]
