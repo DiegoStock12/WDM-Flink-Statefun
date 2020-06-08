@@ -49,8 +49,8 @@ jobs:
         run: |
           docker tag wdm-flink-statefun_stock-endpoint:latest $GCR_REGISTRY/$PROJECT_ID/$STOCK_SERVICE_IMAGE:${GITHUB_SHA::8}
           docker tag wdm-flink-statefun_users-endpoint:latest $GCR_REGISTRY/$PROJECT_ID/$USER_SERVICE_IMAGE:${GITHUB_SHA::8}
-          docker tag wdm-flink-statefun_flink-master:latest $GCR_REGISTRY/$PROJECT_ID/$FLINK_MASTER:${GITHUB_SHA::8}
-          docker tag wdm-flink-statefun_flink-worker:latest $GCR_REGISTRY/$PROJECT_ID/$FLINK_WORKER:${GITHUB_SHA::8}
+          docker tag wdm-flink-statefun_master:latest $GCR_REGISTRY/$PROJECT_ID/$FLINK_MASTER:${GITHUB_SHA::8}
+          docker tag wdm-flink-statefun_worker:latest $GCR_REGISTRY/$PROJECT_ID/$FLINK_WORKER:${GITHUB_SHA::8}
           docker tag wdm-flink-statefun_api-endpoint:latest $GCR_REGISTRY/$PROJECT_ID/$ASYNC_ENDPOINT_IMAGE:${GITHUB_SHA::8}
           docker tag wdm-flink-statefun_orders-endpoint:latest $GCR_REGISTRY/$PROJECT_ID/$ORDER_SERVICE_IMAGE:${GITHUB_SHA::8}
           docker tag wdm-flink-statefun_payments-endpoint:latest $GCR_REGISTRY/$PROJECT_ID/$PAYMENT_SERVICE_IMAGE:${GITHUB_SHA::8}
