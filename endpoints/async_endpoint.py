@@ -4,6 +4,8 @@
 from aiohttp import web
 import asyncio
 
+from ssl import create_default_context, Purpose
+
 # Messages exchanged with the stateful functions
 from general_pb2 import ResponseMessage
 
@@ -26,6 +28,9 @@ logger = logging.getLogger()
 
 # Some parameters to send and read from kafka
 KAFKA_BROKER = "kafka-broker:9092"
+CONFLUENT_KAFKA_BROKER = "***"
+
+ssl_context = create_default_context(Purpose.SERVER_AUTH)
 
 USER_EVENTS_TOPIC = "user-events"
 ORDER_EVENTS_TOPIC = "order-events"
@@ -85,8 +90,13 @@ async def create_kafka_consumer(app: web.Application):
                 USER_EVENTS_TOPIC,
                 ORDER_EVENTS_TOPIC,
                 STOCK_EVENTS_TOPIC,
-                loop=asyncio.get_running_loop(),
-                bootstrap_servers=KAFKA_BROKER
+                loop=asyncio.get_event_loop(),
+                bootstrap_servers=CONFLUENT_KAFKA_BROKER,
+                security_protocol='SASL_SSL',
+                ssl_context=ssl_context,
+                sasl_mechanism='PLAIN',
+                sasl_plain_password='HKipl****',
+                sasl_plain_username='LY2****'
             )
             await consumer.start()
 
@@ -118,7 +128,12 @@ async def create_kafka_producer(app: web.Application):
         try:
             producer = AIOKafkaProducer(
                 loop=asyncio.get_event_loop(),
-                bootstrap_servers=KAFKA_BROKER
+                bootstrap_servers=CONFLUENT_KAFKA_BROKER,
+                security_protocol='SASL_SSL',
+                ssl_context=ssl_context,
+                sasl_mechanism='PLAIN',
+                sasl_plain_password='HKipl****',
+                sasl_plain_username='LY2****'
             )
 
             await producer.start()
