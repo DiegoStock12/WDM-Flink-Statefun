@@ -48,10 +48,10 @@ jobs:
           docker tag wdm-flink-statefun_stock-endpoint:latest $STOCK_SERVICE_IMAGE:${GITHUB_SHA::8}
           docker tag wdm-flink-statefun_users-endpoint:latest $USER_SERVICE_IMAGE:${GITHUB_SHA::8}
     
-      - name: Deploy the stock image
-        uses: RafikFarhad/push-to-gcr-github-action@v1
-        with:
-          gcloud_service_key: ${{ secrets.GCLOUD_SERVICE_KEY}}
-          registry: gcr.io
-          project_name: wdm-statefun
-          image_name: $USER_SERVICE_IMAGE:${GITHUB_SHA::8}
+      - name: Docker push stock.
+        uses: benjlevesque/actions-docker-gcr/push@master
+        env:
+          IMAGE: wdm-statefun/$STOCK_SERVICE_IMAGE:${GITHUB_SHA::8}
+          GCLOUD_REGISTRY: gcr.io
+          GCLOUD_SERVICE_ACCOUNT_KEY: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_KEY }}
+
