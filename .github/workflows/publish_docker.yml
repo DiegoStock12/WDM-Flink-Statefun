@@ -49,9 +49,9 @@ jobs:
           docker tag wdm-flink-statefun_users-endpoint:latest $USER_SERVICE_IMAGE:${GITHUB_SHA::8}
     
       - name: Docker push stock.
-        uses: benjlevesque/actions-docker-gcr/push@master
-        env:
-          IMAGE: wdm-statefun/$STOCK_SERVICE_IMAGE:${GITHUB_SHA::8}
-          GCLOUD_REGISTRY: gcr.io
-          GCLOUD_SERVICE_ACCOUNT_KEY: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_KEY }}
+        run: |
+          echo ${{ secrets.GCLOUD_SERVICE_KEY }} | base64 --decode --ignore-garbage > /tmp/key.json
+          gcloud auth activate-service-account --quiet --key-file /tmp/key.json
+          gcloud auth configure-docker --quiet
+          docker push gcr.io/wdm-statefun/$STOCK_SERVICE_IMAGE:${GITHUB_SHA::8}
 
