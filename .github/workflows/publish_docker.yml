@@ -23,6 +23,8 @@ env:
   ASYNC_ENDPOINT_IMAGE: wdm.endpoint
   FLINK_WORKER: wdm.flink_worker
   FLINK_MASTER: wdm.flink_master
+  GCR_REGISTRY: gcr.io
+  PROJECT_ID: wdm-statefun 
 
 jobs:
 
@@ -45,13 +47,13 @@ jobs:
         run: docker-compose build
       - name: Tag images
         run: |
-          docker tag wdm-flink-statefun_stock-endpoint:latest $STOCK_SERVICE_IMAGE:${GITHUB_SHA::8}
-          docker tag wdm-flink-statefun_users-endpoint:latest $USER_SERVICE_IMAGE:${GITHUB_SHA::8}
+          docker tag wdm-flink-statefun_stock-endpoint:latest $GCR_REGISTRY/$PROJECT_ID/$STOCK_SERVICE_IMAGE:${GITHUB_SHA::8}
+          docker tag wdm-flink-statefun_users-endpoint:latest $GCR_REGISTRY/$PROJECT_ID/$USER_SERVICE_IMAGE:${GITHUB_SHA::8}
     
       - name: Docker push stock.
         run: |
           echo ${{ secrets.GCLOUD_SERVICE_KEY }} | base64 --decode --ignore-garbage > /tmp/key.json
           gcloud auth activate-service-account --quiet --key-file /tmp/key.json
           gcloud auth configure-docker --quiet
-          docker push gcr.io/wdm-statefun/$STOCK_SERVICE_IMAGE:${GITHUB_SHA::8}
+          docker push $GCR_REGISTRY/$PROJECT_ID/$STOCK_SERVICE_IMAGE:${GITHUB_SHA::8}
 
