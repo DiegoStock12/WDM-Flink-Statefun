@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: stock
+  name: users
   namespace: wdm-flink
 spec:
   selector:
     matchLabels:
-      service: stock
+      service: users
   replicas: 1
   template:
     metadata:
       labels:
-        service: stock
+        service: users
     spec:
       containers:
-      - name: stock
-        image: "gcr.io/wdm-statefun/stock_service"
+      - name: users
+        image: "gcr.io/wdm-statefun/user_service"
         ports:
           - containerPort: 80
