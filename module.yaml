@@ -83,13 +83,27 @@ module:
             type: statefun.kafka.io/routable-protobuf-ingress
             id: api-endpoint/in
           spec:
-            address: kafka-broker:9092
+            address: pkc-4yyd6.us-east1.gcp.confluent.cloud:9092
             consumerGroupId: my-group-id
             topics:
               - topic: users-create
                 typeUrl: com.googleapis/users.CreateUserRequest
                 targets:
                   - users/create
+            properties:
+              - sasl.mechanism: PLAIN
+              - security.protocol: SASL_SSL
+              - sasl.username:
+              - sasl.password:
+
+      - ingress:
+          meta:
+            type: statefun.kafka.io/routable-protobuf-ingress
+            id: api-endpoint/in
+          spec:
+            address: kafka-broker:9092
+            consumerGroupId: my-group-id
+            topics:
               - topic: users
                 typeUrl: com.googleapis/users.UserRequest
                 targets:
