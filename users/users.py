@@ -54,15 +54,16 @@ def create_user(context, create_user_request: CreateUserRequest):
     request = CreateUserWithId()
     request.id = state.num
 
+    # update the count and pack the state
+    state.num += 1
+    context.state('count').pack(state)
+
     # copy the request_info stuff
     request = copy_request_info(create_user_request, request)
 
-    logger.debug(f"Sending request to function with id {request.id}")
     context.pack_and_send("users/user", str(request.id), request)
 
     # update the next id to assign and save
-    state.num += 1
-    context.state('count').pack(state)
     logger.debug('Next state to assign is {}'.format(state.num))
 
 
@@ -112,11 +113,13 @@ def operate_user(context,
                 response.success = False
             else:
                 state.credit -= request.amount
-                context.state('user').pack(state)
                 response.success = True
 
         else:
             response.success = False
+
+        # pack the state
+        context.state('user').pack(state)
 
         # respond to the payment service
         context.pack_and_reply(response)
@@ -135,15 +138,14 @@ def operate_user(context,
 
         if state:
             state.credit += request.amount
-
-            # pack the state
-            context.state('user').pack(state)
-
             # reply
             response.success = True
 
         else:
             response.success = False
+
+        # pack the state
+        context.state('user').pack(state)
 
         # reply to the sender function
         context.pack_and_reply(response)
@@ -168,6 +170,8 @@ def operate_user(context,
             response = ResponseMessage()
             response.result = json.dumps({'user_id': state.id,
                                           'credit': state.credit})
+            # pack the state
+            context.state('user').pack(state)
 
         elif msg_type == 'remove_user':
             logger.debug(f"Deleting user {request.remove_user.id}")
@@ -207,6 +211,9 @@ def operate_user(context,
                 response.result = json.dumps({'result': 'failure'})
                 logger.debug('Failure updating credit')
 
+            # pack the state
+            context.state('user').pack(state)
+
     elif isinstance(request, CreateUserWithId):
         # create a new user with the id given and 0 credit
         state = UserData()
@@ -228,8 +235,8 @@ def operate_user(context,
 
         if isinstance(response, ResponseMessage):
             response.request_id = request.request_info.request_id
-        logger.debug(
-            f'Sending response {response} with key {request.request_info.worker_id}')
+        # logger.debug(
+        #     f'Sending response {response} with key {request.request_info.worker_id}')
 
         # create the egress message and send it to the
         # users/out egress
@@ -239,7 +246,7 @@ def operate_user(context,
             value=response
         )
 
-        logger.debug(f'Created egress message: {egress_message}')
+        # logger.debug(f'Created egress message: {egress_message}')
 
         context.pack_and_send_egress("users/out", egress_message)
 

@@ -39,7 +39,7 @@ async def create_order(request):
     request = CreateOrder()
     request.user_id = userId
 
-    result = await send_msg(ORDER_CREATION_TOPIC, key=userId, request=request)
+    result = await send_msg(ORDER_CREATION_TOPIC, key="create", request=request)
     r_json = json.loads(result)
 
     if r_json['result'] == 'success':

@@ -137,6 +137,8 @@ def remove_order(context, msg):
         del context['order']
         response.result = json.dumps({'result': 'success'})
 
+    context.state('order').pack(state)
+
     return response
 
 
@@ -155,6 +157,8 @@ def find_order(context, msg):
                                       'items': [i for i in state.items], 'total_cost': state.total_cost,
                                       'paid': state.paid, 'intent': state.intent})
         logger.info(f"{response.result}")
+
+    context.state('order').pack(state)
 
     return response
 
@@ -176,6 +180,8 @@ def add_item(context, msg):
         subtract_stock_request.subtract_stock.amount = 1
         subtract_stock_request.internal = True
         subtract_stock_request.order_id = state.id
+
+        context.state('order').pack(state)
 
         context.pack_and_send("stock/stock", str(msg.add_item.itemId), subtract_stock_request)
         logger.info("Sent request to ")
@@ -311,6 +317,7 @@ def order_add_item_reply(context, msg):
     else:
         logger.info("No items left in stock.")
         response.result = json.dumps({'result': 'failure', 'message': 'No items left in stock.'})
+        context.state('order').pack(state)
 
     return response
 

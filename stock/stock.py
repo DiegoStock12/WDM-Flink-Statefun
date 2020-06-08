@@ -42,15 +42,19 @@ def create_item(context, request: CreateItemRequest):
 
     item_request = CreateItemWithId()
     item_request.id = state.num
+
+    # update the next id to assign and save
+    state.num += 1
+    context.state('count').pack(state)
+
+
     item_request.price = request.price
     item_request.request_info.request_id = request.request_info.request_id
     item_request.request_info.worker_id = request.request_info.worker_id
     print(f"Sending request to function with id {item_request.id}", flush=True)
     context.pack_and_send("stock/stock", str(item_request.id), item_request)
 
-    # update the next id to assign and save
-    state.num += 1
-    context.state('count').pack(state)
+
     logger.info('Next state to assign is {}'.format(state.num))
 
 @functions.bind("stock/stock")
@@ -86,6 +90,9 @@ def manage_stock(context, request: typing.Union[StockRequest, CreateItemWithId])
         if msg_type == "find_item":
             response = ResponseMessage()
             response.result = json.dumps({'id:': item_state.id, 'price': item_state.price, 'stock': item_state.stock})
+
+            context.state('item').pack(item_state)
+
         elif msg_type == "subtract_stock":
             new_amount = item_state.stock - request.subtract_stock.amount
             if not request.internal:
@@ -113,6 +120,8 @@ def manage_stock(context, request: typing.Union[StockRequest, CreateItemWithId])
                     response.price = item_state.price
                     response.item_id = item_state.id
                     response.result = 'failure'
+
+                context.state('item').pack(item_state)
 
         elif msg_type == "add_stock":
             item_state.stock += request.add_stock.amount
