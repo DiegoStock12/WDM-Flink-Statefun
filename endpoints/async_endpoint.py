@@ -18,6 +18,7 @@ import logging
 import uuid
 import json
 import time
+import os
 
 from typing import Dict, Awaitable
 
@@ -28,7 +29,7 @@ logger = logging.getLogger()
 
 # Some parameters to send and read from kafka
 KAFKA_BROKER = "kafka-broker:9092"
-CONFLUENT_KAFKA_BROKER = "***"
+CONFLUENT_KAFKA_BROKER = "pkc-4yyd6.us-east1.gcp.confluent.cloud:9092"
 
 ssl_context = create_default_context(Purpose.SERVER_AUTH)
 
@@ -95,8 +96,8 @@ async def create_kafka_consumer(app: web.Application):
                 security_protocol='SASL_SSL',
                 ssl_context=ssl_context,
                 sasl_mechanism='PLAIN',
-                sasl_plain_password='HKipl****',
-                sasl_plain_username='LY2****'
+                sasl_plain_username=os.environ['KEY'],
+                sasl_plain_password=os.environ['SECRET']
             )
             await consumer.start()
 
@@ -132,8 +133,8 @@ async def create_kafka_producer(app: web.Application):
                 security_protocol='SASL_SSL',
                 ssl_context=ssl_context,
                 sasl_mechanism='PLAIN',
-                sasl_plain_password='HKipl****',
-                sasl_plain_username='LY2****'
+                sasl_plain_username=os.environ['KEY'],
+                sasl_plain_password=os.environ['SECRET']
             )
 
             await producer.start()
