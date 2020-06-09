@@ -90,20 +90,6 @@ module:
                 typeUrl: com.googleapis/users.CreateUserRequest
                 targets:
                   - users/create
-            properties:
-              - sasl.mechanism: PLAIN
-              - security.protocol: SASL_SSL
-              - sasl.username:
-              - sasl.password:
-
-      - ingress:
-          meta:
-            type: statefun.kafka.io/routable-protobuf-ingress
-            id: api-endpoint/in
-          spec:
-            address: kafka-broker:9092
-            consumerGroupId: my-group-id
-            topics:
               - topic: users
                 typeUrl: com.googleapis/users.UserRequest
                 targets:
@@ -128,40 +114,70 @@ module:
                 typeUrl: com.googleapis/payment.PaymentRequest
                 targets:
                   - payments/pay
+
+            properties:
+              - sasl.mechanism: PLAIN
+              - security.protocol: SASL_SSL
+              - sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="{KEY}" password="{SECRET}";
+              - ssl.endpoint.identification.algorithm: https
+
     egresses:
       - egress:
           meta:
             type: statefun.kafka.io/generic-egress
             id: users/out
           spec:
-            address: kafka-broker:9092
+            address: pkc-4yyd6.us-east1.gcp.confluent.cloud:9092
             deliverySemantic:
               type: exactly-once
               transactionTimeoutMillis: 100000
+            properties:
+              - sasl.mechanism: PLAIN
+              - security.protocol: SASL_SSL
+              - sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="{KEY}" password="{SECRET}";
+              - ssl.endpoint.identification.algorithm: https
+
       - egress:
           meta:
             type: statefun.kafka.io/generic-egress
             id: orders/out
           spec:
-            address: kafka-broker:9092
+            address: pkc-4yyd6.us-east1.gcp.confluent.cloud:9092
             deliverySemantic:
               type: exactly-once
               transactionTimeoutMillis: 100000
+            properties:
+              - sasl.mechanism: PLAIN
+              - security.protocol: SASL_SSL
+              - sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="{KEY}" password="{SECRET}";
+              - ssl.endpoint.identification.algorithm: https
+
       - egress:
           meta:
             type: statefun.kafka.io/generic-egress
             id: stock/out
           spec:
-            address: kafka-broker:9092
+            address: pkc-4yyd6.us-east1.gcp.confluent.cloud:9092
             deliverySemantic:
               type: exactly-once
               transactionTimeoutMillis: 100000
+            properties:
+              - sasl.mechanism: PLAIN
+              - security.protocol: SASL_SSL
+              - sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="{KEY}" password="{SECRET}";
+              - ssl.endpoint.identification.algorithm: https
+
       - egress:
           meta:
             type: statefun.kafka.io/generic-egress
             id: payments/out
           spec:
-            address: kafka-broker:9092
+            address: pkc-4yyd6.us-east1.gcp.confluent.cloud:9092
             deliverySemantic:
               type: exactly-once
               transactionTimeoutMillis: 100000
+            properties:
+              - sasl.mechanism: PLAIN
+              - security.protocol: SASL_SSL
+              - sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="{KEY}" password="{SECRET}";
+              - ssl.endpoint.identification.algorithm: https
