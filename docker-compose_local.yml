@@ -1,0 +1,96 @@
+version: "2.1"
+services:
+    zookeeper:
+        image: wurstmeister/zookeeper
+        ports:
+            - "2181:2181"
+    kafka-broker:
+        image: wurstmeister/kafka:2.12-2.0.1
+        ports:
+            - "9092:9092"
+        environment:
+            HOSTNAME_COMMAND: "route -n | awk '/UG[ \t]/{print $$2}'"
+            KAFKA_CREATE_TOPICS: "users:1:1,users-create:1:1,user-events:1:1,names:1:1,orders:1:1,orders-create:1:1,order-events:1:1,payments:1:1,payment-events:1:1"
+            KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+        depends_on:
+            - zookeeper
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+    master:
+        build:
+            context: .
+        expose:
+            - "6123"
+        ports:
+            - "8081:8081"
+        environment:
+            - ROLE=master
+            - MASTER_HOST=master
+        volumes:
+            - ./checkpoint-dir:/checkpoint-dir
+    worker:
+        build:
+            context: .
+        expose:
+            - "6121"
+            - "6122"
+        depends_on:
+            - master
+            - kafka-broker
+        links:
+            - "master:master"
+            - "kafka-broker:kafka-broker"
+        environment:
+            - ROLE=worker
+            - MASTER_HOST=master
+        volumes:
+            - ./checkpoint-dir:/checkpoint-dir
+
+    users-endpoint:
+        build:
+            context: .
+            dockerfile: ./users/Dockerfile_local
+        expose:
+            - "8000"
+        ports:
+            - "8000:8000"
+
+    orders-endpoint:
+        build:
+            context: .
+            dockerfile: ./orders/Dockerfile_local
+        expose:
+            - "8001"
+        ports:
+            - "8001:8001"
+
+
+    stock-endpoint:
+        build:
+            context: .
+            dockerfile: ./stock/Dockerfile_local
+        expose:
+            - "8002"
+        ports:
+            - "8002:8002"
+
+    payments-endpoint:
+        build:
+            context: .
+            dockerfile: ./payments/Dockerfile_local
+        expose:
+            - "8003"
+        ports:
+            - "8003:8003"
+
+    api-endpoint:
+        build:
+            context: .
+            dockerfile: ./endpoints/Dockerfile_local
+        depends_on: 
+            - kafka-broker
+        expose:
+            - "5000"
+        ports:
+            - "5000:5000"
+
