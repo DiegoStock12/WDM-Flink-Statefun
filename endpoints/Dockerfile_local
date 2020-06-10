@@ -17,6 +17,9 @@ COPY ./endpoints/*_async_endpoint.py /app/
 
 COPY ./protobuf/*_pb2.py /app/
 
+ENV KEY=KEY
+ENV SECRET=SECRET
+
 EXPOSE 5000
 
 CMD ["gunicorn", "-b", "0.0.0.0:5000", "--access-logfile", "acc", "-w 4", "--worker-class", "aiohttp.GunicornWebWorker", "async_endpoint:app"]

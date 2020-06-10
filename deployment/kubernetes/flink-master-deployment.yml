@@ -68,6 +68,8 @@ spec:
         volumeMounts:
         - name: flink-config-volume
           mountPath: /opt/flink/conf
+        - name: statefun-config-volume
+          mountPath: /opt/statefun/modules/test
         securityContext:
           runAsUser: 9999  # refers to user _flink_ from official flink image, change if necessary
       volumes:
@@ -79,6 +81,13 @@ spec:
             path: flink-conf.yaml
           - key: log4j.properties
             path: log4j.properties
+      - name: statefun-config-volume
+        # Create configMap using kubectl: kubectl create configmap module --from-file=module_key=module.yaml
+        configMap:
+          name: module
+          items:
+            - key: module_key
+              path: module.yaml
 ---
 apiVersion: v1
 kind: Service

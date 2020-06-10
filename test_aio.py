@@ -15,8 +15,8 @@ async def produce_and_consume():
         security_protocol='SASL_SSL',
         ssl_context=ssl_context,
         sasl_mechanism='PLAIN',
-        sasl_plain_password='HKipl****',
-        sasl_plain_username='LY2****'
+        sasl_plain_password='***',
+        sasl_plain_username='***'
     )
 
     await producer.start()
@@ -33,8 +33,8 @@ async def produce_and_consume():
         security_protocol='SASL_SSL',
         ssl_context=ssl_context,
         sasl_mechanism='PLAIN',
-        sasl_plain_password='HKipl****',
-        sasl_plain_username='LY2****'
+        sasl_plain_password='***',
+        sasl_plain_username='***'
     )
     await consumer.start()
     try:
@@ -53,8 +53,8 @@ async def consume():
         security_protocol='SASL_SSL',
         ssl_context=ssl_context,
         sasl_mechanism='PLAIN',
-        sasl_plain_password='HKipl****',
-        sasl_plain_username='LY2****',
+        sasl_plain_password='***',
+        sasl_plain_username='***',
         auto_offset_reset='earliest'
     )
     await consumer.start()

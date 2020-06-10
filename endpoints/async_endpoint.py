@@ -29,7 +29,6 @@ logger = logging.getLogger()
 
 # Some parameters to send and read from kafka
 KAFKA_BROKER = "kafka-broker:9092"
-CONFLUENT_KAFKA_BROKER = "pkc-4yyd6.us-east1.gcp.confluent.cloud:9092"
 
 ssl_context = create_default_context(Purpose.SERVER_AUTH)
 
@@ -92,7 +91,7 @@ async def create_kafka_consumer(app: web.Application):
                 ORDER_EVENTS_TOPIC,
                 STOCK_EVENTS_TOPIC,
                 loop=asyncio.get_event_loop(),
-                bootstrap_servers=CONFLUENT_KAFKA_BROKER,
+                bootstrap_servers=os.environ['BROKER'],
                 security_protocol='SASL_SSL',
                 ssl_context=ssl_context,
                 sasl_mechanism='PLAIN',
@@ -129,7 +128,7 @@ async def create_kafka_producer(app: web.Application):
         try:
             producer = AIOKafkaProducer(
                 loop=asyncio.get_event_loop(),
-                bootstrap_servers=CONFLUENT_KAFKA_BROKER,
+                bootstrap_servers=os.environ['BROKER'],
                 security_protocol='SASL_SSL',
                 ssl_context=ssl_context,
                 sasl_mechanism='PLAIN',

@@ -83,7 +83,7 @@ module:
             type: statefun.kafka.io/routable-protobuf-ingress
             id: api-endpoint/in
           spec:
-            address: pkc-4yyd6.us-east1.gcp.confluent.cloud:9092
+            address: {BROKER}
             consumerGroupId: my-group-id
             topics:
               - topic: users-create
@@ -122,7 +122,7 @@ module:
             type: statefun.kafka.io/generic-egress
             id: users/out
           spec:
-            address: pkc-4yyd6.us-east1.gcp.confluent.cloud:9092
+            address: {BROKER}
             deliverySemantic:
               type: exactly-once
               transactionTimeoutMillis: 100000
@@ -137,7 +137,7 @@ module:
             type: statefun.kafka.io/generic-egress
             id: orders/out
           spec:
-            address: pkc-4yyd6.us-east1.gcp.confluent.cloud:9092
+            address: {BROKER}
             deliverySemantic:
               type: exactly-once
               transactionTimeoutMillis: 100000
@@ -152,7 +152,7 @@ module:
             type: statefun.kafka.io/generic-egress
             id: stock/out
           spec:
-            address: pkc-4yyd6.us-east1.gcp.confluent.cloud:9092
+            address: {BROKER}
             deliverySemantic:
               type: exactly-once
               transactionTimeoutMillis: 100000
@@ -167,7 +167,7 @@ module:
             type: statefun.kafka.io/generic-egress
             id: payments/out
           spec:
-            address: pkc-4yyd6.us-east1.gcp.confluent.cloud:9092
+            address: {BROKER}
             deliverySemantic:
               type: exactly-once
               transactionTimeoutMillis: 100000
