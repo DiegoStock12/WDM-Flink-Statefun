@@ -16,13 +16,15 @@ on:
     - master
 
 env:
-  STOCK_SERVICE_IMAGE: wdm.stock_service
-  ORDER_SERVICE_IMAGE: wdm.order_service
-  USER_SERVICE_IMAGE: wdm.user_service
-  PAYMENT_SERVICE_IMAGE: wdm.payment_service
-  ASYNC_ENDPOINT_IMAGE: wdm.endpoint
-  FLINK_WORKER: wdm.flink_worker
-  FLINK_MASTER: wdm.flink_master
+  STOCK_SERVICE_IMAGE: stock_service
+  ORDER_SERVICE_IMAGE: order_service
+  USER_SERVICE_IMAGE: user_service
+  PAYMENT_SERVICE_IMAGE: payment_service
+  ASYNC_ENDPOINT_IMAGE: api_endpoint
+  FLINK_WORKER: flink_worker
+  FLINK_MASTER: flink_master
+  GCR_REGISTRY: gcr.io
+  PROJECT_ID: wdm-statefun 
 
 jobs:
 
@@ -45,12 +47,44 @@ jobs:
         run: docker-compose build
       - name: Tag images
         run: |
-          docker tag wdm-flink-statefun_stock-endpoint:latest ${STOCK_SERVICE_IMAGE}:${GITHUB_SHA::8}
-          docker tag wdm-flink-statefun_users-endpoint:latest ${USER_SERVICE_IMAGE}:${GITHUB_SHA::8}
-      - name: Publish to Registry
-        uses: elgohr/Publish-Docker-Github-Action@master
-        with:
-          name: wzorgdrager/wdm
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          tags: "latest,${GITHUB_SHA::8}"
+          docker tag wdm-flink-statefun_stock-endpoint:latest $GCR_REGISTRY/$PROJECT_ID/$STOCK_SERVICE_IMAGE:${GITHUB_SHA::8}
+          docker tag wdm-flink-statefun_users-endpoint:latest $GCR_REGISTRY/$PROJECT_ID/$USER_SERVICE_IMAGE:${GITHUB_SHA::8}
+          docker tag wdm-flink-statefun_master:latest $GCR_REGISTRY/$PROJECT_ID/$FLINK_MASTER:${GITHUB_SHA::8}
+          docker tag wdm-flink-statefun_worker:latest $GCR_REGISTRY/$PROJECT_ID/$FLINK_WORKER:${GITHUB_SHA::8}
+          docker tag wdm-flink-statefun_api-endpoint:latest $GCR_REGISTRY/$PROJECT_ID/$ASYNC_ENDPOINT_IMAGE:${GITHUB_SHA::8}
+          docker tag wdm-flink-statefun_orders-endpoint:latest $GCR_REGISTRY/$PROJECT_ID/$ORDER_SERVICE_IMAGE:${GITHUB_SHA::8}
+          docker tag wdm-flink-statefun_payments-endpoint:latest $GCR_REGISTRY/$PROJECT_ID/$PAYMENT_SERVICE_IMAGE:${GITHUB_SHA::8}
+          
+          docker tag wdm-flink-statefun_stock-endpoint:latest $GCR_REGISTRY/$PROJECT_ID/$STOCK_SERVICE_IMAGE:latest
+          docker tag wdm-flink-statefun_users-endpoint:latest $GCR_REGISTRY/$PROJECT_ID/$USER_SERVICE_IMAGE:latest
+          docker tag wdm-flink-statefun_master:latest $GCR_REGISTRY/$PROJECT_ID/$FLINK_MASTER:latest
+          docker tag wdm-flink-statefun_worker:latest $GCR_REGISTRY/$PROJECT_ID/$FLINK_WORKER:latest
+          docker tag wdm-flink-statefun_api-endpoint:latest $GCR_REGISTRY/$PROJECT_ID/$ASYNC_ENDPOINT_IMAGE:latest
+          docker tag wdm-flink-statefun_orders-endpoint:latest $GCR_REGISTRY/$PROJECT_ID/$ORDER_SERVICE_IMAGE:latest
+          docker tag wdm-flink-statefun_payments-endpoint:latest $GCR_REGISTRY/$PROJECT_ID/$PAYMENT_SERVICE_IMAGE:latest
+      - name: Push images
+        run: |
+          echo ${{ secrets.GCLOUD_SERVICE_KEY }} | base64 --decode --ignore-garbage > /tmp/key.json
+          gcloud auth activate-service-account --quiet --key-file /tmp/key.json
+          gcloud auth configure-docker --quiet
+          
+          docker push $GCR_REGISTRY/$PROJECT_ID/$STOCK_SERVICE_IMAGE:${GITHUB_SHA::8}
+          docker push $GCR_REGISTRY/$PROJECT_ID/$STOCK_SERVICE_IMAGE:latest
+          
+          docker push $GCR_REGISTRY/$PROJECT_ID/$USER_SERVICE_IMAGE:${GITHUB_SHA::8}
+          docker push $GCR_REGISTRY/$PROJECT_ID/$USER_SERVICE_IMAGE:latest
+          
+          docker push $GCR_REGISTRY/$PROJECT_ID/$FLINK_MASTER:${GITHUB_SHA::8}
+          docker push $GCR_REGISTRY/$PROJECT_ID/$FLINK_MASTER:latest
+          
+          docker push $GCR_REGISTRY/$PROJECT_ID/$FLINK_WORKER:${GITHUB_SHA::8}
+          docker push $GCR_REGISTRY/$PROJECT_ID/$FLINK_WORKER:latest
+          
+          docker push $GCR_REGISTRY/$PROJECT_ID/$ASYNC_ENDPOINT_IMAGE:${GITHUB_SHA::8}
+          docker push $GCR_REGISTRY/$PROJECT_ID/$ASYNC_ENDPOINT_IMAGE:latest
+          
+          docker push $GCR_REGISTRY/$PROJECT_ID/$ORDER_SERVICE_IMAGE:${GITHUB_SHA::8}
+          docker push $GCR_REGISTRY/$PROJECT_ID/$ORDER_SERVICE_IMAGE:latest
+          
+          docker push $GCR_REGISTRY/$PROJECT_ID/$PAYMENT_SERVICE_IMAGE:${GITHUB_SHA::8}
+          docker push $GCR_REGISTRY/$PROJECT_ID/$PAYMENT_SERVICE_IMAGE:latest
