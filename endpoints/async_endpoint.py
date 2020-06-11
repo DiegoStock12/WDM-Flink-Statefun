@@ -91,8 +91,6 @@ async def create_kafka_consumer(app: web.Application):
                 ORDER_EVENTS_TOPIC,
                 STOCK_EVENTS_TOPIC,
                 PAYMENT_EVENTS_TOPIC,
-                loop=asyncio.get_running_loop(),
-                bootstrap_servers=KAFKA_BROKER
                 loop=asyncio.get_event_loop(),
                 bootstrap_servers=os.environ['BROKER'],
                 security_protocol='SASL_SSL',
