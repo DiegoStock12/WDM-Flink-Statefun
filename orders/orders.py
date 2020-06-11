@@ -30,7 +30,7 @@ def create_order(context, msg: CreateOrder):
     - Only has one state (int) that saves the current id to be 
     assigned to the next order """
 
-    logger.debug("Creating order...")
+    # logger.debug("Creating order...")
 
     # get the current id to assign
     state = context.state('count').unpack(Count)
@@ -51,7 +51,7 @@ def create_order(context, msg: CreateOrder):
     # update the next id to assign and save
     state.num += 1
     context.state('count').pack(state)
-    logger.debug('Next state to assign is {}'.format(state.num))
+    # logger.debug('Next state to assign is {}'.format(state.num))
 
 
 @functions.bind("orders/order")
@@ -64,10 +64,10 @@ def operate_order(context, msg: typing.Union[CreateOrderWithId, OrderRequest, Or
         response = create_order_with_id(context, msg)
 
     elif isinstance(msg, OrderRequest):
-        logger.debug("Received order request!")
+        # logger.debug("Received order request!")
 
         msg_type = msg.WhichOneof('message')
-        logger.debug(f'Got message of type {msg_type}')
+        # logger.debug(f'Got message of type {msg_type}')
 
         if msg_type == 'remove_order':
             response = remove_order(context, msg)
@@ -100,7 +100,7 @@ def operate_order(context, msg: typing.Union[CreateOrderWithId, OrderRequest, Or
         logger.error('Received unknown message type!')
 
     if response:
-        logger.debug("Sending a response.")
+        # logger.debug("Sending a response.")
         response.request_id = msg.request_info.request_id
         egress_message = kafka_egress_record(
             topic=ORDER_EVENTS_TOPIC,
@@ -118,7 +118,7 @@ def create_order_with_id(context, msg):
     state.total_cost = 0
 
     context.state('order').pack(state)
-    logger.debug(f'Created new order with id {msg.id}')
+    # logger.debug(f'Created new order with id {msg.id}')
 
     response = ResponseMessage()
     response.result = json.dumps({'result': 'success',
@@ -130,10 +130,10 @@ def remove_order(context, msg):
     state = context.state('order').unpack(Order)
     response = ResponseMessage()
     if not state:
-        logger.debug("Order does not exists.")
+        # logger.debug("Order does not exists.")
         response.result = json.dumps({'result': 'failure', 'message': 'Order does not exist.'})
     else:
-        logger.info(f"Deleting the order with id: {msg.remove_order.id}")
+        # logger.info(f"Deleting the order with id: {msg.remove_order.id}")
         item_to_count = {}
         items = state.items
         for i in range(len(items)):
@@ -164,16 +164,16 @@ def find_order(context, msg):
     state = context.state('order').unpack(Order)
     response = ResponseMessage()
     if not state:
-        logger.debug("Order does not exist.")
+        # logger.debug("Order does not exist.")
         response.result = json.dumps({'result': 'failure', 'message': 'Order does not exist.'})
     else:
-        logger.debug(f"Returning order with id: {msg.find_order.id}")
+        # logger.debug(f"Returning order with id: {msg.find_order.id}")
 
         # Have to assign all like this so they're not casted to string
         response.result = json.dumps({'id': state.id, 'user_id': state.user_id,
                                       'items': [i.item_id for i in state.items], 'total_cost': state.total_cost,
                                       'paid': state.paid, 'intent': state.intent})
-        logger.debug(f"{response.result}")
+        # logger.debug(f"{response.result}")
 
     context.state('order').pack(state)
 
@@ -184,7 +184,7 @@ def add_item(context, msg):
     state = context.state('order').unpack(Order)
     if not state:
         response = ResponseMessage()
-        logger.debug("Order does not exist.")
+        # logger.debug("Order does not exist.")
         response.result = json.dumps({'result': 'failure', 'message': 'Order does not exist.'})
 
         return response
@@ -201,7 +201,7 @@ def add_item(context, msg):
         context.state('order').pack(state)
 
         context.pack_and_send("stock/stock", str(msg.add_item.itemId), subtract_stock_request)
-        logger.debug("Sent request to ")
+        # logger.debug("Sent request to ")
 
 
 def remove_item(context, msg):
@@ -209,7 +209,7 @@ def remove_item(context, msg):
     state = context.state('order').unpack(Order)
     response = ResponseMessage()
     if not state:
-        logger.debug("Order does not exist.")
+        # logger.debug("Order does not exist.")
         response.result = json.dumps({'result': 'failure',
                                       'message': 'Order does not exist.'})
     else:
@@ -217,13 +217,13 @@ def remove_item(context, msg):
         item_to_delete = msg.remove_item.itemId
         item_index = -1
         for i in range(len(items)):
-            logger.info(f"{items[i].item_id}")
+            # logger.info(f"{items[i].item_id}")
             if items[i].item_id == item_to_delete:
                 item_index = i
         if item_index != -1:
             state.total_cost -= items[item_index].price
             del state.items[item_index]
-            logger.info(f"Removing item {item_to_delete} from order {orderId}")
+            # logger.info(f"Removing item {item_to_delete} from order {orderId}")
             response.result = json.dumps({'result': 'success'})
 
             add_stock_request = StockRequest()
@@ -235,7 +235,7 @@ def remove_item(context, msg):
             context.pack_and_send("stock/stock", str(item_to_delete), add_stock_request)
 
         else:
-            logger.warning(f"Order {orderId} does not contain item with id {item_to_delete}")
+            # logger.warning(f"Order {orderId} does not contain item with id {item_to_delete}")
             response.result = json.dumps({'result': 'failure',
                                           'message': 'Order does not contain requested item.'})
 
@@ -246,7 +246,7 @@ def remove_item(context, msg):
 
 def order_checkout(context, msg):
     state = context.state('order').unpack(Order)
-    logger.debug(f"Checkouting order {msg.order_checkout.id}.")
+    # logger.debug(f"Checkouting order {msg.order_checkout.id}.")
 
     request = Order()
     request.id = msg.order_checkout.id
@@ -262,7 +262,7 @@ def order_checkout(context, msg):
     # send to payment service
     context.pack_and_send("payments/pay", str(request.id), request)
 
-    logger.debug('Sent the message to payments')
+    # logger.debug('Sent the message to payments')
 
 
 def order_payment_find(context, msg):
@@ -307,10 +307,10 @@ def order_payment_confirm(context, msg):
         state.paid = True
         context.state('order').pack(state)
 
-        logger.debug("Checkout succeeded.")
+        # logger.debug("Checkout succeeded.")
         response.result = json.dumps({'result': 'success', 'message': 'Checkout succeeded.'})
     else:
-        logger.debug("Payment cancelling failed.")
+        # logger.debug("Payment cancelling failed.")
         response.result = json.dumps({'result': 'failure', 'message': 'Payment cancelling failed.'})
 
     return response
@@ -320,17 +320,17 @@ def order_add_item_reply(context, msg):
     state = context.state('order').unpack(Order)
     response = ResponseMessage()
     if msg.result == 'success':
-        logger.info("Successfully added item to order.")
+        # logger.info("Successfully added item to order.")
         new_item = Item()
         new_item.item_id = msg.item_id
         new_item.price = msg.price
         state.items.append(new_item)
         state.total_cost += msg.price
-        logger.info(f"{state}")
+        # logger.info(f"{state}")
         context.state('order').pack(state)
         response.result = json.dumps({'result': 'success'})
     else:
-        logger.debug("No items left in stock.")
+        # logger.debug("No items left in stock.")
         response.result = json.dumps({'result': 'failure', 'message': 'No items left in stock.'})
         context.state('order').pack(state)
 
