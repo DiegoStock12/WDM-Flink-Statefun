@@ -13,4 +13,4 @@ COPY ./protobuf/general_pb2.py /app
 
 EXPOSE 80
 
-CMD ["gunicorn", "-b", "0.0.0.0:80", "--access-logfile", "acc", "-w 4", "orders:app"]
+CMD ["gunicorn", "-b", "0.0.0.0:80", "--access-logfile", "acc", "-w 5", "orders:app"]

@@ -25,3 +25,10 @@ spec:
             value: '***'
           - name: SECRET
             value: '***'
+        resources:
+          requests:
+            memory: "2048Mi"
+            cpu: "3750m"
+          limits:
+            memory: "2048Mi"
+            cpu: "4000m"

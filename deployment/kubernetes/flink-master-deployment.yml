@@ -7,13 +7,14 @@ metadata:
 data:
   flink-conf.yaml: |+
     jobmanager.rpc.address: flink-jobmanager
-    taskmanager.numberOfTaskSlots: 2
+    taskmanager.numberOfTaskSlots: 1
     blob.server.port: 6124
     jobmanager.rpc.port: 6123
     taskmanager.rpc.port: 6122
     jobmanager.heap.size: 1024m
     taskmanager.memory.process.size: 1024m
-    parallelism.default: 8
+    parallelism.default: 1
+    statefun.flink-job-name: wdm
   log4j.properties: |+
     log4j.rootLogger=INFO, file
     log4j.logger.akka=INFO
@@ -60,6 +61,13 @@ spec:
           name: blob
         - containerPort: 8081
           name: ui
+        resources:
+          requests:
+            memory: "1024Mi"
+            cpu: "750m"
+          limits:
+            memory: "1024Mi"
+            cpu: "1000m"
         livenessProbe:
           tcpSocket:
             port: 6123

@@ -25,6 +25,13 @@ spec:
               then tail -f -n +1 log/*taskmanager*.log;
             fi;
           done"]
+        resources:
+          requests:
+            memory: "1024Mi"
+            cpu: "750m"
+          limits:
+            memory: "1024Mi"
+            cpu: "1000m"
         ports:
         - containerPort: 6122
           name: rpc

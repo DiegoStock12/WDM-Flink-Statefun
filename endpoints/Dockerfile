@@ -19,4 +19,4 @@ COPY ./protobuf/*_pb2.py /app/
 
 EXPOSE 80
 
-CMD ["gunicorn", "-b", "0.0.0.0:80", "--access-logfile", "acc", "-w 4", "--worker-class", "aiohttp.GunicornWebWorker", "async_endpoint:app"]
+CMD ["gunicorn", "-b", "0.0.0.0:80", "--access-logfile", "acc", "-w 9", "--worker-class", "aiohttp.GunicornWebWorker", "async_endpoint:app"]

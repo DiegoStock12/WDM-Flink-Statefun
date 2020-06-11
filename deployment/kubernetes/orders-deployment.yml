@@ -18,3 +18,10 @@ spec:
         image: "gcr.io/wdm-statefun/order_service"
         ports:
           - containerPort: 80
+        resources:
+          requests:
+            memory: "2048Mi"
+            cpu: "1750m"
+          limits:
+            memory: "2048Mi"
+            cpu: "2000m"
