@@ -33,7 +33,7 @@ STOCK_EVENTS_TOPIC = "stock-events"
 PAYMENT_EVENTS_TOPIC = "payment-events"
 
 # timeout for waiting for a server response
-TIMEOUT = 30
+TIMEOUT = 10
 
 # Where yet to answer request messages
 # are kept (request_id --> Future[json])

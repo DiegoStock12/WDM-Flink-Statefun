@@ -97,7 +97,7 @@ def operate_user(context,
 
     if isinstance(request, UserPayRequest):
 
-        logger.info('Received request to decrement user credit')
+        logger.debug('Received request to decrement user credit')
         # calculate if the credit is enough to pay for the product
         # get the credit
         response = UserPayResponse()
@@ -128,7 +128,7 @@ def operate_user(context,
 
     elif isinstance(request, UserCancelPayRequest):
 
-        logger.info('Received request to cancel a payment')
+        logger.debug('Received request to cancel a payment')
         # add the amount specified to the user credit
         response = UserPayResponse()
         response.order_id = request.order_id

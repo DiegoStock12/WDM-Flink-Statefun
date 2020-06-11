@@ -32,7 +32,7 @@ def create_item(context, request: CreateItemRequest):
     - Only has one state (int) that saves the current id to be
     asigned to the next user """
 
-    logger.info("Creating item...")
+    logger.debug("Creating item...")
 
     # get the current id to assign
     state = context.state('count').unpack(Count)
@@ -51,11 +51,11 @@ def create_item(context, request: CreateItemRequest):
     item_request.price = request.price
     item_request.request_info.request_id = request.request_info.request_id
     item_request.request_info.worker_id = request.request_info.worker_id
-    print(f"Sending request to function with id {item_request.id}", flush=True)
+    # print(f"Sending request to function with id {item_request.id}", flush=True)
     context.pack_and_send("stock/stock", str(item_request.id), item_request)
 
 
-    logger.info('Next state to assign is {}'.format(state.num))
+    logger.debug('Next state to assign is {}'.format(state.num))
 
 @functions.bind("stock/stock")
 def manage_stock(context, request: typing.Union[StockRequest, CreateItemWithId]):

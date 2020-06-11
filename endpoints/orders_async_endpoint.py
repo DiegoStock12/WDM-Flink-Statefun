@@ -30,7 +30,6 @@ async def add_credit(request):
 
 @routes_orders.post('/orders/create/{userId}')
 async def create_order(request):
-    print("Received request to create order for user", flush=True)
 
     userId = int(request.match_info['userId'])
     if (userId < 0):
@@ -50,7 +49,6 @@ async def create_order(request):
 
 @routes_orders.delete('/orders/remove/{orderId}')
 async def remove_order(request):
-    print("Received request to remove order.", flush=True)
 
     orderId = int(request.match_info['orderId'])
     request = OrderRequest()
@@ -67,14 +65,13 @@ async def remove_order(request):
 
 @routes_orders.get('/orders/find/{orderId}')
 async def get_order(request):
-    print("Received request to find an order.", flush=True)
+    # print("Received request to find an order.", flush=True)
 
     orderId = int(request.match_info['orderId'])
     request = OrderRequest()
     request.find_order.id = orderId
 
     result = await send_msg(ORDER_TOPIC, key=orderId, request=request)
-    print(f'Result: {result}', flush=True)
     r_json = json.loads(result)
 
     if 'result' in r_json:
@@ -85,7 +82,7 @@ async def get_order(request):
 
 @routes_orders.post('/orders/addItem/{orderId}/{itemId}')
 async def add_item_to_order(request):
-    print("Received request to add item to an order.", flush=True)
+    # print("Received request to add item to an order.", flush=True)
 
     orderId = int(request.match_info['orderId'])
     itemId = int(request.match_info['itemId'])
@@ -104,7 +101,7 @@ async def add_item_to_order(request):
 
 @routes_orders.delete('/orders/removeItem/{orderId}/{itemId}')
 async def remove_item_from_order(request):
-    print("Received request to remove item from an order.", flush=True)
+    # print("Received request to remove item from an order.", flush=True)
 
     orderId = int(request.match_info['orderId'])
     itemId = int(request.match_info['itemId'])
@@ -123,7 +120,7 @@ async def remove_item_from_order(request):
 
 @routes_orders.post('/orders/checkout/{orderId}')
 async def checkout_order(request):
-    print("Received request to checkout the order.", flush=True)
+    # print("Received request to checkout the order.", flush=True)
 
     orderId = int(request.match_info['orderId'])
     request = OrderRequest()
