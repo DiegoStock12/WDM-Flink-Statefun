@@ -68,7 +68,7 @@ async def consume_forever(consumer: AIOKafkaConsumer):
             # set the result of the future in the dict
             if resp.request_id in messages:
                 messages[resp.request_id].set_result(resp.result)
-            # else:
+            else:
                 logger.error(f'Received response for an unknown message with request id: {resp.request_id}')
 
 

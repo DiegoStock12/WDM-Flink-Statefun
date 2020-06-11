@@ -182,7 +182,7 @@ def operate_user(context,
                 else:
                     response.result = json.dumps({'result': 'failure'})
 
-    else:
+    # else:
         #logger.error('Received unknown message type!')
 
     # respond if needed

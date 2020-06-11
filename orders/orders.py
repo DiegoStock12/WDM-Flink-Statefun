@@ -4,7 +4,7 @@ import typing
 import json
 
 from orders_pb2 import Order, CreateOrder, OrderRequest, \
-    OrdersPayFind, OrderPaymentCancel, OrderPaymentCancelReply
+    OrdersPayFind, OrderPaymentCancel, OrderPaymentCancelReply, Item
 from general_pb2 import ResponseMessage
 from payment_pb2 import PaymentStatus
 from stock_pb2 import StockRequest, StockResponse
@@ -35,7 +35,7 @@ def operate_order(context, msg: typing.Union[CreateOrder, OrderRequest, OrdersPa
     elif isinstance(msg, OrderRequest):
 
         msg_type = msg.WhichOneof('message')
-        #logger.debug(f'Got message of type {msg_type}')
+        # logger.debug(f'Got message of type {msg_type}')
 
         if msg_type == 'remove_order':
             response = remove_order(context, msg)
@@ -116,12 +116,12 @@ def remove_order(context, msg):
             add_stock_request.add_stock.id = id
             add_stock_request.add_stock.amount = cnt
 
+            # logger.info('Sending request to add stock back.')
             context.pack_and_send("stock/stock", str(id), add_stock_request)
 
+        # logger.info('Deleting order.')
         del context['order']
         response.result = json.dumps({'result': 'success'})
-
-    context.state('order').pack(state)
 
     return response
 
