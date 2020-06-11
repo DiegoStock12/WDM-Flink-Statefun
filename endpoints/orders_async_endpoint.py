@@ -1,12 +1,12 @@
-from aiohttp import web
-import asyncio
-
-from async_endpoint import app, send_msg, messages, WORKER_ID
-from orders_pb2 import CreateOrder, OrderRequest
-
+import json
 # create the logger and configure
 import logging
-import json
+import uuid
+
+from aiohttp import web
+
+from async_endpoint import send_msg
+from orders_pb2 import CreateOrder, OrderRequest
 
 # define the routes object
 routes_orders = web.RouteTableDef()
@@ -31,14 +31,14 @@ async def add_credit(request):
 @routes_orders.post('/orders/create/{userId}')
 async def create_order(request):
 
-    userId = int(request.match_info['userId'])
-    if (userId < 0):
-        return web.HTTPNotFound()
+    userId = request.match_info['userId']
+    order_id = str(uuid.uuid4())
 
     request = CreateOrder()
     request.user_id = userId
+    request.id = order_id
 
-    result = await send_msg(ORDER_CREATION_TOPIC, key="create", request=request)
+    result = await send_msg(ORDER_CREATION_TOPIC, key=order_id, request=request)
     r_json = json.loads(result)
 
     if r_json['result'] == 'success':
@@ -50,7 +50,7 @@ async def create_order(request):
 @routes_orders.delete('/orders/remove/{orderId}')
 async def remove_order(request):
 
-    orderId = int(request.match_info['orderId'])
+    orderId = request.match_info['orderId']
     request = OrderRequest()
     request.remove_order.id = orderId
 
@@ -67,7 +67,7 @@ async def remove_order(request):
 async def get_order(request):
     # print("Received request to find an order.", flush=True)
 
-    orderId = int(request.match_info['orderId'])
+    orderId = request.match_info['orderId']
     request = OrderRequest()
     request.find_order.id = orderId
 
@@ -84,8 +84,8 @@ async def get_order(request):
 async def add_item_to_order(request):
     # print("Received request to add item to an order.", flush=True)
 
-    orderId = int(request.match_info['orderId'])
-    itemId = int(request.match_info['itemId'])
+    orderId = request.match_info['orderId']
+    itemId = request.match_info['itemId']
     request = OrderRequest()
     request.add_item.id = orderId
     request.add_item.itemId = itemId
@@ -103,8 +103,8 @@ async def add_item_to_order(request):
 async def remove_item_from_order(request):
     # print("Received request to remove item from an order.", flush=True)
 
-    orderId = int(request.match_info['orderId'])
-    itemId = int(request.match_info['itemId'])
+    orderId = request.match_info['orderId']
+    itemId = request.match_info['itemId']
     request = OrderRequest()
     request.remove_item.id = orderId
     request.remove_item.itemId = itemId
@@ -122,7 +122,7 @@ async def remove_item_from_order(request):
 async def checkout_order(request):
     # print("Received request to checkout the order.", flush=True)
 
-    orderId = int(request.match_info['orderId'])
+    orderId = request.match_info['orderId']
     request = OrderRequest()
     request.order_checkout.id = orderId
 

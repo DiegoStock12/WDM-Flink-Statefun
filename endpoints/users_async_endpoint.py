@@ -1,12 +1,13 @@
-from aiohttp import web
-import asyncio
-
-from async_endpoint import app, send_msg, messages, WORKER_ID
-from users_pb2 import CreateUserRequest, UserRequest
-
+import json
 # create the logger and configure
 import logging
-import json
+import uuid
+
+from aiohttp import web
+
+from async_endpoint import send_msg
+from users_pb2 import CreateUserRequest, UserRequest
+
 # define the routes object
 routes_users = web.RouteTableDef()
 
@@ -21,14 +22,19 @@ USER_TOPIC = "users"
 USER_CREATION_TOPIC = "users-create"
 USER_EVENTS_TOPIC = "user-events"
 
+
 # Declaration of the user endpoints
 @routes_users.post('/users/create')
 async def create_user(request):
     """ Sends a create user request to the cluster"""
     msg = CreateUserRequest()
 
+    user_id = str(uuid.uuid4())
+
+    msg.id = user_id
+
     # wait for the response asynchronously
-    result = await send_msg(USER_CREATION_TOPIC, key="create", request=msg)
+    result = await send_msg(USER_CREATION_TOPIC, key=user_id, request=msg)
     return web.Response(text=result, content_type='application/json')
 
 
@@ -36,7 +42,7 @@ async def create_user(request):
 async def remove_user(request):
     """ Sends a remove user request to the statefun cluster"""
 
-    user_id = int(request.match_info['user_id'])
+    user_id = request.match_info['user_id']
 
     msg = UserRequest()
     msg.remove_user.id = user_id
@@ -50,8 +56,7 @@ async def remove_user(request):
 
 @routes_users.get('/users/find/{user_id}')
 async def find_user(request):
-
-    user_id = int(request.match_info['user_id'])
+    user_id = request.match_info['user_id']
 
     msg = UserRequest()
     msg.find_user.id = user_id
@@ -81,8 +86,7 @@ async def get_credit(request):
 
 @routes_users.post('/users/credit/subtract/{user_id}/{amount}')
 async def subtract_credit(request):
-
-    user_id = int(request.match_info['user_id'])
+    user_id = request.match_info['user_id']
     amount = int(request.match_info['amount'])
 
     msg = UserRequest()
@@ -100,7 +104,7 @@ async def subtract_credit(request):
 @routes_users.post('/users/credit/add/{user_id}/{amount}')
 async def add_credit(request):
 
-    user_id = int(request.match_info['user_id'])
+    user_id = request.match_info['user_id']
     amount = int(request.match_info['amount'])
 
     msg = UserRequest()

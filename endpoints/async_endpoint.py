@@ -1,29 +1,26 @@
 """ Asynchronous web server with aiohttp and kafka-aio"""
 
+import asyncio
+# create the logger and configure
+import logging
+import time
+import uuid
+from ssl import create_default_context, Purpose
+from typing import Dict, Awaitable
+
 # main async web server
 from aiohttp import web
-import asyncio
-
-from ssl import create_default_context, Purpose
-
-# Messages exchanged with the stateful functions
-from general_pb2 import ResponseMessage, RequestInfo
-
 # Async kafka producer and consumer
 from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 from aiokafka.errors import KafkaConnectionError, NoBrokersAvailable
 
-# create the logger and configure
-import logging
-import uuid
-import json
-import time
-import os
-
-from typing import Dict, Awaitable
+# Messages exchanged with the stateful functions
+from general_pb2 import ResponseMessage
 
 FORMAT = '[%(asctime)s] %(levelname)-8s %(message)s'
 logging.basicConfig(level=logging.INFO, format=FORMAT)
+
+import os
 
 logger = logging.getLogger()
 
@@ -38,7 +35,7 @@ STOCK_EVENTS_TOPIC = "stock-events"
 PAYMENT_EVENTS_TOPIC = "payment-events"
 
 # timeout for waiting for a server response
-TIMEOUT = 10
+TIMEOUT = 20
 
 # Where yet to answer request messages
 # are kept (request_id --> Future[json])
@@ -63,7 +60,7 @@ async def consume_forever(consumer: AIOKafkaConsumer):
     async for msg in consumer:
         # if the message is for our worker, get it
         if msg.key.decode('utf-8') == WORKER_ID:
-            logger.info(f'Received message! {msg.value}')
+            # logger.info(f'Received message! {msg.value}')
 
             resp = ResponseMessage()
             resp.ParseFromString(msg.value)
@@ -71,8 +68,8 @@ async def consume_forever(consumer: AIOKafkaConsumer):
             # set the result of the future in the dict
             if resp.request_id in messages:
                 messages[resp.request_id].set_result(resp.result)
-            else:
-                logger.error('Received response for an unknown message')
+            # else:
+                logger.error(f'Received response for an unknown message with request id: {resp.request_id}')
 
 
 async def create_kafka_consumer(app: web.Application):
@@ -193,7 +190,7 @@ async def send_msg(topic: str, key: str, request):
         return result
 
     except asyncio.TimeoutError:
-        logger.error('Timeout while waiting for message')
+        logger.error(f'Timeout while waiting for message with request id: {request.request_info.request_id}')
 
         # clean the entry and raise
         del messages[request.request_info.request_id]

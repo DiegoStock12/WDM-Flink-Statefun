@@ -347,4 +347,4 @@ class LoadTests(TaskSet):
 
 class MicroservicesUser(HttpLocust):
     task_set = LoadTests
-    wait_time = between(1, 15)  # how much time a user waits (seconds) to run another TaskSequence
+    wait_time = between(1, 3)  # how much time a user waits (seconds) to run another TaskSequence

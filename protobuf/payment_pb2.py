@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='payment',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=b'\n\rpayment.proto\x12\x07payment\x1a\rgeneral.proto\"\xc2\x01\n\x0ePaymentRequest\x12\x0f\n\x07user_id\x18\x01 \x01(\x04\x12\x10\n\x08order_id\x18\x02 \x01(\x04\x12\"\n\x0crequest_info\x18\x03 \x01(\x0b\x32\x0c.RequestInfo\x12\x39\n\x0crequest_type\x18\x04 \x01(\x0e\x32#.payment.PaymentRequest.RequestType\".\n\x0bRequestType\x12\x07\n\x03PAY\x10\x00\x12\n\n\x06\x43\x41NCEL\x10\x01\x12\n\n\x06STATUS\x10\x02\"\\\n\rPaymentStatus\x12\x10\n\x08order_id\x18\x01 \x01(\x04\x12\x15\n\ractually_paid\x18\x02 \x01(\x08\x12\"\n\x0crequest_info\x18\x03 \x01(\x0b\x32\x0c.RequestInfob\x06proto3'
+  serialized_pb=b'\n\rpayment.proto\x12\x07payment\x1a\rgeneral.proto\"\xc2\x01\n\x0ePaymentRequest\x12\x0f\n\x07user_id\x18\x01 \x01(\t\x12\x10\n\x08order_id\x18\x02 \x01(\t\x12\"\n\x0crequest_info\x18\x03 \x01(\x0b\x32\x0c.RequestInfo\x12\x39\n\x0crequest_type\x18\x04 \x01(\x0e\x32#.payment.PaymentRequest.RequestType\".\n\x0bRequestType\x12\x07\n\x03PAY\x10\x00\x12\n\n\x06\x43\x41NCEL\x10\x01\x12\n\n\x06STATUS\x10\x02\"\\\n\rPaymentStatus\x12\x10\n\x08order_id\x18\x01 \x01(\t\x12\x15\n\ractually_paid\x18\x02 \x01(\x08\x12\"\n\x0crequest_info\x18\x03 \x01(\x0b\x32\x0c.RequestInfob\x06proto3'
   ,
   dependencies=[general__pb2.DESCRIPTOR,])
 
@@ -61,15 +61,15 @@ _PAYMENTREQUEST = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='user_id', full_name='payment.PaymentRequest.user_id', index=0,
-      number=1, type=4, cpp_type=4, label=1,
-      has_default_value=False, default_value=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='order_id', full_name='payment.PaymentRequest.order_id', index=1,
-      number=2, type=4, cpp_type=4, label=1,
-      has_default_value=False, default_value=0,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
@@ -114,8 +114,8 @@ _PAYMENTSTATUS = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='order_id', full_name='payment.PaymentStatus.order_id', index=0,
-      number=1, type=4, cpp_type=4, label=1,
-      has_default_value=False, default_value=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
