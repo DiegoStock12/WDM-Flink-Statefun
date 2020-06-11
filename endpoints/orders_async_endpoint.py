@@ -6,6 +6,7 @@ from orders_pb2 import CreateOrder, OrderRequest
 
 # create the logger and configure
 import logging
+import json
 
 # define the routes object
 routes_orders = web.RouteTableDef()
@@ -32,12 +33,19 @@ async def create_order(request):
     print("Received request to create order for user", flush=True)
 
     userId = int(request.match_info['userId'])
+    if (userId < 0):
+        return web.HTTPNotFound()
+
     request = CreateOrder()
-    request.userId = userId
+    request.user_id = userId
 
     result = await send_msg(ORDER_CREATION_TOPIC, key=userId, request=request)
+    r_json = json.loads(result)
 
-    return web.Response(text=result, status=201, content_type='application/json')
+    if r_json['result'] == 'success':
+        return web.Response(text=result, status=200, content_type='application/json')
+    else:
+        return web.HTTPNotFound()
 
 
 @routes_orders.delete('/orders/remove/{orderId}')
@@ -47,9 +55,14 @@ async def remove_order(request):
     orderId = int(request.match_info['orderId'])
     request = OrderRequest()
     request.remove_order.id = orderId
-    result = await send_msg(ORDER_TOPIC, key=orderId, request=request)
 
-    return web.Response(text=result, content_type='application/json')
+    result = await send_msg(ORDER_TOPIC, key=orderId, request=request)
+    r_json = json.loads(result)
+
+    if r_json['result'] == 'success':
+        return web.HTTPOk()
+    else:
+        return web.HTTPNotFound()
 
 
 @routes_orders.get('/orders/find/{orderId}')
@@ -60,10 +73,14 @@ async def get_order(request):
     request = OrderRequest()
     request.find_order.id = orderId
 
-
     result = await send_msg(ORDER_TOPIC, key=orderId, request=request)
+    print(f'Result: {result}', flush=True)
+    r_json = json.loads(result)
 
-    return web.Response(text=result, content_type='application/json')
+    if 'result' in r_json:
+        return web.HTTPNotFound()
+    else:
+        return web.Response(text=result, content_type='application/json')
 
 
 @routes_orders.post('/orders/addItem/{orderId}/{itemId}')
@@ -77,8 +94,12 @@ async def add_item_to_order(request):
     request.add_item.itemId = itemId
 
     result = await send_msg(ORDER_TOPIC, key=orderId, request=request)
+    r_json = json.loads(result)
 
-    return web.Response(text=result, status=201, content_type='application/json')
+    if r_json['result'] == 'success':
+        return web.Response(text=result, status=200, content_type='application/json')
+    else:
+        return web.HTTPNotFound()
 
 
 @routes_orders.delete('/orders/removeItem/{orderId}/{itemId}')
@@ -92,5 +113,26 @@ async def remove_item_from_order(request):
     request.remove_item.itemId = itemId
 
     result = await send_msg(ORDER_TOPIC, key=orderId, request=request)
+    r_json = json.loads(result)
 
-    return web.Response(text=result, content_type='application/json')
+    if r_json['result'] == 'success':
+        return web.Response(text=result, content_type='application/json')
+    else:
+        return web.HTTPNotFound()
+
+
+@routes_orders.delete('/orders/checkout/{orderId}')
+async def checkout_order(request):
+    print("Received request to checkout the order.", flush=True)
+
+    orderId = int(request.match_info['orderId'])
+    request = OrderRequest()
+    request.order_checkout.id = orderId
+
+    result = await send_msg(ORDER_TOPIC, key=orderId, request=request)
+    r_json = json.loads(result)
+
+    if r_json['result'] == 'success':
+        return web.Response(text=result, content_type='application/json')
+    else:
+        return web.HTTPNotFound()

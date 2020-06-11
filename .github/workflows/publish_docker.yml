@@ -88,4 +88,3 @@ jobs:
           
           docker push $GCR_REGISTRY/$PROJECT_ID/$PAYMENT_SERVICE_IMAGE:${GITHUB_SHA::8}
           docker push $GCR_REGISTRY/$PROJECT_ID/$PAYMENT_SERVICE_IMAGE:latest
-
