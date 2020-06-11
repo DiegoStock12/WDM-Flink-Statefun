@@ -5,41 +5,37 @@ package orders;
 import "general.proto";
 
 message CreateOrder{
-    int64 user_id = 1;
-    RequestInfo request_info = 2;
-}
-
-message CreateOrderWithId{
-    int64 id = 1;
-    int64 user_id = 2;
+    string user_id = 1;
+    string id = 2;
     RequestInfo request_info = 3;
 }
 
+
 message CreateOrderResponse{
-    int64 orderId = 1;
+    string orderId = 1;
 }
 
 message OrderRequest{
     message RemoveOrderRequest{
-        int64 id = 1;
+        string id = 1;
     }
 
     message FindOrderRequest{
-        int64 id = 1;
+        string id = 1;
     }
 
     message AddItemRequest{
-        int64 id = 1;
-        int64 itemId = 2;
+        string id = 1;
+        string itemId = 2;
     }
 
     message RemoveItemRequest{
-        int64 id = 1;
-        int64 itemId = 2;
+        string id = 1;
+        string itemId = 2;
     }
 
     message OrderCheckoutRequest {
-        int64 id = 1;
+        string id = 1;
     }
 
     RequestInfo request_info = 1;
@@ -64,10 +60,10 @@ message Item {
 }
 
 message Order {
-    int64 id = 1;
+    string id = 1;
     RequestInfo request_info = 2;
-    int64 user_id = 3;
-    repeated Item items = 4;
+    string user_id = 3;
+    repeated string items = 4;
     int64 total_cost = 5;
     bool paid = 6;
     enum Intent {
@@ -80,13 +76,13 @@ message Order {
 
 message OrdersPayFind {
     RequestInfo request_info = 1;
-    int64 order_id = 2;
+    string order_id = 2;
 }
 
 
 message OrderPaymentCancel {
     RequestInfo request_info = 1;
-    int64 order_id = 2;
+    string order_id = 2;
 }
 
 message OrderPaymentCancelReply {

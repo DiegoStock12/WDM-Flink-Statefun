@@ -22,8 +22,6 @@ logging.basicConfig(level=logging.DEBUG, format=FORMAT)
 
 logger = logging.getLogger()
 
-# Topic to output the responses to
-USER_EVENTS_TOPIC = "user-events"
 
 # Functions where to bind
 functions = StatefulFunctions()
@@ -35,11 +33,9 @@ def payments_pay(context, request: typing.Union[
 
     # Incoming from Orders
     if isinstance(request, Order):
-        # logger.debug(f'Received order request!')
         # If intent == PAY, request is initiated by Orders
 
         if request.intent == Order.Intent.PAY:
-            # logger.debug(f'Sending payment request to user {request.user_id}')
             user_pay_request = set_worker_and_request_ids(request, UserPayRequest())
             user_pay_request.order_id = request.id
             user_pay_request.amount = request.total_cost
@@ -60,7 +56,7 @@ def payments_pay(context, request: typing.Union[
                 user_pay_request = set_worker_and_request_ids(request, UserCancelPayRequest())
                 user_pay_request.order_id = request.order_id
                 user_pay_request.amount = request.total_cost
-                context.pack_and_send("users/user", str(request.user_id), user_pay_request)
+                context.pack_and_send("users/user", request.user_id, user_pay_request)
 
         elif request.intent == Order.Intent.STATUS:
             response = ResponseMessage()
@@ -74,24 +70,21 @@ def payments_pay(context, request: typing.Union[
         if request.request_type == PaymentRequest.RequestType.CANCEL:
             order_payment_cancel_request = set_worker_and_request_ids(request, OrderPaymentCancel())
             order_payment_cancel_request.order_id = request.order_id
-            context.pack_and_send("orders/order", str(request.order_id), order_payment_cancel_request)
+            context.pack_and_send("orders/order", request.order_id, order_payment_cancel_request)
 
         elif request.request_type == PaymentRequest.RequestType.STATUS:
             orders_pay_find_request = set_worker_and_request_ids(request, OrdersPayFind())
             orders_pay_find_request.order_id = request.order_id
-            # logger.debug(f"Sending message to the orders service {orders_pay_find_request}")
-            context.pack_and_send("orders/order", str(request.order_id), orders_pay_find_request)
+            context.pack_and_send("orders/order", request.order_id, orders_pay_find_request)
 
     # Reply from Users
     elif isinstance(request, UserPayResponse):
 
-        # logger.debug(f'Got reply from users! {request}')
         payment_status = set_worker_and_request_ids(request, PaymentStatus())
         payment_status.order_id = request.order_id
         payment_status.actually_paid = request.success
 
-        # logger.debug(f'Sending request to orders {payment_status}')
-        context.pack_and_send("orders/order", str(request.order_id), payment_status)
+        context.pack_and_send("orders/order", request.order_id, payment_status)
 
     # Reply from Users
     elif isinstance(request, OrderPaymentCancelReply):
@@ -108,11 +101,15 @@ def set_worker_and_request_ids(message_in, message_out):
 
 
 def send_response(context, response_message, worker_id):
+
+    #logger.debug(worker_id)
     egress_message = kafka_egress_record(
         topic=PAYMENT_EVENTS_TOPIC,
         key=worker_id,
         value=response_message
     )
+
+    #logger.info(f'Sending message {egress_message}')
     context.pack_and_send_egress("payments/out", egress_message)
 
 

@@ -1,11 +1,11 @@
 """ File including the functions served by the endpoint """
-from flask import Flask, request, jsonify, make_response
+from flask import Flask, request, make_response
 import typing
 import logging
 import json
 
 # Messages and internal states of the functions
-from users_pb2 import CreateUserRequest, UserRequest, UserData, Count, CreateUserWithId
+from users_pb2 import CreateUserRequest, UserRequest, UserData
 
 # messages from the payment service
 from users_pb2 import UserPayRequest, UserPayResponse, UserCancelPayRequest
@@ -30,43 +30,6 @@ USER_EVENTS_TOPIC = "user-events"
 # Functions where to bind
 functions = StatefulFunctions()
 
-
-# Function to create users
-# extracts the next free user id from its state and
-# sends a creation request to that new user function
-@functions.bind("users/create")
-def create_user(context, create_user_request: CreateUserRequest):
-    """ Creates a user by sending a message to the user function
-    - Only has one state (int) that saves the current id to be
-    asigned to the next user """
-
-    # logger.debug("Creating user...")
-
-    # get the current id to assign
-    state = context.state('count').unpack(Count)
-    if not state:
-        # logger.debug("First user ever!")
-        state = Count()
-        state.num = 0
-
-    # send a message to the user function to define the user
-    # also send the request and worker id with it
-    request = CreateUserWithId()
-    request.id = state.num
-
-    # update the count and pack the state
-    state.num += 1
-    context.state('count').pack(state)
-
-    # copy the request_info stuff
-    request = copy_request_info(create_user_request, request)
-
-    context.pack_and_send("users/user", str(request.id), request)
-
-    # update the next id to assign and save
-    # logger.debug('Next state to assign is {}'.format(state.num))
-
-
 def copy_request_info(origin, destination):
     """ Copies the request_info field of two messages"""
     destination.request_info.request_id = origin.request_info.request_id
@@ -79,7 +42,8 @@ def copy_request_info(origin, destination):
 # there
 @functions.bind("users/user")
 def operate_user(context,
-                 request: typing.Union[UserPayRequest, UserCancelPayRequest, UserRequest, CreateUserWithId]):
+                 request: typing.Union[UserPayRequest, UserCancelPayRequest,
+                                       UserRequest, CreateUserRequest]):
     """ Does all the operations with a single user
 
     Has the state of a user in a UserData() object that includes
@@ -97,7 +61,7 @@ def operate_user(context,
 
     if isinstance(request, UserPayRequest):
 
-        # logger.debug('Received request to decrement user credit')
+        #logger.debug('Received request to decrement user credit')
         # calculate if the credit is enough to pay for the product
         # get the credit
         response = UserPayResponse()
@@ -128,7 +92,7 @@ def operate_user(context,
 
     elif isinstance(request, UserCancelPayRequest):
 
-        # logger.debug('Received request to cancel a payment')
+        #logger.debug('Received request to cancel a payment')
         # add the amount specified to the user credit
         response = UserPayResponse()
         response.order_id = request.order_id
@@ -151,90 +115,82 @@ def operate_user(context,
         context.pack_and_reply(response)
         return
 
-        # -------------------------------------
+    # -------------------------------------
     # Interaction with the user endpoint
     # -------------------------------------
 
-    elif isinstance(request, UserRequest):
-        # logger.debug("Received user request!")
-
-        # check which field we have
-        msg_type = request.WhichOneof('message')
-        # logger.debug(f'Got message of type {msg_type}')
-
-        if msg_type == 'find_user':
-            # logger.debug('finding user')
-
-            # logger.debug(f'Found user: {state.id}:{state.credit}')
-
-            response = ResponseMessage()
-            response.result = json.dumps({'user_id': state.id,
-                                          'credit': state.credit})
-            # pack the state
-            context.state('user').pack(state)
-
-        elif msg_type == 'remove_user':
-            # logger.debug(f"Deleting user {request.remove_user.id}")
-            del context['user']
-
-            response = ResponseMessage()
-            response.result = json.dumps({'result': 'success'})
-
-        elif msg_type == 'add_credit':
-            # Update the credit and save state
-            state.credit += request.add_credit.amount
-            context.state('user').pack(state)
-
-            # logger.debug(f"New credit for user {request.add_credit.id} is {state.credit}")
-
-            # send the reponse
-            response = ResponseMessage()
-            response.result = json.dumps({'result': 'success'})
-
-        elif msg_type == 'subtract_credit':
-            # try to subtract the amount from the user credit
-            new_amount = state.credit - request.subtract_credit.amount
-            response = ResponseMessage()
-
-            if new_amount >= 0:
-                state.credit -= request.subtract_credit.amount
-                context.state('user').pack(state)
-
-                # response.result = "success"
-                # logger.debug(f"New credit for user {request.subtract_credit.id} is {state.credit}")
-
-                response.result = json.dumps({'result': 'success'})
-
-            else:
-                response.result = json.dumps({'result': 'failure'})
-                # logger.debug('Failure updating credit')
-
-            # pack the state
-            context.state('user').pack(state)
-
-    elif isinstance(request, CreateUserWithId):
-        # create a new user with the id given and 0 credit
+    elif isinstance(request, CreateUserRequest):
+        # we are given the uuid in the message so that's already done
         state = UserData()
         state.id = request.id
         state.credit = 0
+
+        #logger.debug(f'Created new user with id {request.id}')
         context.state('user').pack(state)
-        # logger.debug(f'Created new user with id {request.id}')
 
         response = ResponseMessage()
         response.result = json.dumps({'user_id': state.id})
 
-    # else:
-        # logger.error('Received unknown message type!')
+    elif isinstance(request, UserRequest):
+
+        # check which field we have
+        msg_type = request.WhichOneof('message')
+        #logger.debug(f'Got message of type {msg_type}')
+
+        # If the state is None we return an error
+        if not state:
+            response = ResponseMessage()
+            response.result = json.dumps({'result': 'failure: user does not exist'})
+
+        else:
+            # If the state exists we then operate with it
+            if msg_type == 'find_user':
+
+                response = ResponseMessage()
+                response.result = json.dumps({'user_id': state.id,
+                                              'credit': state.credit})
+                # pack the state
+                context.state('user').pack(state)
+
+            elif msg_type == 'remove_user':
+                del context['user']
+
+                response = ResponseMessage()
+                response.result = json.dumps({'result': 'success'})
+
+            elif msg_type == 'add_credit':
+                # Update the credit and save state
+                state.credit += request.add_credit.amount
+                context.state('user').pack(state)
+
+
+                # send the response
+                response = ResponseMessage()
+                response.result = json.dumps({'result': 'success'})
+
+            elif msg_type == 'subtract_credit':
+                # try to subtract the amount from the user credit
+                new_amount = state.credit - request.subtract_credit.amount
+                response = ResponseMessage()
+
+                if new_amount >= 0:
+                    state.credit -= request.subtract_credit.amount
+                    context.state('user').pack(state)
+
+                    response.result = json.dumps({'result': 'success'})
+
+                else:
+                    response.result = json.dumps({'result': 'failure'})
+
+    else:
+        #logger.error('Received unknown message type!')
 
     # respond if needed
     if response:
         # Use the same request id in the message body
         # and use the request worker_id as key of the message
 
-        if isinstance(response, ResponseMessage):
-            response.request_id = request.request_info.request_id
-        # logger.debug(
-        #     f'Sending response {response} with key {request.request_info.worker_id}')
+        response.request_id = request.request_info.request_id
 
         # create the egress message and send it to the
         # users/out egress
@@ -243,8 +199,6 @@ def operate_user(context,
             key=request.request_info.worker_id,
             value=response
         )
-
-        # logger.debug(f'Created egress message: {egress_message}')
 
         context.pack_and_send_egress("users/out", egress_message)
 

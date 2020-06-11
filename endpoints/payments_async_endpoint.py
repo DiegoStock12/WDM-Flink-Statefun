@@ -23,15 +23,15 @@ PAYMENT_INPUT_TOPIC = "payments"
 
 @routes_payments.post('/payment/cancel/{user_id}/{order_id}')
 async def payment_cancel(request):
-    user_id = int(request.match_info['user_id'])
-    order_id = int(request.match_info['order_id'])
+    user_id = request.match_info['user_id']
+    order_id = request.match_info['order_id']
 
     msg = PaymentRequest()
     msg.user_id = user_id
     msg.order_id = order_id
     msg.request_type = PaymentRequest.RequestType.CANCEL
 
-    result = await send_msg(PAYMENT_INPUT_TOPIC, key=str(order_id), request=msg)
+    result = await send_msg(PAYMENT_INPUT_TOPIC, key=order_id, request=msg)
 
     r_json = json.loads(result)
     raise web.HTTPOk() if r_json['result'] == 'success' else web.HTTPNotFound()
@@ -39,13 +39,15 @@ async def payment_cancel(request):
 
 @routes_payments.get('/payment/status/{order_id}')
 async def payment_status(request):
-    order_id = int(request.match_info['order_id'])
+    order_id = request.match_info['order_id']
 
     msg = PaymentRequest()
     msg.order_id = order_id
     msg.request_type = PaymentRequest.RequestType.STATUS
 
-    result = await send_msg(PAYMENT_INPUT_TOPIC, key=str(order_id), request=msg)
+    #logger.info('Payments sending message')
+
+    result = await send_msg(PAYMENT_INPUT_TOPIC, key=order_id, request=msg)
 
     r_json = json.loads(result)
 

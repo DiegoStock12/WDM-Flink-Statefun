@@ -5,8 +5,8 @@ import "general.proto";
 package payment;
 
 message PaymentRequest {
-    uint64 user_id = 1;
-    uint64 order_id = 2;
+    string user_id = 1;
+    string order_id = 2;
     RequestInfo request_info = 3;
 
     enum RequestType {
@@ -18,7 +18,7 @@ message PaymentRequest {
 }
 
 message PaymentStatus {
-  uint64 order_id = 1;
+  string order_id = 1;
   bool actually_paid = 2;
   RequestInfo request_info = 3;
 }

@@ -1,7 +1,6 @@
 import requests
 
-# URL = "http://192.168.99.100:5000"
-URL = "http://localhost:5000"
+URL = "http://192.168.99.100:5000"
 
 
 def user_create():
