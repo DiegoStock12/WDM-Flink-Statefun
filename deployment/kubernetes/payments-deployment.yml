@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payments
+  namespace: wdm-flink
+spec:
+  selector:
+    matchLabels:
+      service: payments
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service: payments
+    spec:
+      containers:
+      - name: payments
+        image: "gcr.io/wdm-statefun/payment_service"
+        ports:
+          - containerPort: 80
+        resources:
+          requests:
+            memory: "2048Mi"
+            cpu: "1750m"
+          limits:
+            memory: "2048Mi"
+            cpu: "2000m"
