@@ -7,7 +7,7 @@ spec:
   selector:
     matchLabels:
       service: orders
-  replicas: 1
+  replicas: 2
   template:
     metadata:
       labels:
@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: orders
-        image: "gcr.io/wdm-statefun/order_service:dd0342b4"
+        image: "gcr.io/wdm-statefun/order_service:380176b0"
         ports:
           - containerPort: 80
         resources:

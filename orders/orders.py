@@ -3,8 +3,7 @@ import logging
 import typing
 import json
 
-from orders_pb2 import Order, CreateOrder, OrderRequest, \
-    OrdersPayFind, OrderPaymentCancel, OrderPaymentCancelReply, Item
+from orders_pb2 import *
 from general_pb2 import ResponseMessage
 from payment_pb2 import PaymentStatus
 from stock_pb2 import StockRequest, StockResponse
