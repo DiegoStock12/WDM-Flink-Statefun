@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='orders',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=b'\n\x0corders.proto\x12\x06orders\x1a\rgeneral.proto\"N\n\x0b\x43reateOrder\x12\x0f\n\x07user_id\x18\x01 \x01(\t\x12\n\n\x02id\x18\x02 \x01(\t\x12\"\n\x0crequest_info\x18\x03 \x01(\x0b\x32\x0c.RequestInfo\"&\n\x13\x43reateOrderResponse\x12\x0f\n\x07orderId\x18\x01 \x01(\t\"\xbd\x04\n\x0cOrderRequest\x12\"\n\x0crequest_info\x18\x01 \x01(\x0b\x32\x0c.RequestInfo\x12?\n\x0cremove_order\x18\x02 \x01(\x0b\x32\'.orders.OrderRequest.RemoveOrderRequestH\x00\x12;\n\nfind_order\x18\x03 \x01(\x0b\x32%.orders.OrderRequest.FindOrderRequestH\x00\x12\x37\n\x08\x61\x64\x64_item\x18\x04 \x01(\x0b\x32#.orders.OrderRequest.AddItemRequestH\x00\x12=\n\x0bremove_item\x18\x05 \x01(\x0b\x32&.orders.OrderRequest.RemoveItemRequestH\x00\x12\x43\n\x0eorder_checkout\x18\x06 \x01(\x0b\x32).orders.OrderRequest.OrderCheckoutRequestH\x00\x1a \n\x12RemoveOrderRequest\x12\n\n\x02id\x18\x01 \x01(\t\x1a\x1e\n\x10\x46indOrderRequest\x12\n\n\x02id\x18\x01 \x01(\t\x1a,\n\x0e\x41\x64\x64ItemRequest\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06itemId\x18\x02 \x01(\t\x1a/\n\x11RemoveItemRequest\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06itemId\x18\x02 \x01(\t\x1a\"\n\x14OrderCheckoutRequest\x12\n\n\x02id\x18\x01 \x01(\tB\t\n\x07message\"3\n\rOrderResponse\x12\x12\n\nrequest_id\x18\x01 \x01(\t\x12\x0e\n\x06result\x18\x02 \x01(\t\"\xca\x01\n\x05Order\x12\n\n\x02id\x18\x01 \x01(\t\x12\"\n\x0crequest_info\x18\x02 \x01(\x0b\x32\x0c.RequestInfo\x12\x0f\n\x07user_id\x18\x03 \x01(\t\x12\r\n\x05items\x18\x04 \x03(\t\x12\x12\n\ntotal_cost\x18\x05 \x01(\x03\x12\x0c\n\x04paid\x18\x06 \x01(\x08\x12$\n\x06intent\x18\x07 \x01(\x0e\x32\x14.orders.Order.Intent\")\n\x06Intent\x12\x07\n\x03PAY\x10\x00\x12\n\n\x06\x43\x41NCEL\x10\x01\x12\n\n\x06STATUS\x10\x02\"E\n\rOrdersPayFind\x12\"\n\x0crequest_info\x18\x01 \x01(\x0b\x32\x0c.RequestInfo\x12\x10\n\x08order_id\x18\x02 \x01(\t\"J\n\x12OrderPaymentCancel\x12\"\n\x0crequest_info\x18\x01 \x01(\x0b\x32\x0c.RequestInfo\x12\x10\n\x08order_id\x18\x02 \x01(\t\"N\n\x17OrderPaymentCancelReply\x12\"\n\x0crequest_info\x18\x01 \x01(\x0b\x32\x0c.RequestInfo\x12\x0f\n\x07success\x18\x02 \x01(\x08\x62\x06proto3'
+  serialized_pb=b'\n\x0corders.proto\x12\x06orders\x1a\rgeneral.proto\"N\n\x0b\x43reateOrder\x12\x0f\n\x07user_id\x18\x01 \x01(\t\x12\n\n\x02id\x18\x02 \x01(\t\x12\"\n\x0crequest_info\x18\x03 \x01(\x0b\x32\x0c.RequestInfo\"&\n\x13\x43reateOrderResponse\x12\x0f\n\x07orderId\x18\x01 \x01(\t\"\xbd\x04\n\x0cOrderRequest\x12\"\n\x0crequest_info\x18\x01 \x01(\x0b\x32\x0c.RequestInfo\x12?\n\x0cremove_order\x18\x02 \x01(\x0b\x32\'.orders.OrderRequest.RemoveOrderRequestH\x00\x12;\n\nfind_order\x18\x03 \x01(\x0b\x32%.orders.OrderRequest.FindOrderRequestH\x00\x12\x37\n\x08\x61\x64\x64_item\x18\x04 \x01(\x0b\x32#.orders.OrderRequest.AddItemRequestH\x00\x12=\n\x0bremove_item\x18\x05 \x01(\x0b\x32&.orders.OrderRequest.RemoveItemRequestH\x00\x12\x43\n\x0eorder_checkout\x18\x06 \x01(\x0b\x32).orders.OrderRequest.OrderCheckoutRequestH\x00\x1a \n\x12RemoveOrderRequest\x12\n\n\x02id\x18\x01 \x01(\t\x1a\x1e\n\x10\x46indOrderRequest\x12\n\n\x02id\x18\x01 \x01(\t\x1a,\n\x0e\x41\x64\x64ItemRequest\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06itemId\x18\x02 \x01(\t\x1a/\n\x11RemoveItemRequest\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06itemId\x18\x02 \x01(\t\x1a\"\n\x14OrderCheckoutRequest\x12\n\n\x02id\x18\x01 \x01(\tB\t\n\x07message\"3\n\rOrderResponse\x12\x12\n\nrequest_id\x18\x01 \x01(\t\x12\x0e\n\x06result\x18\x02 \x01(\t\"&\n\x04Item\x12\x0f\n\x07item_id\x18\x01 \x01(\x03\x12\r\n\x05price\x18\x02 \x01(\x03\"\xca\x01\n\x05Order\x12\n\n\x02id\x18\x01 \x01(\t\x12\"\n\x0crequest_info\x18\x02 \x01(\x0b\x32\x0c.RequestInfo\x12\x0f\n\x07user_id\x18\x03 \x01(\t\x12\r\n\x05items\x18\x04 \x03(\t\x12\x12\n\ntotal_cost\x18\x05 \x01(\x03\x12\x0c\n\x04paid\x18\x06 \x01(\x08\x12$\n\x06intent\x18\x07 \x01(\x0e\x32\x14.orders.Order.Intent\")\n\x06Intent\x12\x07\n\x03PAY\x10\x00\x12\n\n\x06\x43\x41NCEL\x10\x01\x12\n\n\x06STATUS\x10\x02\"E\n\rOrdersPayFind\x12\"\n\x0crequest_info\x18\x01 \x01(\x0b\x32\x0c.RequestInfo\x12\x10\n\x08order_id\x18\x02 \x01(\t\"J\n\x12OrderPaymentCancel\x12\"\n\x0crequest_info\x18\x01 \x01(\x0b\x32\x0c.RequestInfo\x12\x10\n\x08order_id\x18\x02 \x01(\t\"N\n\x17OrderPaymentCancelReply\x12\"\n\x0crequest_info\x18\x01 \x01(\x0b\x32\x0c.RequestInfo\x12\x0f\n\x07success\x18\x02 \x01(\x08\x62\x06proto3'
   ,
   dependencies=[general__pb2.DESCRIPTOR,])
 
@@ -46,8 +46,8 @@ _ORDER_INTENT = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=950,
-  serialized_end=991,
+  serialized_start=990,
+  serialized_end=1031,
 )
 _sym_db.RegisterEnumDescriptor(_ORDER_INTENT)
 
@@ -432,8 +432,8 @@ _ITEM = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=862,
-  serialized_end=900,
+  serialized_start=788,
+  serialized_end=826,
 )
 
 
@@ -506,8 +506,8 @@ _ORDER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=789,
-  serialized_end=991,
+  serialized_start=829,
+  serialized_end=1031,
 )
 
 
@@ -544,8 +544,8 @@ _ORDERSPAYFIND = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=993,
-  serialized_end=1062,
+  serialized_start=1033,
+  serialized_end=1102,
 )
 
 
@@ -582,8 +582,8 @@ _ORDERPAYMENTCANCEL = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1064,
-  serialized_end=1138,
+  serialized_start=1104,
+  serialized_end=1178,
 )
 
 
@@ -620,8 +620,8 @@ _ORDERPAYMENTCANCELREPLY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1140,
-  serialized_end=1218,
+  serialized_start=1180,
+  serialized_end=1258,
 )
 
 _CREATEORDER.fields_by_name['request_info'].message_type = general__pb2._REQUESTINFO
@@ -652,7 +652,6 @@ _ORDERREQUEST.oneofs_by_name['message'].fields.append(
   _ORDERREQUEST.fields_by_name['order_checkout'])
 _ORDERREQUEST.fields_by_name['order_checkout'].containing_oneof = _ORDERREQUEST.oneofs_by_name['message']
 _ORDER.fields_by_name['request_info'].message_type = general__pb2._REQUESTINFO
-_ORDER.fields_by_name['items'].message_type = _ITEM
 _ORDER.fields_by_name['intent'].enum_type = _ORDER_INTENT
 _ORDER_INTENT.containing_type = _ORDER
 _ORDERSPAYFIND.fields_by_name['request_info'].message_type = general__pb2._REQUESTINFO
