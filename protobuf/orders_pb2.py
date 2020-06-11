@@ -399,6 +399,44 @@ _ORDERRESPONSE = _descriptor.Descriptor(
 )
 
 
+_ITEM = _descriptor.Descriptor(
+  name='Item',
+  full_name='orders.Item',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='item_id', full_name='orders.Item.item_id', index=0,
+      number=1, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='price', full_name='orders.Item.price', index=1,
+      number=2, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=862,
+  serialized_end=900,
+)
+
+
 _ORDER = _descriptor.Descriptor(
   name='Order',
   full_name='orders.Order',
@@ -614,6 +652,7 @@ _ORDERREQUEST.oneofs_by_name['message'].fields.append(
   _ORDERREQUEST.fields_by_name['order_checkout'])
 _ORDERREQUEST.fields_by_name['order_checkout'].containing_oneof = _ORDERREQUEST.oneofs_by_name['message']
 _ORDER.fields_by_name['request_info'].message_type = general__pb2._REQUESTINFO
+_ORDER.fields_by_name['items'].message_type = _ITEM
 _ORDER.fields_by_name['intent'].enum_type = _ORDER_INTENT
 _ORDER_INTENT.containing_type = _ORDER
 _ORDERSPAYFIND.fields_by_name['request_info'].message_type = general__pb2._REQUESTINFO
@@ -623,6 +662,7 @@ DESCRIPTOR.message_types_by_name['CreateOrder'] = _CREATEORDER
 DESCRIPTOR.message_types_by_name['CreateOrderResponse'] = _CREATEORDERRESPONSE
 DESCRIPTOR.message_types_by_name['OrderRequest'] = _ORDERREQUEST
 DESCRIPTOR.message_types_by_name['OrderResponse'] = _ORDERRESPONSE
+DESCRIPTOR.message_types_by_name['Item'] = _ITEM
 DESCRIPTOR.message_types_by_name['Order'] = _ORDER
 DESCRIPTOR.message_types_by_name['OrdersPayFind'] = _ORDERSPAYFIND
 DESCRIPTOR.message_types_by_name['OrderPaymentCancel'] = _ORDERPAYMENTCANCEL
@@ -696,6 +736,13 @@ OrderResponse = _reflection.GeneratedProtocolMessageType('OrderResponse', (_mess
   # @@protoc_insertion_point(class_scope:orders.OrderResponse)
   })
 _sym_db.RegisterMessage(OrderResponse)
+
+Item = _reflection.GeneratedProtocolMessageType('Item', (_message.Message,), {
+  'DESCRIPTOR' : _ITEM,
+  '__module__' : 'orders_pb2'
+  # @@protoc_insertion_point(class_scope:orders.Item)
+  })
+_sym_db.RegisterMessage(Item)
 
 Order = _reflection.GeneratedProtocolMessageType('Order', (_message.Message,), {
   'DESCRIPTOR' : _ORDER,
