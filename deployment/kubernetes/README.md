@@ -7,4 +7,6 @@
 It looks something like this `gcloud container clusters get-credentials CLUSTER_NAME --zone europe-west3-a --project PROJECT_NAME`.
 You need `gcloud` installed and logged in using `gcloud login`. 
 5) Verify it works by executing `kubectl get nodes`. It will show you the nodes in the cluster.
-6) Apply manifests of all folders. `kubectl apply -f .`
+6) Swap the KEY and SECRET in frontend-deployment.yaml.
+7) Swap the BROKER, KEY and SECRET in module.yaml and run `kubectl create configmap module --from-file=module_key=module.yaml`.
+8) Apply manifests of all folders. `kubectl apply -f .`
