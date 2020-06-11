@@ -32,7 +32,7 @@ def create_item(context, request: CreateItemRequest):
     - Only has one state (int) that saves the current id to be
     asigned to the next user """
 
-    logger.debug("Creating item...")
+    # logger.debug("Creating item...")
 
     # get the current id to assign
     state = context.state('count').unpack(Count)
@@ -55,7 +55,7 @@ def create_item(context, request: CreateItemRequest):
     context.pack_and_send("stock/stock", str(item_request.id), item_request)
 
 
-    logger.debug('Next state to assign is {}'.format(state.num))
+    # logger.debug('Next state to assign is {}'.format(state.num))
 
 @functions.bind("stock/stock")
 def manage_stock(context, request: typing.Union[StockRequest, CreateItemWithId]):
@@ -69,7 +69,7 @@ def manage_stock(context, request: typing.Union[StockRequest, CreateItemWithId])
         item_state.stock = 0
 
         context.state('item').pack(item_state)
-        logger.debug(f'Created new item with id {request.id}')
+        # logger.debug(f'Created new item with id {request.id}')
 
         response = ResponseMessage()
         response.result = json.dumps({'item_id': item_state.id})
@@ -85,7 +85,7 @@ def manage_stock(context, request: typing.Union[StockRequest, CreateItemWithId])
     elif isinstance(request, StockRequest):
         # check which field we have
         msg_type = request.WhichOneof('message')
-        logger.debug(f'Got message of type {msg_type}')
+        # logger.debug(f'Got message of type {msg_type}')
 
         if msg_type == "find_item":
             response = ResponseMessage()

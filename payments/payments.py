@@ -35,11 +35,11 @@ def payments_pay(context, request: typing.Union[
 
     # Incoming from Orders
     if isinstance(request, Order):
-        logger.debug(f'Received order request!')
+        # logger.debug(f'Received order request!')
         # If intent == PAY, request is initiated by Orders
 
         if request.intent == Order.Intent.PAY:
-            logger.debug(f'Sending payment request to user {request.user_id}')
+            # logger.debug(f'Sending payment request to user {request.user_id}')
             user_pay_request = set_worker_and_request_ids(request, UserPayRequest())
             user_pay_request.order_id = request.id
             user_pay_request.amount = request.total_cost
@@ -79,18 +79,18 @@ def payments_pay(context, request: typing.Union[
         elif request.request_type == PaymentRequest.RequestType.STATUS:
             orders_pay_find_request = set_worker_and_request_ids(request, OrdersPayFind())
             orders_pay_find_request.order_id = request.order_id
-            logger.debug(f"Sending message to the orders service {orders_pay_find_request}")
+            # logger.debug(f"Sending message to the orders service {orders_pay_find_request}")
             context.pack_and_send("orders/order", str(request.order_id), orders_pay_find_request)
 
     # Reply from Users
     elif isinstance(request, UserPayResponse):
 
-        logger.debug(f'Got reply from users! {request}')
+        # logger.debug(f'Got reply from users! {request}')
         payment_status = set_worker_and_request_ids(request, PaymentStatus())
         payment_status.order_id = request.order_id
         payment_status.actually_paid = request.success
 
-        logger.debug(f'Sending request to orders {payment_status}')
+        # logger.debug(f'Sending request to orders {payment_status}')
         context.pack_and_send("orders/order", str(request.order_id), payment_status)
 
     # Reply from Users

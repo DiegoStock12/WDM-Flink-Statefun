@@ -63,7 +63,7 @@ async def consume_forever(consumer: AIOKafkaConsumer):
     async for msg in consumer:
         # if the message is for our worker, get it
         if msg.key.decode('utf-8') == WORKER_ID:
-            logger.info(f'Received message! {msg.value}')
+            # logger.info(f'Received message! {msg.value}')
 
             resp = ResponseMessage()
             resp.ParseFromString(msg.value)
@@ -71,8 +71,8 @@ async def consume_forever(consumer: AIOKafkaConsumer):
             # set the result of the future in the dict
             if resp.request_id in messages:
                 messages[resp.request_id].set_result(resp.result)
-            else:
-                logger.error('Received response for an unknown message')
+            # else:
+                logger.error(f'Received response for an unknown message with request id: {resp.request_id}')
 
 
 async def create_kafka_consumer(app: web.Application):
@@ -192,7 +192,7 @@ async def send_msg(topic: str, key: str, request):
         return result
 
     except asyncio.TimeoutError:
-        logger.error('Timeout while waiting for message')
+        logger.error(f'Timeout while waiting for message with request id: {request.request_info.request_id}')
 
         # clean the entry and raise
         del messages[request.request_info.request_id]

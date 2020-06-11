@@ -40,12 +40,12 @@ def create_user(context, create_user_request: CreateUserRequest):
     - Only has one state (int) that saves the current id to be
     asigned to the next user """
 
-    logger.debug("Creating user...")
+    # logger.debug("Creating user...")
 
     # get the current id to assign
     state = context.state('count').unpack(Count)
     if not state:
-        logger.debug("First user ever!")
+        # logger.debug("First user ever!")
         state = Count()
         state.num = 0
 
@@ -64,7 +64,7 @@ def create_user(context, create_user_request: CreateUserRequest):
     context.pack_and_send("users/user", str(request.id), request)
 
     # update the next id to assign and save
-    logger.debug('Next state to assign is {}'.format(state.num))
+    # logger.debug('Next state to assign is {}'.format(state.num))
 
 
 def copy_request_info(origin, destination):
@@ -97,7 +97,7 @@ def operate_user(context,
 
     if isinstance(request, UserPayRequest):
 
-        logger.debug('Received request to decrement user credit')
+        # logger.debug('Received request to decrement user credit')
         # calculate if the credit is enough to pay for the product
         # get the credit
         response = UserPayResponse()
@@ -128,7 +128,7 @@ def operate_user(context,
 
     elif isinstance(request, UserCancelPayRequest):
 
-        logger.debug('Received request to cancel a payment')
+        # logger.debug('Received request to cancel a payment')
         # add the amount specified to the user credit
         response = UserPayResponse()
         response.order_id = request.order_id
@@ -156,16 +156,16 @@ def operate_user(context,
     # -------------------------------------
 
     elif isinstance(request, UserRequest):
-        logger.debug("Received user request!")
+        # logger.debug("Received user request!")
 
         # check which field we have
         msg_type = request.WhichOneof('message')
-        logger.debug(f'Got message of type {msg_type}')
+        # logger.debug(f'Got message of type {msg_type}')
 
         if msg_type == 'find_user':
-            logger.debug('finding user')
+            # logger.debug('finding user')
 
-            logger.debug(f'Found user: {state.id}:{state.credit}')
+            # logger.debug(f'Found user: {state.id}:{state.credit}')
 
             response = ResponseMessage()
             response.result = json.dumps({'user_id': state.id,
@@ -174,7 +174,7 @@ def operate_user(context,
             context.state('user').pack(state)
 
         elif msg_type == 'remove_user':
-            logger.debug(f"Deleting user {request.remove_user.id}")
+            # logger.debug(f"Deleting user {request.remove_user.id}")
             del context['user']
 
             response = ResponseMessage()
@@ -185,8 +185,7 @@ def operate_user(context,
             state.credit += request.add_credit.amount
             context.state('user').pack(state)
 
-            logger.debug(
-                f"New credit for user {request.add_credit.id} is {state.credit}")
+            # logger.debug(f"New credit for user {request.add_credit.id} is {state.credit}")
 
             # send the reponse
             response = ResponseMessage()
@@ -202,14 +201,13 @@ def operate_user(context,
                 context.state('user').pack(state)
 
                 # response.result = "success"
-                logger.debug(
-                    f"New credit for user {request.subtract_credit.id} is {state.credit}")
+                # logger.debug(f"New credit for user {request.subtract_credit.id} is {state.credit}")
 
                 response.result = json.dumps({'result': 'success'})
 
             else:
                 response.result = json.dumps({'result': 'failure'})
-                logger.debug('Failure updating credit')
+                # logger.debug('Failure updating credit')
 
             # pack the state
             context.state('user').pack(state)
@@ -220,13 +218,13 @@ def operate_user(context,
         state.id = request.id
         state.credit = 0
         context.state('user').pack(state)
-        logger.debug(f'Created new user with id {request.id}')
+        # logger.debug(f'Created new user with id {request.id}')
 
         response = ResponseMessage()
         response.result = json.dumps({'user_id': state.id})
 
-    else:
-        logger.error('Received unknown message type!')
+    # else:
+        # logger.error('Received unknown message type!')
 
     # respond if needed
     if response:
