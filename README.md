@@ -10,6 +10,9 @@ Run the whole demo:
 Rebuild single container:
 * `docker-compose up -d --no-deps --build <service-name>`
 
+Rebuild everying after you changed files (do this before docker-compose up, otherwise it will stil run old containers):
+* `docker-compose build`
+
 Compile proto files example:
 * `protoc --proto_path=payments/protobuf/ --python_out=payments/ payments/protobuf/orders.proto`
 

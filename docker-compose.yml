@@ -46,6 +46,7 @@ services:
         volumes:
             - ./checkpoint-dir:/checkpoint-dir
 
+
     users-endpoint:
         build:
             context: .

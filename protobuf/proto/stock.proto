@@ -65,11 +65,12 @@ message StockRequest {
 
     // Internal messages for order service.
     bool internal = 6;
-    string order_id = 7;
+    int64 order_id = 7;
 }
 
 message StockResponse {
     RequestInfo request_info = 1;
     uint64 item_id = 2;
-    string result = 3;
+    uint64 price = 3;
+    string result = 4;
 }

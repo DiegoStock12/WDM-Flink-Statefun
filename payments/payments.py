@@ -32,38 +32,41 @@ functions = StatefulFunctions()
 @functions.bind('payments/pay')
 def payments_pay(context, request: typing.Union[
     PaymentRequest, UserPayRequest, Order, OrdersPayFind, UserPayResponse, OrderPaymentCancelReply]):
+
     # Incoming from Orders
     if isinstance(request, Order):
+        logger.debug(f'Received order request!')
         # If intent == PAY, request is initiated by Orders
 
         if request.intent == Order.Intent.PAY:
+            logger.debug(f'Sending payment request to user {request.user_id}')
             user_pay_request = set_worker_and_request_ids(request, UserPayRequest())
-            user_pay_request.order_id = request.order_id
+            user_pay_request.order_id = request.id
             user_pay_request.amount = request.total_cost
-            context.pack_and_send("users/user", request.user_id, user_pay_request)
+            context.pack_and_send("users/user", str(request.user_id), user_pay_request)
 
         # If intent == CANCEL or STATUS, this is a reply message to an earlier request
         elif request.intent == Order.Intent.CANCEL:
 
-            if request.paid == False:
+            if not request.paid:
                 # Payment cannot be cancelled cause it is not paid
                 response = ResponseMessage()
                 response.request_id = request.request_info.request_id
                 response.result = json.dumps({'result': 'failure'})
-                send_response(context, request.request_info.worker_id, response)
+                send_response(context, response,request.request_info.worker_id)
 
             # Otherwise send request to user to subtract the amount
-            elif request.paid == True:
+            elif request.paid:
                 user_pay_request = set_worker_and_request_ids(request, UserCancelPayRequest())
                 user_pay_request.order_id = request.order_id
                 user_pay_request.amount = request.total_cost
-                context.pack_and_send("users/user", request.user_id, user_pay_request)
+                context.pack_and_send("users/user", str(request.user_id), user_pay_request)
 
         elif request.intent == Order.Intent.STATUS:
             response = ResponseMessage()
             response.request_id = request.request_info.request_id
             response.result = json.dumps({'paid': True}) if request.paid else json.dumps({'paid': False})
-            send_response(context, request.request_info.worker_id, response)
+            send_response(context, response, request.request_info.worker_id)
 
     # Incoming from Flask
     elif isinstance(request, PaymentRequest):
@@ -71,24 +74,29 @@ def payments_pay(context, request: typing.Union[
         if request.request_type == PaymentRequest.RequestType.CANCEL:
             order_payment_cancel_request = set_worker_and_request_ids(request, OrderPaymentCancel())
             order_payment_cancel_request.order_id = request.order_id
-            context.pack_and_send("orders/order", request.order_id, order_payment_cancel_request)
+            context.pack_and_send("orders/order", str(request.order_id), order_payment_cancel_request)
 
         elif request.request_type == PaymentRequest.RequestType.STATUS:
             orders_pay_find_request = set_worker_and_request_ids(request, OrdersPayFind())
             orders_pay_find_request.order_id = request.order_id
-            context.pack_and_send("orders/order", request.order_id, orders_pay_find_request)
+            logger.debug(f"Sending message to the orders service {orders_pay_find_request}")
+            context.pack_and_send("orders/order", str(request.order_id), orders_pay_find_request)
 
     # Reply from Users
     elif isinstance(request, UserPayResponse):
+
+        logger.debug(f'Got reply from users! {request}')
         payment_status = set_worker_and_request_ids(request, PaymentStatus())
         payment_status.order_id = request.order_id
         payment_status.actually_paid = request.success
-        context.pack_and_send("orders/order", request.order_id, payment_status)
+
+        logger.debug(f'Sending request to orders {payment_status}')
+        context.pack_and_send("orders/order", str(request.order_id), payment_status)
 
     # Reply from Users
     elif isinstance(request, OrderPaymentCancelReply):
         response = ResponseMessage()
-        response.response_id = request.request_info.request_id
+        response.request_id = request.request_info.request_id
         response.result = json.dumps({'result': 'success'}) if request.success else json.dumps({'result': 'failure'})
         send_response(context, response, request.request_info.worker_id)
 

@@ -110,6 +110,10 @@ module:
                 typeUrl: com.googleapis/stock.StockRequest
                 targets:
                   - stock/stock
+              - topic: payments
+                typeUrl: com.googleapis/payment.PaymentRequest
+                targets:
+                  - payments/pay
             properties:
               - sasl.mechanism: PLAIN
               - security.protocol: SASL_SSL

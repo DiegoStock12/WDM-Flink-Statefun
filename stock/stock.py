@@ -32,7 +32,7 @@ def create_item(context, request: CreateItemRequest):
     - Only has one state (int) that saves the current id to be
     asigned to the next user """
 
-    logger.info("Creating item...")
+    logger.debug("Creating item...")
 
     # get the current id to assign
     state = context.state('count').unpack(Count)
@@ -42,16 +42,20 @@ def create_item(context, request: CreateItemRequest):
 
     item_request = CreateItemWithId()
     item_request.id = state.num
-    item_request.price = request.price
-    item_request.request_info.request_id = request.request_info.request_id
-    item_request.request_info.worker_id = request.request_info.worker_id
-    print(f"Sending request to function with id {item_request.id}", flush=True)
-    context.pack_and_send("stock/stock", str(item_request.id), item_request)
 
     # update the next id to assign and save
     state.num += 1
     context.state('count').pack(state)
-    logger.info('Next state to assign is {}'.format(state.num))
+
+
+    item_request.price = request.price
+    item_request.request_info.request_id = request.request_info.request_id
+    item_request.request_info.worker_id = request.request_info.worker_id
+    # print(f"Sending request to function with id {item_request.id}", flush=True)
+    context.pack_and_send("stock/stock", str(item_request.id), item_request)
+
+
+    logger.debug('Next state to assign is {}'.format(state.num))
 
 @functions.bind("stock/stock")
 def manage_stock(context, request: typing.Union[StockRequest, CreateItemWithId]):
@@ -71,11 +75,14 @@ def manage_stock(context, request: typing.Union[StockRequest, CreateItemWithId])
         response.result = json.dumps({'item_id': item_state.id})
     elif item_state is None:
         # Item does not exist yet. Return error.
-        response = ResponseMessage()
-        response.result = json.dumps({'result:': 'not_found'})
+        if not request.internal:
+            response = ResponseMessage()
+            response.result = json.dumps({'result:': 'not_found'})
+        else:
+            response = StockResponse()
+            response.item_id = request.subtract_stock.id
+            response.result = 'failure'
     elif isinstance(request, StockRequest):
-        logger.debug("Received stock request!")
-
         # check which field we have
         msg_type = request.WhichOneof('message')
         logger.debug(f'Got message of type {msg_type}')
@@ -83,17 +90,38 @@ def manage_stock(context, request: typing.Union[StockRequest, CreateItemWithId])
         if msg_type == "find_item":
             response = ResponseMessage()
             response.result = json.dumps({'id:': item_state.id, 'price': item_state.price, 'stock': item_state.stock})
+
+            context.state('item').pack(item_state)
+
         elif msg_type == "subtract_stock":
             new_amount = item_state.stock - request.subtract_stock.amount
-            response = ResponseMessage()
+            if not request.internal:
+                response = ResponseMessage()
+            else:
+                response = StockResponse()
 
             if new_amount >= 0:
                 item_state.stock -= request.subtract_stock.amount
 
+
                 context.state('item').pack(item_state)
-                response.result = json.dumps({'result': 'success', 'item_id': item_state.id})
+
+                if not request.internal:
+                    response.result = json.dumps({'result': 'success', 'item_id': item_state.id})
+                else:
+                    # Include the item id and price
+                    response.price = item_state.price
+                    response.item_id = item_state.id
+                    response.result = 'success'
             else:
-                response.result = json.dumps({'result': 'stock too low', 'item_id': item_state.id})
+                if not request.internal:
+                    response.result = json.dumps({'result': 'stock too low', 'item_id': item_state.id})
+                else:
+                    response.price = item_state.price
+                    response.item_id = item_state.id
+                    response.result = 'failure'
+
+                context.state('item').pack(item_state)
 
         elif msg_type == "add_stock":
             item_state.stock += request.add_stock.amount
@@ -106,9 +134,8 @@ def manage_stock(context, request: typing.Union[StockRequest, CreateItemWithId])
         # Use the same request id in the message body
         # and use the request worker_id as key of the message
 
-        response.request_id = request.request_info.request_id
-
         if not request.internal:
+            response.request_id = request.request_info.request_id
             # create the egress message and send it to the
             # users/out egress
             egress_message = kafka_egress_record(
@@ -118,6 +145,9 @@ def manage_stock(context, request: typing.Union[StockRequest, CreateItemWithId])
             )
             context.pack_and_send_egress("stock/out", egress_message)
         else:
+            response.request_info.request_id = request.request_info.request_id
+            response.request_info.worker_id = request.request_info.worker_id
+
             context.pack_and_send("orders/order", str(request.order_id), response)
 
 # Use the handler and expose the endpoint

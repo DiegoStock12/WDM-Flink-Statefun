@@ -7,9 +7,7 @@ COPY ./orders/requirements.txt /app
 RUN pip install -r requirements.txt
 
 COPY ./orders/orders.py /app
-COPY ./protobuf/orders_pb2.py /app
-COPY ./protobuf/users_pb2.py /app
-COPY ./protobuf/general_pb2.py /app
+COPY ./protobuf/*_pb2.py /app/
 
 EXPOSE 80
 

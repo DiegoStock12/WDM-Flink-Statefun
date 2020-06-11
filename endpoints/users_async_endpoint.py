@@ -29,7 +29,6 @@ async def create_user(request):
 
     # wait for the response asynchronously
     result = await send_msg(USER_CREATION_TOPIC, key="create", request=msg)
-
     return web.Response(text=result, content_type='application/json')
 
 

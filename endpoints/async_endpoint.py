@@ -7,7 +7,7 @@ import asyncio
 from ssl import create_default_context, Purpose
 
 # Messages exchanged with the stateful functions
-from general_pb2 import ResponseMessage
+from general_pb2 import ResponseMessage, RequestInfo
 
 # Async kafka producer and consumer
 from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
@@ -35,9 +35,10 @@ ssl_context = create_default_context(Purpose.SERVER_AUTH)
 USER_EVENTS_TOPIC = "user-events"
 ORDER_EVENTS_TOPIC = "order-events"
 STOCK_EVENTS_TOPIC = "stock-events"
+PAYMENT_EVENTS_TOPIC = "payment-events"
 
 # timeout for waiting for a server response
-TIMEOUT = 30
+TIMEOUT = 10
 
 # Where yet to answer request messages
 # are kept (request_id --> Future[json])
@@ -64,7 +65,6 @@ async def consume_forever(consumer: AIOKafkaConsumer):
         if msg.key.decode('utf-8') == WORKER_ID:
             logger.info(f'Received message! {msg.value}')
 
-            # TODO Maybe use some custom Response class with single json to return.
             resp = ResponseMessage()
             resp.ParseFromString(msg.value)
 
@@ -90,6 +90,9 @@ async def create_kafka_consumer(app: web.Application):
                 USER_EVENTS_TOPIC,
                 ORDER_EVENTS_TOPIC,
                 STOCK_EVENTS_TOPIC,
+                PAYMENT_EVENTS_TOPIC,
+                loop=asyncio.get_running_loop(),
+                bootstrap_servers=KAFKA_BROKER
                 loop=asyncio.get_event_loop(),
                 bootstrap_servers=os.environ['BROKER'],
                 security_protocol='SASL_SSL',
