@@ -45,7 +45,7 @@ async def payment_status(request):
     msg.order_id = order_id
     msg.request_type = PaymentRequest.RequestType.STATUS
 
-    logger.info('Payments sending message')
+    #logger.info('Payments sending message')
 
     result = await send_msg(PAYMENT_INPUT_TOPIC, key=order_id, request=msg)
 

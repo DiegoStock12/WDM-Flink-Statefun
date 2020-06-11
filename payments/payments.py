@@ -102,14 +102,14 @@ def set_worker_and_request_ids(message_in, message_out):
 
 def send_response(context, response_message, worker_id):
 
-    logger.debug(worker_id)
+    #logger.debug(worker_id)
     egress_message = kafka_egress_record(
         topic=PAYMENT_EVENTS_TOPIC,
         key=worker_id,
         value=response_message
     )
 
-    logger.info(f'Sending message {egress_message}')
+    #logger.info(f'Sending message {egress_message}')
     context.pack_and_send_egress("payments/out", egress_message)
 
 

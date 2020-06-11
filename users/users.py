@@ -61,7 +61,7 @@ def operate_user(context,
 
     if isinstance(request, UserPayRequest):
 
-        logger.debug('Received request to decrement user credit')
+        #logger.debug('Received request to decrement user credit')
         # calculate if the credit is enough to pay for the product
         # get the credit
         response = UserPayResponse()
@@ -92,7 +92,7 @@ def operate_user(context,
 
     elif isinstance(request, UserCancelPayRequest):
 
-        logger.debug('Received request to cancel a payment')
+        #logger.debug('Received request to cancel a payment')
         # add the amount specified to the user credit
         response = UserPayResponse()
         response.order_id = request.order_id
@@ -125,7 +125,7 @@ def operate_user(context,
         state.id = request.id
         state.credit = 0
 
-        logger.debug(f'Created new user with id {request.id}')
+        #logger.debug(f'Created new user with id {request.id}')
         context.state('user').pack(state)
 
         response = ResponseMessage()
@@ -135,7 +135,7 @@ def operate_user(context,
 
         # check which field we have
         msg_type = request.WhichOneof('message')
-        logger.debug(f'Got message of type {msg_type}')
+        #logger.debug(f'Got message of type {msg_type}')
 
         # If the state is None we return an error
         if not state:
@@ -183,7 +183,7 @@ def operate_user(context,
                     response.result = json.dumps({'result': 'failure'})
 
     else:
-        logger.error('Received unknown message type!')
+        #logger.error('Received unknown message type!')
 
     # respond if needed
     if response:

@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: orders
-        image: "gcr.io/wdm-statefun/order_service"
+        image: "gcr.io/wdm-statefun/order_service:dd0342b4"
         ports:
           - containerPort: 80
         resources:

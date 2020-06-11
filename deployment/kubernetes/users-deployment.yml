@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: users
-        image: "gcr.io/wdm-statefun/user_service"
+        image: "gcr.io/wdm-statefun/user_service:dd0342b4"
         ports:
           - containerPort: 80
         resources:
