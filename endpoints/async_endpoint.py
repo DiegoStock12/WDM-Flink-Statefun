@@ -1,29 +1,26 @@
 """ Asynchronous web server with aiohttp and kafka-aio"""
 
+import asyncio
+# create the logger and configure
+import logging
+import time
+import uuid
+from ssl import create_default_context, Purpose
+from typing import Dict, Awaitable
+
 # main async web server
 from aiohttp import web
-import asyncio
-
-from ssl import create_default_context, Purpose
-
-# Messages exchanged with the stateful functions
-from general_pb2 import ResponseMessage, RequestInfo
-
 # Async kafka producer and consumer
 from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 from aiokafka.errors import KafkaConnectionError, NoBrokersAvailable
 
-# create the logger and configure
-import logging
-import uuid
-import json
-import time
-import os
-
-from typing import Dict, Awaitable
+# Messages exchanged with the stateful functions
+from general_pb2 import ResponseMessage
 
 FORMAT = '[%(asctime)s] %(levelname)-8s %(message)s'
 logging.basicConfig(level=logging.INFO, format=FORMAT)
+
+import os
 
 logger = logging.getLogger()
 
@@ -38,7 +35,7 @@ STOCK_EVENTS_TOPIC = "stock-events"
 PAYMENT_EVENTS_TOPIC = "payment-events"
 
 # timeout for waiting for a server response
-TIMEOUT = 10
+TIMEOUT = 20
 
 # Where yet to answer request messages
 # are kept (request_id --> Future[json])
@@ -63,7 +60,6 @@ async def consume_forever(consumer: AIOKafkaConsumer):
     async for msg in consumer:
         # if the message is for our worker, get it
         if msg.key.decode('utf-8') == WORKER_ID:
-            logger.info(f'Received message! {msg.value}')
 
             resp = ResponseMessage()
             resp.ParseFromString(msg.value)
@@ -92,8 +88,6 @@ async def create_kafka_consumer(app: web.Application):
                 STOCK_EVENTS_TOPIC,
                 PAYMENT_EVENTS_TOPIC,
                 loop=asyncio.get_running_loop(),
-                bootstrap_servers=KAFKA_BROKER
-                loop=asyncio.get_event_loop(),
                 bootstrap_servers=os.environ['BROKER'],
                 security_protocol='SASL_SSL',
                 ssl_context=ssl_context,

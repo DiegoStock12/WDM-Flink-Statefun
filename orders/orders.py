@@ -3,9 +3,8 @@ import logging
 import typing
 import json
 
-from orders_pb2 import Order, CreateOrder, CreateOrderWithId, CreateOrderResponse, OrderRequest, OrderResponse, \
+from orders_pb2 import Order, CreateOrder, OrderRequest, \
     OrdersPayFind, OrderPaymentCancel, OrderPaymentCancelReply
-from users_pb2 import Count
 from general_pb2 import ResponseMessage
 from payment_pb2 import PaymentStatus
 from stock_pb2 import StockRequest, StockResponse
@@ -24,47 +23,16 @@ ORDER_EVENTS_TOPIC = "order-events"
 item_to_price = {}
 
 
-@functions.bind("orders/create")
-def create_order(context, msg: CreateOrder):
-    """ Creates an order by sending a message to the order function 
-    - Only has one state (int) that saves the current id to be 
-    assigned to the next order """
-
-    logger.debug("Creating order...")
-
-    # get the current id to assign
-    state = context.state('count').unpack(Count)
-
-    if not state:
-        state = Count()
-        state.num = 1
-
-    request = CreateOrderWithId()
-    request.id = state.num
-    request.user_id = msg.user_id
-    request.request_info.request_id = msg.request_info.request_id
-    request.request_info.worker_id = msg.request_info.worker_id
-
-    # print(f"Sending request to function with id {request.id}", flush=True)
-    context.pack_and_send("orders/order", str(request.id), request)
-
-    # update the next id to assign and save
-    state.num += 1
-    context.state('count').pack(state)
-    logger.debug('Next state to assign is {}'.format(state.num))
-
-
 @functions.bind("orders/order")
-def operate_order(context, msg: typing.Union[CreateOrderWithId, OrderRequest, OrdersPayFind,
+def operate_order(context, msg: typing.Union[CreateOrder, OrderRequest, OrdersPayFind,
                                              OrderPaymentCancel, PaymentStatus, StockResponse]):
     """ Does all the operations with a single order """
     response = None
 
-    if isinstance(msg, CreateOrderWithId):
+    if isinstance(msg, CreateOrder):
         response = create_order_with_id(context, msg)
 
     elif isinstance(msg, OrderRequest):
-        logger.debug("Received order request!")
 
         msg_type = msg.WhichOneof('message')
         logger.debug(f'Got message of type {msg_type}')
@@ -100,7 +68,6 @@ def operate_order(context, msg: typing.Union[CreateOrderWithId, OrderRequest, Or
         logger.error('Received unknown message type!')
 
     if response:
-        logger.debug("Sending a response.")
         response.request_id = msg.request_info.request_id
         egress_message = kafka_egress_record(
             topic=ORDER_EVENTS_TOPIC,
@@ -130,10 +97,8 @@ def remove_order(context, msg):
     state = context.state('order').unpack(Order)
     response = ResponseMessage()
     if not state:
-        logger.debug("Order does not exists.")
         response.result = json.dumps({'result': 'failure', 'message': 'Order does not exist.'})
     else:
-        logger.debug(f"Deleting the order with id: {msg.remove_order.id}")
         del context['order']
         response.result = json.dumps({'result': 'success'})
 
@@ -146,16 +111,13 @@ def find_order(context, msg):
     state = context.state('order').unpack(Order)
     response = ResponseMessage()
     if not state:
-        logger.debug("Order does not exist.")
         response.result = json.dumps({'result': 'failure', 'message': 'Order does not exist.'})
     else:
-        logger.debug(f"Returning order with id: {msg.find_order.id}")
 
         # Have to assign all like this so they're not casted to string
         response.result = json.dumps({'id': state.id, 'user_id': state.user_id,
                                       'items': [i for i in state.items], 'total_cost': state.total_cost,
                                       'paid': state.paid, 'intent': state.intent})
-        logger.debug(f"{response.result}")
 
     context.state('order').pack(state)
 
@@ -166,7 +128,6 @@ def add_item(context, msg):
     state = context.state('order').unpack(Order)
     if not state:
         response = ResponseMessage()
-        logger.debug("Order does not exist.")
         response.result = json.dumps({'result': 'failure', 'message': 'Order does not exist.'})
 
         return response
@@ -183,7 +144,6 @@ def add_item(context, msg):
         context.state('order').pack(state)
 
         context.pack_and_send("stock/stock", str(msg.add_item.itemId), subtract_stock_request)
-        logger.debug("Sent request to ")
 
 
 def remove_item(context, msg):
@@ -191,7 +151,6 @@ def remove_item(context, msg):
     state = context.state('order').unpack(Order)
     response = ResponseMessage()
     if not state:
-        logger.debug("Order does not exist.")
         response.result = json.dumps({'result': 'failure',
                                       'message': 'Order does not exist.'})
     else:
@@ -199,12 +158,12 @@ def remove_item(context, msg):
         item_to_delete = msg.remove_item.itemId
         item_index = -1
         for i in range(len(items)):
-            logger.debug(f"{items[i]}")
             if items[i] == item_to_delete:
                 item_index = i
         if item_index != -1:
             del state.items[item_index]
-            logger.debug(f'{item_to_price}')
+
+
             state.total_cost -= item_to_price[item_to_delete]
             logger.debug(f"Removing item {item_to_delete} from order {orderId}")
             response.result = json.dumps({'result': 'success'})
@@ -242,10 +201,10 @@ def order_checkout(context, msg):
     request.paid = state.paid
     request.intent = Order.Intent.PAY
 
+    logger.debug(f'Sending order check to payments {request}')
     # send to payment service
     context.pack_and_send("payments/pay", str(request.id), request)
 
-    logger.debug('Sent the message to payments')
 
 
 def order_payment_find(context, msg):
@@ -261,7 +220,7 @@ def order_payment_find(context, msg):
     request.paid = state.paid
     request.intent = Order.Intent.STATUS
 
-    context.pack_and_send("payments/pay", str(msg.order_id), request)
+    context.pack_and_send("payments/pay", msg.order_id, request)
 
 
 def order_payment_cancel(context, msg):

@@ -4,16 +4,7 @@ module:
     type: remote
   spec:
     functions:
-      - function:
-          meta:
-            kind: http
-            type: users/create
-          spec:
-            endpoint: http://users-endpoint:8000/statefun
-            states:
-              - count
-            maxNumBatchRequests: 500
-            timeout: 2min
+
       - function:
           meta:
             kind: http
@@ -28,17 +19,6 @@ module:
       - function:
           meta:
             kind: http
-            type: orders/create
-          spec:
-            endpoint: http://orders-endpoint:8001/statefun
-            states:
-              - count
-            maxNumBatchRequests: 500
-            timeout: 2min
-
-      - function:
-          meta:
-            kind: http
             type: orders/order
           spec:
             endpoint: http://orders-endpoint:8001/statefun
@@ -46,16 +26,7 @@ module:
               - order
             maxNumBatchRequests: 500
             timeout: 2min
-      - function:
-          meta:
-            kind: http
-            type: stock/create
-          spec:
-            endpoint: http://stock-endpoint:8002/statefun
-            states:
-              - count
-            maxNumBatchRequests: 500
-            timeout: 2min
+
       - function:
           meta:
             kind: http
@@ -89,7 +60,7 @@ module:
               - topic: users-create
                 typeUrl: com.googleapis/users.CreateUserRequest
                 targets:
-                  - users/create
+                  - users/user
               - topic: users
                 typeUrl: com.googleapis/users.UserRequest
                 targets:
@@ -97,7 +68,7 @@ module:
               - topic: orders-create
                 typeUrl: com.googleapis/orders.CreateOrder
                 targets:
-                  - orders/create
+                  - orders/order
               - topic: orders
                 typeUrl: com.googleapis/orders.OrderRequest
                 targets:
@@ -105,11 +76,15 @@ module:
               - topic: stock-create
                 typeUrl: com.googleapis/stock.CreateItemRequest
                 targets:
-                  - stock/create
+                  - stock/stock
               - topic: stock
                 typeUrl: com.googleapis/stock.StockRequest
                 targets:
                   - stock/stock
+              - topic: payments
+                typeUrl: com.googleapis/payment.PaymentRequest
+                targets:
+                  - payments/pay
     egresses:
       - egress:
           meta:

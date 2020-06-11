@@ -1,11 +1,10 @@
 from aiohttp import web
-import asyncio
-
-from async_endpoint import app, send_msg, messages, WORKER_ID
+from async_endpoint import send_msg
 from stock_pb2 import *
 
 # create the logger and configure
 import logging
+import uuid
 
 # define the routes object
 routes_stock = web.RouteTableDef()
@@ -26,15 +25,20 @@ STOCK_EVENTS_TOPIC = "stock-events"
 async def stock_create_item(request):
     price = int(request.match_info['price'])
 
+    item_id = str(uuid.uuid4())
+
     msg = CreateItemRequest()
     msg.price = price
+    msg.id = item_id
 
-    result = await send_msg(STOCK_CREATION_TOPIC, key="create", request=msg)
+
+    result = await send_msg(STOCK_CREATION_TOPIC, key=item_id, request=msg)
     return web.Response(text=result, content_type='application/json')
+
 
 @routes_stock.get('/stock/find/{item_id}')
 async def stock_find_item(request):
-    item_id = int(request.match_info['item_id'])
+    item_id = request.match_info['item_id']
 
     msg = StockRequest()
     msg.find_item.id = item_id
@@ -46,9 +50,10 @@ async def stock_find_item(request):
 
     return web.Response(text=result, content_type='application/json')
 
+
 @routes_stock.post('/stock/add/{item_id}/{number}')
 async def item_add_stock(request):
-    item_id = int(request.match_info['item_id'])
+    item_id = request.match_info['item_id']
     number = int(request.match_info['number'])
 
     msg = StockRequest()
@@ -62,9 +67,10 @@ async def item_add_stock(request):
 
     return web.Response(text=result, content_type='application/json')
 
+
 @routes_stock.post('/stock/subtract/{item_id}/{number}')
 async def item_substract_stock(request):
-    item_id = int(request.match_info['item_id'])
+    item_id = request.match_info['item_id']
     number = int(request.match_info['number'])
 
     msg = StockRequest()

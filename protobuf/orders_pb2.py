@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='orders',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=b'\n\x0corders.proto\x12\x06orders\x1a\rgeneral.proto\"B\n\x0b\x43reateOrder\x12\x0f\n\x07user_id\x18\x01 \x01(\x03\x12\"\n\x0crequest_info\x18\x02 \x01(\x0b\x32\x0c.RequestInfo\"T\n\x11\x43reateOrderWithId\x12\n\n\x02id\x18\x01 \x01(\x03\x12\x0f\n\x07user_id\x18\x02 \x01(\x03\x12\"\n\x0crequest_info\x18\x03 \x01(\x0b\x32\x0c.RequestInfo\"&\n\x13\x43reateOrderResponse\x12\x0f\n\x07orderId\x18\x01 \x01(\x03\"\xbd\x04\n\x0cOrderRequest\x12\"\n\x0crequest_info\x18\x01 \x01(\x0b\x32\x0c.RequestInfo\x12?\n\x0cremove_order\x18\x02 \x01(\x0b\x32\'.orders.OrderRequest.RemoveOrderRequestH\x00\x12;\n\nfind_order\x18\x03 \x01(\x0b\x32%.orders.OrderRequest.FindOrderRequestH\x00\x12\x37\n\x08\x61\x64\x64_item\x18\x04 \x01(\x0b\x32#.orders.OrderRequest.AddItemRequestH\x00\x12=\n\x0bremove_item\x18\x05 \x01(\x0b\x32&.orders.OrderRequest.RemoveItemRequestH\x00\x12\x43\n\x0eorder_checkout\x18\x06 \x01(\x0b\x32).orders.OrderRequest.OrderCheckoutRequestH\x00\x1a \n\x12RemoveOrderRequest\x12\n\n\x02id\x18\x01 \x01(\x03\x1a\x1e\n\x10\x46indOrderRequest\x12\n\n\x02id\x18\x01 \x01(\x03\x1a,\n\x0e\x41\x64\x64ItemRequest\x12\n\n\x02id\x18\x01 \x01(\x03\x12\x0e\n\x06itemId\x18\x02 \x01(\x03\x1a/\n\x11RemoveItemRequest\x12\n\n\x02id\x18\x01 \x01(\x03\x12\x0e\n\x06itemId\x18\x02 \x01(\x03\x1a\"\n\x14OrderCheckoutRequest\x12\n\n\x02id\x18\x01 \x01(\x03\x42\t\n\x07message\"3\n\rOrderResponse\x12\x12\n\nrequest_id\x18\x01 \x01(\t\x12\x0e\n\x06result\x18\x02 \x01(\t\"\xca\x01\n\x05Order\x12\n\n\x02id\x18\x01 \x01(\x03\x12\"\n\x0crequest_info\x18\x02 \x01(\x0b\x32\x0c.RequestInfo\x12\x0f\n\x07user_id\x18\x03 \x01(\x03\x12\r\n\x05items\x18\x04 \x03(\x03\x12\x12\n\ntotal_cost\x18\x05 \x01(\x03\x12\x0c\n\x04paid\x18\x06 \x01(\x08\x12$\n\x06intent\x18\x07 \x01(\x0e\x32\x14.orders.Order.Intent\")\n\x06Intent\x12\x07\n\x03PAY\x10\x00\x12\n\n\x06\x43\x41NCEL\x10\x01\x12\n\n\x06STATUS\x10\x02\"E\n\rOrdersPayFind\x12\"\n\x0crequest_info\x18\x01 \x01(\x0b\x32\x0c.RequestInfo\x12\x10\n\x08order_id\x18\x02 \x01(\x03\"J\n\x12OrderPaymentCancel\x12\"\n\x0crequest_info\x18\x01 \x01(\x0b\x32\x0c.RequestInfo\x12\x10\n\x08order_id\x18\x02 \x01(\x03\"N\n\x17OrderPaymentCancelReply\x12\"\n\x0crequest_info\x18\x01 \x01(\x0b\x32\x0c.RequestInfo\x12\x0f\n\x07success\x18\x02 \x01(\x08\x62\x06proto3'
+  serialized_pb=b'\n\x0corders.proto\x12\x06orders\x1a\rgeneral.proto\"N\n\x0b\x43reateOrder\x12\x0f\n\x07user_id\x18\x01 \x01(\t\x12\n\n\x02id\x18\x02 \x01(\t\x12\"\n\x0crequest_info\x18\x03 \x01(\x0b\x32\x0c.RequestInfo\"&\n\x13\x43reateOrderResponse\x12\x0f\n\x07orderId\x18\x01 \x01(\t\"\xbd\x04\n\x0cOrderRequest\x12\"\n\x0crequest_info\x18\x01 \x01(\x0b\x32\x0c.RequestInfo\x12?\n\x0cremove_order\x18\x02 \x01(\x0b\x32\'.orders.OrderRequest.RemoveOrderRequestH\x00\x12;\n\nfind_order\x18\x03 \x01(\x0b\x32%.orders.OrderRequest.FindOrderRequestH\x00\x12\x37\n\x08\x61\x64\x64_item\x18\x04 \x01(\x0b\x32#.orders.OrderRequest.AddItemRequestH\x00\x12=\n\x0bremove_item\x18\x05 \x01(\x0b\x32&.orders.OrderRequest.RemoveItemRequestH\x00\x12\x43\n\x0eorder_checkout\x18\x06 \x01(\x0b\x32).orders.OrderRequest.OrderCheckoutRequestH\x00\x1a \n\x12RemoveOrderRequest\x12\n\n\x02id\x18\x01 \x01(\t\x1a\x1e\n\x10\x46indOrderRequest\x12\n\n\x02id\x18\x01 \x01(\t\x1a,\n\x0e\x41\x64\x64ItemRequest\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06itemId\x18\x02 \x01(\t\x1a/\n\x11RemoveItemRequest\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06itemId\x18\x02 \x01(\t\x1a\"\n\x14OrderCheckoutRequest\x12\n\n\x02id\x18\x01 \x01(\tB\t\n\x07message\"3\n\rOrderResponse\x12\x12\n\nrequest_id\x18\x01 \x01(\t\x12\x0e\n\x06result\x18\x02 \x01(\t\"\xca\x01\n\x05Order\x12\n\n\x02id\x18\x01 \x01(\t\x12\"\n\x0crequest_info\x18\x02 \x01(\x0b\x32\x0c.RequestInfo\x12\x0f\n\x07user_id\x18\x03 \x01(\t\x12\r\n\x05items\x18\x04 \x03(\t\x12\x12\n\ntotal_cost\x18\x05 \x01(\x03\x12\x0c\n\x04paid\x18\x06 \x01(\x08\x12$\n\x06intent\x18\x07 \x01(\x0e\x32\x14.orders.Order.Intent\")\n\x06Intent\x12\x07\n\x03PAY\x10\x00\x12\n\n\x06\x43\x41NCEL\x10\x01\x12\n\n\x06STATUS\x10\x02\"E\n\rOrdersPayFind\x12\"\n\x0crequest_info\x18\x01 \x01(\x0b\x32\x0c.RequestInfo\x12\x10\n\x08order_id\x18\x02 \x01(\t\"J\n\x12OrderPaymentCancel\x12\"\n\x0crequest_info\x18\x01 \x01(\x0b\x32\x0c.RequestInfo\x12\x10\n\x08order_id\x18\x02 \x01(\t\"N\n\x17OrderPaymentCancelReply\x12\"\n\x0crequest_info\x18\x01 \x01(\x0b\x32\x0c.RequestInfo\x12\x0f\n\x07success\x18\x02 \x01(\x08\x62\x06proto3'
   ,
   dependencies=[general__pb2.DESCRIPTOR,])
 
@@ -46,8 +46,8 @@ _ORDER_INTENT = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=1024,
-  serialized_end=1065,
+  serialized_start=950,
+  serialized_end=991,
 )
 _sym_db.RegisterEnumDescriptor(_ORDER_INTENT)
 
@@ -61,58 +61,20 @@ _CREATEORDER = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='user_id', full_name='orders.CreateOrder.user_id', index=0,
-      number=1, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='request_info', full_name='orders.CreateOrder.request_info', index=1,
-      number=2, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=39,
-  serialized_end=105,
-)
-
-
-_CREATEORDERWITHID = _descriptor.Descriptor(
-  name='CreateOrderWithId',
-  full_name='orders.CreateOrderWithId',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='id', full_name='orders.CreateOrderWithId.id', index=0,
-      number=1, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
+      name='id', full_name='orders.CreateOrder.id', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='user_id', full_name='orders.CreateOrderWithId.user_id', index=1,
-      number=2, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='request_info', full_name='orders.CreateOrderWithId.request_info', index=2,
+      name='request_info', full_name='orders.CreateOrder.request_info', index=2,
       number=3, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -130,8 +92,8 @@ _CREATEORDERWITHID = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=107,
-  serialized_end=191,
+  serialized_start=39,
+  serialized_end=117,
 )
 
 
@@ -144,8 +106,8 @@ _CREATEORDERRESPONSE = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='orderId', full_name='orders.CreateOrderResponse.orderId', index=0,
-      number=1, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
@@ -161,8 +123,8 @@ _CREATEORDERRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=193,
-  serialized_end=231,
+  serialized_start=119,
+  serialized_end=157,
 )
 
 
@@ -175,8 +137,8 @@ _ORDERREQUEST_REMOVEORDERREQUEST = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='id', full_name='orders.OrderRequest.RemoveOrderRequest.id', index=0,
-      number=1, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
@@ -192,8 +154,8 @@ _ORDERREQUEST_REMOVEORDERREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=601,
-  serialized_end=633,
+  serialized_start=527,
+  serialized_end=559,
 )
 
 _ORDERREQUEST_FINDORDERREQUEST = _descriptor.Descriptor(
@@ -205,8 +167,8 @@ _ORDERREQUEST_FINDORDERREQUEST = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='id', full_name='orders.OrderRequest.FindOrderRequest.id', index=0,
-      number=1, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
@@ -222,8 +184,8 @@ _ORDERREQUEST_FINDORDERREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=635,
-  serialized_end=665,
+  serialized_start=561,
+  serialized_end=591,
 )
 
 _ORDERREQUEST_ADDITEMREQUEST = _descriptor.Descriptor(
@@ -235,15 +197,15 @@ _ORDERREQUEST_ADDITEMREQUEST = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='id', full_name='orders.OrderRequest.AddItemRequest.id', index=0,
-      number=1, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='itemId', full_name='orders.OrderRequest.AddItemRequest.itemId', index=1,
-      number=2, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
@@ -259,8 +221,8 @@ _ORDERREQUEST_ADDITEMREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=667,
-  serialized_end=711,
+  serialized_start=593,
+  serialized_end=637,
 )
 
 _ORDERREQUEST_REMOVEITEMREQUEST = _descriptor.Descriptor(
@@ -272,15 +234,15 @@ _ORDERREQUEST_REMOVEITEMREQUEST = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='id', full_name='orders.OrderRequest.RemoveItemRequest.id', index=0,
-      number=1, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='itemId', full_name='orders.OrderRequest.RemoveItemRequest.itemId', index=1,
-      number=2, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
@@ -296,8 +258,8 @@ _ORDERREQUEST_REMOVEITEMREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=713,
-  serialized_end=760,
+  serialized_start=639,
+  serialized_end=686,
 )
 
 _ORDERREQUEST_ORDERCHECKOUTREQUEST = _descriptor.Descriptor(
@@ -309,8 +271,8 @@ _ORDERREQUEST_ORDERCHECKOUTREQUEST = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='id', full_name='orders.OrderRequest.OrderCheckoutRequest.id', index=0,
-      number=1, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
@@ -326,8 +288,8 @@ _ORDERREQUEST_ORDERCHECKOUTREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=762,
-  serialized_end=796,
+  serialized_start=688,
+  serialized_end=722,
 )
 
 _ORDERREQUEST = _descriptor.Descriptor(
@@ -394,8 +356,8 @@ _ORDERREQUEST = _descriptor.Descriptor(
       name='message', full_name='orders.OrderRequest.message',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=234,
-  serialized_end=807,
+  serialized_start=160,
+  serialized_end=733,
 )
 
 
@@ -432,8 +394,8 @@ _ORDERRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=809,
-  serialized_end=860,
+  serialized_start=735,
+  serialized_end=786,
 )
 
 
@@ -446,8 +408,8 @@ _ORDER = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='id', full_name='orders.Order.id', index=0,
-      number=1, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
@@ -460,14 +422,14 @@ _ORDER = _descriptor.Descriptor(
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='user_id', full_name='orders.Order.user_id', index=2,
-      number=3, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='items', full_name='orders.Order.items', index=3,
-      number=4, type=3, cpp_type=2, label=3,
+      number=4, type=9, cpp_type=9, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -506,8 +468,8 @@ _ORDER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=863,
-  serialized_end=1065,
+  serialized_start=789,
+  serialized_end=991,
 )
 
 
@@ -527,8 +489,8 @@ _ORDERSPAYFIND = _descriptor.Descriptor(
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='order_id', full_name='orders.OrdersPayFind.order_id', index=1,
-      number=2, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
@@ -544,8 +506,8 @@ _ORDERSPAYFIND = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1067,
-  serialized_end=1136,
+  serialized_start=993,
+  serialized_end=1062,
 )
 
 
@@ -565,8 +527,8 @@ _ORDERPAYMENTCANCEL = _descriptor.Descriptor(
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='order_id', full_name='orders.OrderPaymentCancel.order_id', index=1,
-      number=2, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
@@ -582,8 +544,8 @@ _ORDERPAYMENTCANCEL = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1138,
-  serialized_end=1212,
+  serialized_start=1064,
+  serialized_end=1138,
 )
 
 
@@ -620,12 +582,11 @@ _ORDERPAYMENTCANCELREPLY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1214,
-  serialized_end=1292,
+  serialized_start=1140,
+  serialized_end=1218,
 )
 
 _CREATEORDER.fields_by_name['request_info'].message_type = general__pb2._REQUESTINFO
-_CREATEORDERWITHID.fields_by_name['request_info'].message_type = general__pb2._REQUESTINFO
 _ORDERREQUEST_REMOVEORDERREQUEST.containing_type = _ORDERREQUEST
 _ORDERREQUEST_FINDORDERREQUEST.containing_type = _ORDERREQUEST
 _ORDERREQUEST_ADDITEMREQUEST.containing_type = _ORDERREQUEST
@@ -659,7 +620,6 @@ _ORDERSPAYFIND.fields_by_name['request_info'].message_type = general__pb2._REQUE
 _ORDERPAYMENTCANCEL.fields_by_name['request_info'].message_type = general__pb2._REQUESTINFO
 _ORDERPAYMENTCANCELREPLY.fields_by_name['request_info'].message_type = general__pb2._REQUESTINFO
 DESCRIPTOR.message_types_by_name['CreateOrder'] = _CREATEORDER
-DESCRIPTOR.message_types_by_name['CreateOrderWithId'] = _CREATEORDERWITHID
 DESCRIPTOR.message_types_by_name['CreateOrderResponse'] = _CREATEORDERRESPONSE
 DESCRIPTOR.message_types_by_name['OrderRequest'] = _ORDERREQUEST
 DESCRIPTOR.message_types_by_name['OrderResponse'] = _ORDERRESPONSE
@@ -675,13 +635,6 @@ CreateOrder = _reflection.GeneratedProtocolMessageType('CreateOrder', (_message.
   # @@protoc_insertion_point(class_scope:orders.CreateOrder)
   })
 _sym_db.RegisterMessage(CreateOrder)
-
-CreateOrderWithId = _reflection.GeneratedProtocolMessageType('CreateOrderWithId', (_message.Message,), {
-  'DESCRIPTOR' : _CREATEORDERWITHID,
-  '__module__' : 'orders_pb2'
-  # @@protoc_insertion_point(class_scope:orders.CreateOrderWithId)
-  })
-_sym_db.RegisterMessage(CreateOrderWithId)
 
 CreateOrderResponse = _reflection.GeneratedProtocolMessageType('CreateOrderResponse', (_message.Message,), {
   'DESCRIPTOR' : _CREATEORDERRESPONSE,
