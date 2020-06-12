@@ -24,7 +24,7 @@ STOCK_EVENTS_TOPIC = "stock-events"
 
 
 @functions.bind("stock/stock")
-def manage_stock(context, request: typing.Union[StockRequest, CreateItemRequest]):
+def manage_stock(context, request: typing.Union[StockRequest, CreateItemRequest, OrderAddItemStockRequest]):
     # Get the current state.
     item_state: ItemData = context.state('item').unpack(ItemData)
 
@@ -39,6 +39,14 @@ def manage_stock(context, request: typing.Union[StockRequest, CreateItemRequest]
 
         response = ResponseMessage()
         response.result = json.dumps({'item_id': item_state.id})
+
+    elif isinstance(request, OrderAddItemStockRequest):
+        response = None
+        if item_state is None:
+            pass
+        else:
+            item_state.stock += request.amount
+            context.state('item').pack(item_state)
 
     elif isinstance(request, StockRequest):
 

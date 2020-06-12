@@ -6,7 +6,7 @@ import json
 from orders_pb2 import *
 from general_pb2 import ResponseMessage
 from payment_pb2 import PaymentStatus
-from stock_pb2 import StockRequest, StockResponse
+from stock_pb2 import StockRequest, StockResponse, OrderAddItemStockRequest
 
 from statefun import StatefulFunctions, RequestReplyHandler, kafka_egress_record
 
@@ -49,7 +49,7 @@ def operate_order(context, msg: typing.Union[CreateOrder, OrderRequest, OrdersPa
             response = remove_item(context, msg)
 
         elif msg_type == 'order_checkout':
-            order_checkout(context, msg)
+            response = order_checkout(context, msg)
 
     elif isinstance(msg, OrdersPayFind):
         order_payment_find(context, msg)
@@ -109,11 +109,11 @@ def remove_order(context, msg):
                 item_to_count[id] = item_to_count[id] + 1
 
         for id, cnt in item_to_count.items():
-            add_stock_request = StockRequest()
+            add_stock_request = OrderAddItemStockRequest()
             add_stock_request.request_info.worker_id = msg.request_info.worker_id
             add_stock_request.request_info.request_id = msg.request_info.request_id
-            add_stock_request.add_stock.id = id
-            add_stock_request.add_stock.amount = cnt
+            add_stock_request.id = id
+            add_stock_request.amount = cnt
 
             # logger.info('Sending request to add stock back.')
             context.pack_and_send("stock/stock", str(id), add_stock_request)
@@ -137,7 +137,7 @@ def find_order(context, msg):
                                       'items': [i.item_id for i in state.items], 'total_cost': state.total_cost,
                                       'paid': state.paid, 'intent': state.intent})
 
-    context.state('order').pack(state)
+        context.state('order').pack(state)
 
     return response
 
@@ -205,7 +205,12 @@ def remove_item(context, msg):
 
 def order_checkout(context, msg):
     state = context.state('order').unpack(Order)
-    #logger.debug(f"Checkouting order {msg.order_checkout.id}.")
+    if not state:
+        response = ResponseMessage()
+        response.result = json.dumps({'result': 'failure',
+                                      'message': 'Order does not exist.'})
+        return response
+
 
     request = Order()
     request.id = msg.order_checkout.id

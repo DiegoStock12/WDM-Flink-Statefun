@@ -68,3 +68,10 @@ message StockResponse {
     uint64 price = 3;
     string result = 4;
 }
+
+
+message OrderAddItemStockRequest{
+        string id = 1;
+        int64 amount = 2;
+        RequestInfo request_info = 3;
+    }
