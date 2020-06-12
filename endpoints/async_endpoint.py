@@ -71,7 +71,7 @@ async def consume_forever(consumer: AIOKafkaConsumer):
                 # logger.info(f'Setting future for message {resp.request_id}')
 
                 if messages[resp.request_id].done():
-                    logger.waning(f'Future was already done while setting it {resp.request_id}')
+                    logger.warning(f'Future was already done while setting it {resp.request_id}')
                 else:
                     messages[resp.request_id].set_result(resp.result)
 
