@@ -8,6 +8,8 @@ import uuid
 from ssl import create_default_context, Purpose
 from typing import Dict, Awaitable
 
+import os
+
 # main async web server
 from aiohttp import web
 # Async kafka producer and consumer
@@ -20,7 +22,6 @@ from general_pb2 import ResponseMessage
 FORMAT = '[%(asctime)s] %(levelname)-8s %(message)s'
 logging.basicConfig(level=logging.INFO, format=FORMAT)
 
-import os
 
 logger = logging.getLogger()
 
@@ -67,7 +68,13 @@ async def consume_forever(consumer: AIOKafkaConsumer):
 
             # set the result of the future in the dict
             if resp.request_id in messages:
-                messages[resp.request_id].set_result(resp.result)
+                # logger.info(f'Setting future for message {resp.request_id}')
+
+                if messages[resp.request_id].done():
+                    logger.warning(f'Future was already done while setting it {resp.request_id}')
+                else:
+                    messages[resp.request_id].set_result(resp.result)
+
             else:
                 logger.error(f'Received response for an unknown message with request id: {resp.request_id}')
 
@@ -90,6 +97,7 @@ async def create_kafka_consumer(app: web.Application):
                 PAYMENT_EVENTS_TOPIC,
                 group_id=WORKER_ID,
                 loop=asyncio.get_event_loop(),
+
                 bootstrap_servers=os.environ['BROKER'],
                 security_protocol='SASL_SSL',
                 ssl_context=ssl_context,

@@ -7,16 +7,6 @@ module:
       - function:
           meta:
             kind: http
-            type: users/create
-          spec:
-            endpoint: http://users-endpoint:8000/statefun
-            states:
-              - count
-            maxNumBatchRequests: 500
-            timeout: 2min
-      - function:
-          meta:
-            kind: http
             type: users/user
           spec:
             endpoint: http://users-endpoint:8000/statefun
@@ -25,16 +15,7 @@ module:
             maxNumBatchRequests: 500
             timeout: 2min
 
-      - function:
-          meta:
-            kind: http
-            type: orders/create
-          spec:
-            endpoint: http://orders-endpoint:8001/statefun
-            states:
-              - count
-            maxNumBatchRequests: 500
-            timeout: 2min
+
 
       - function:
           meta:
@@ -46,16 +27,7 @@ module:
               - order
             maxNumBatchRequests: 500
             timeout: 2min
-      - function:
-          meta:
-            kind: http
-            type: stock/create
-          spec:
-            endpoint: http://stock-endpoint:8002/statefun
-            states:
-              - count
-            maxNumBatchRequests: 500
-            timeout: 2min
+
       - function:
           meta:
             kind: http
