@@ -211,6 +211,12 @@ def order_checkout(context, msg):
                                       'message': 'Order does not exist.'})
         return response
 
+    if state.paid:
+        response = ResponseMessage()
+        response.result = json.dumps({'result': 'failure',
+                                      'message': 'Order already paid.'})
+
+        return response
 
     request = Order()
     request.id = msg.order_checkout.id
